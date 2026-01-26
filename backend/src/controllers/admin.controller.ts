@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { verificationService } from '../services/VerificationService';
 import { propertyService } from '../services/PropertyService';
-import { DocumentType, DocumentStatus } from '../models/Document';
-import { PropertyStatus } from '../types/property.types';
+import { PropertyStatus } from '@shared/types/property.types';
 import { paginationSchema } from '../utils/validators';
-import { ApiResponse } from '../types/api.types';
+import { ApiResponse } from '@shared/types/api.types';
 
 export class AdminController {
     // Document Verification
@@ -253,7 +252,7 @@ export class AdminController {
     }
 
     // Statistics
-    async getDashboardStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async getDashboardStats(_req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { User } = await import('../models/User');
             const { Property } = await import('../models/Property');

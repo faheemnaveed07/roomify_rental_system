@@ -1,13 +1,14 @@
 import { Types, FilterQuery, UpdateQuery } from 'mongoose';
 import { Property, IPropertyDocument } from '../models/Property';
 import {
+    IProperty,
     IPropertyCreate,
     IPropertyUpdate,
     IPropertyFilter,
     IPropertySearchResult,
     PropertyStatus,
-} from '../types/property.types';
-import { PaginationQuery } from '../types/api.types';
+} from '@shared/types/property.types';
+import { PaginationQuery } from '@shared/types/api.types';
 import { logger } from '../utils/logger';
 
 export class PropertyService {
@@ -138,12 +139,12 @@ export class PropertyService {
         const skip = (page - 1) * limit;
         const sort: Record<string, 1 | -1> = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
-        let propertiesQuery;
+        let queryBuilder;
 
         // Geo-spatial search
         if (filters.nearLocation) {
             const { longitude, latitude, maxDistanceKm } = filters.nearLocation;
-            propertiesQuery = Property.find({
+            queryBuilder = Property.find({
                 ...query,
                 'location.coordinates': {
                     $near: {
@@ -156,18 +157,28 @@ export class PropertyService {
                 },
             });
         } else {
-            propertiesQuery = Property.find(query);
+            queryBuilder = Property.find(query);
         }
 
-        const [properties, total] = await Promise.all([
-            propertiesQuery
+        const [results, total] = await Promise.all([
+            queryBuilder
                 .populate('owner', 'firstName lastName avatar cnicVerified')
                 .sort(sort)
                 .skip(skip)
                 .limit(limit)
+                .lean()
                 .exec(),
             Property.countDocuments(query),
         ]);
+
+        const properties = (results as any[]).map(doc => ({
+            ...doc,
+            _id: doc._id.toString(),
+            owner: typeof doc.owner === 'object' && doc.owner !== null ? {
+                ...doc.owner,
+                _id: (doc.owner as any)._id?.toString()
+            } : doc.owner
+        })) as unknown as IProperty[];
 
         const totalPages = Math.ceil(total / limit);
 
@@ -187,14 +198,20 @@ export class PropertyService {
         const { page = 1, limit = 10 } = pagination;
         const skip = (page - 1) * limit;
 
-        const [properties, total] = await Promise.all([
+        const [results, total] = await Promise.all([
             Property.find({ owner: ownerId })
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)
+                .lean()
                 .exec(),
             Property.countDocuments({ owner: ownerId }),
         ]);
+
+        const properties = (results as any[]).map(doc => ({
+            ...doc,
+            _id: doc._id.toString()
+        })) as unknown as IProperty[];
 
         return {
             properties,

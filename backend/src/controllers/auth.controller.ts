@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/AuthService';
 import { userRegistrationSchema, userLoginSchema } from '../utils/validators';
-import { ApiResponse, AuthResponse } from '../types/api.types';
-import { IUserRegistration } from '../types/user.types';
-import { logger } from '../utils/logger';
+import { ApiResponse, AuthResponse } from '@shared/types/api.types';
+import { IUserRegistration } from '@shared/types/user.types';
 
 export class AuthController {
     async register(req: Request, res: Response, next: NextFunction): Promise<void> {

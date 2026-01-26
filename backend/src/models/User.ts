@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { IUser, UserRole, UserStatus } from '../types/user.types';
+import { IUser, UserRole, UserStatus } from '@shared/types/user.types';
 
 // Omit use kiya hai taake _id aur interface ka conflict khatam ho jaye
 export interface IUserDocument extends Document, Omit<IUser, '_id'> {

@@ -2,7 +2,7 @@ import { Types } from 'mongoose';
 import { DocumentModel, IDocument, DocumentType, DocumentStatus } from '../models/Document';
 import { User } from '../models/User';
 import { Property } from '../models/Property';
-import { UserStatus } from '../types/user.types';
+import { UserStatus } from '@shared/types/user.types';
 import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary';
 import { uploadToS3, deleteFromS3 } from '../config/aws-s3';
 import { sendVerificationStatusEmail } from '../utils/email';

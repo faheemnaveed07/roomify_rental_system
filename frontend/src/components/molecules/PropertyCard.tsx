@@ -24,7 +24,6 @@ interface PropertyCardProps {
 
 export const PropertyCard: React.FC<PropertyCardProps> = ({
     title,
-    address,
     city,
     area,
     price,

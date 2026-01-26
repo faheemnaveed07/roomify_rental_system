@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserRole } from '../types/user.types';
+import { UserRole } from '@shared/types/user.types';
 
 export const requireRole = (...allowedRoles: UserRole[]) => {
     return (req: Request, res: Response, next: NextFunction): void => {

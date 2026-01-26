@@ -1,4 +1,3 @@
-import { Types } from 'mongoose';
 import { RoommateProfile, IRoommateProfile } from '../models/RoommateProfile';
 import { logger } from '../utils/logger';
 

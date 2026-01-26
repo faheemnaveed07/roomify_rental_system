@@ -170,6 +170,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                         <option value="islamabad">Islamabad</option>
                         <option value="rawalpindi">Rawalpindi</option>
                         <option value="faisalabad">Faisalabad</option>
+                        <option value="Multan">Multan</option>
+                        <option value="Vehari">Vehari</option>
                     </select>
                 </div>
 

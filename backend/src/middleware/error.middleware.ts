@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { logger } from '../utils/logger';
-import { ApiResponse, ApiError } from '../types/api.types';
+import { ApiResponse, ApiError } from '@shared/types/api.types';
 
 interface CustomError extends Error {
     statusCode?: number;
@@ -44,7 +44,7 @@ export const errorHandler = (
     }
 
     // Handle MongoDB duplicate key error
-    if (err.code === '11000' || (err as Record<string, unknown>).code === 11000) {
+    if (err.code === '11000' || (err as unknown as Record<string, unknown>).code === 11000) {
         statusCode = 409;
         message = 'Duplicate entry found';
         errorDetails = {

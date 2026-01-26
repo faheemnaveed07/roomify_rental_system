@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/environment';
-import { ITokenPayload } from '../types/user.types';
+import { ITokenPayload } from '@shared/types/user.types';
 
 // Extend Express Request type
 declare global {
@@ -47,7 +47,7 @@ export const authenticate = (
 
 export const optionalAuth = (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
 ): void => {
     try {

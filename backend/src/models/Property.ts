@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose'; // 'Types' removed as it was unused
-import { IProperty, PropertyType, PropertyStatus, Amenity } from '../types/property.types';
+import { IProperty, PropertyType, PropertyStatus, Amenity } from '@shared/types/property.types';
 
 // Fix for TS2320: Omit _id from IProperty to avoid conflict with Mongoose Document _id
 export interface IPropertyDocument extends Document, Omit<IProperty, '_id'> {
@@ -108,7 +108,7 @@ const fullHouseDetailsSchema = new Schema(
 const propertySchema = new Schema<IPropertyDocument>(
     {
         owner: {
-            type: Schema.Types.ObjectId,
+            type: Schema.Types.ObjectId as any,
             ref: 'User',
             required: [true, 'Property must have an owner'],
         },

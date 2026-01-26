@@ -9,7 +9,7 @@ import {
     IAuthTokens,
     UserRole,
     UserStatus,
-} from '../types/user.types';
+} from '@shared/types/user.types';
 import { logger } from '../utils/logger';
 
 export class AuthService {

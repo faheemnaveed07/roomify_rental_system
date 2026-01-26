@@ -21,7 +21,7 @@ app.use(morgan('combined', { stream: httpLogStream as any }));
 
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: [env.FRONTEND_URL, 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   })
 );

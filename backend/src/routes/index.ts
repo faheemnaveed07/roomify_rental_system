@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authRoutes from './auth.routes';
 import propertyRoutes from './property.routes';
 import adminRoutes from './admin.routes';
+import bookingRoutes from './booking.routes';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.get('/health', (_req, res) => {
 router.use('/auth', authRoutes);
 router.use('/properties', propertyRoutes);
 router.use('/admin', adminRoutes);
+router.use('/bookings', bookingRoutes);
 
 export default router;

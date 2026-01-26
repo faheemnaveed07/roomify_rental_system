@@ -1,57 +1,29 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
-// Placeholder page components (to be implemented later)
-const HomePage: React.FC = () => (
-    <div className="container py-8">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Roomify</h1>
-        <p className="text-lg text-neutral-600">
-            Find your perfect rental property or roommate in Pakistan.
-        </p>
-    </div>
-);
-
-const SearchPage: React.FC = () => (
-    <div className="container py-8">
-        <h1 className="text-4xl font-bold mb-4">Search Properties</h1>
-        <p className="text-lg text-neutral-600">
-            Search for properties and roommates in your area.
-        </p>
-    </div>
-);
-
-const AuthPage: React.FC = () => (
-    <div className="container py-8">
-        <h1 className="text-4xl font-bold mb-4">Sign In / Sign Up</h1>
-        <p className="text-lg text-neutral-600">
-            Access your Roomify account.
-        </p>
-    </div>
-);
-
-const NotFoundPage: React.FC = () => (
-    <div className="container py-8 text-center">
-        <h1 className="text-6xl font-bold mb-4">404</h1>
-        <p className="text-lg text-neutral-600">Page not found</p>
-    </div>
-);
+import AuthPage from './pages/Auth';
+import SearchPage from './pages/Search';
+import PropertyDetailPage from './pages/PropertyDetail';
+import AdminDashboardPage from './pages/AdminDashboard';
+import ProtectedRoute from './components/organisms/ProtectedRoute';
+import { UserRole } from '@shared/types';
 
 const App: React.FC = () => {
     return (
         <Router>
-            <div className="min-h-screen bg-neutral-50">
+            <div className="min-h-screen bg-neutral-50 flex flex-col">
                 {/* Navigation placeholder */}
-                <nav className="bg-white shadow-sm border-b border-neutral-200">
+                <nav className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
                     <div className="container">
                         <div className="flex items-center justify-between h-16">
-                            <a href="/" className="text-xl font-bold text-primary-500">
+                            <a href="/" className="text-xl font-bold text-primary-500 flex items-center gap-2">
+                                <span className="bg-primary-500 text-white p-1 rounded-lg">R</span>
                                 Roomify
                             </a>
-                            <div className="flex items-center gap-4">
-                                <a href="/search" className="text-neutral-600 hover:text-primary-500">
-                                    Search
+                            <div className="flex items-center gap-6">
+                                <a href="/search" className="text-neutral-600 hover:text-primary-500 font-medium">
+                                    Browse
                                 </a>
-                                <a href="/auth" className="btn btn-primary">
+                                <a href="/auth" className="px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors">
                                     Sign In
                                 </a>
                             </div>
@@ -60,22 +32,61 @@ const App: React.FC = () => {
                 </nav>
 
                 {/* Main content */}
-                <main>
+                <main className="flex-grow">
                     <Routes>
-                        <Route path="/" element={<Navigate to="/home" replace />} />
-                        <Route path="/home" element={<HomePage />} />
-                        <Route path="/search" element={<SearchPage />} />
+                        <Route path="/" element={<Navigate to="/search" replace />} />
                         <Route path="/auth" element={<AuthPage />} />
-                        <Route path="*" element={<NotFoundPage />} />
+
+                        {/* Protected Routes */}
+                        <Route path="/search" element={
+                            <ProtectedRoute>
+                                <SearchPage />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/property/:id" element={
+                            <ProtectedRoute>
+                                <PropertyDetailPage />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="/admin" element={
+                            <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
+                                <AdminDashboardPage />
+                            </ProtectedRoute>
+                        } />
+
+                        <Route path="*" element={
+                            <div className="container py-20 text-center">
+                                <h1 className="text-6xl font-bold text-neutral-200 mb-4">404</h1>
+                                <p className="text-xl text-neutral-500">Page not found</p>
+                                <a href="/" className="mt-8 inline-block text-primary-600 font-bold underline">Go back home</a>
+                            </div>
+                        } />
                     </Routes>
                 </main>
 
-                {/* Footer placeholder */}
-                <footer className="bg-neutral-800 text-white py-8 mt-auto">
-                    <div className="container text-center">
-                        <p className="text-neutral-400">
-                            © 2024 Roomify. All rights reserved.
-                        </p>
+                {/* Footer */}
+                <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20">
+                    <div className="container grid grid-cols-1 md:grid-cols-3 gap-12">
+                        <div>
+                            <h3 className="text-white font-bold text-xl mb-4">Roomify</h3>
+                            <p className="max-w-xs">Simplifying rental search and verification for Pakistan's growing urban population.</p>
+                        </div>
+                        <div>
+                            <h4 className="text-white font-semibold mb-4">Quick Links</h4>
+                            <ul className="space-y-2">
+                                <li><a href="/search" className="hover:text-white">Find Properties</a></li>
+                                <li><a href="/auth" className="hover:text-white">Landlord Portal</a></li>
+                                <li><a href="/admin" className="hover:text-white">Admin Dashboard</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 className="text-white font-semibold mb-4">Contact</h4>
+                            <p>support@roomify.pk</p>
+                            <p>Multan, Pakistan</p>
+                        </div>
+                    </div>
+                    <div className="container border-t border-neutral-800 mt-12 pt-8 text-center text-sm">
+                        © 2026 Roomify Rental System. Built with ❤️ for Multan.
                     </div>
                 </footer>
             </div>

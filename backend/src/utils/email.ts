@@ -3,60 +3,60 @@ import { env } from '../config/environment';
 import { logger } from './logger';
 
 interface EmailOptions {
-    to: string;
-    subject: string;
-    html: string;
-    text?: string;
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
 }
 
 let transporter: Transporter;
 
 const createTransporter = (): Transporter => {
-    return nodemailer.createTransport({
-        host: env.SMTP_HOST,
-        port: env.SMTP_PORT,
-        secure: env.SMTP_PORT === 465,
-        auth: {
-            user: env.SMTP_USER,
-            pass: env.SMTP_PASS,
-        },
-    });
+  return nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: env.SMTP_PORT === 465,
+    auth: {
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS,
+    },
+  } as any); // Type assertion to bypass strict host property check in some nodemailer versions
 };
 
 const getTransporter = (): Transporter => {
-    if (!transporter) {
-        transporter = createTransporter();
-    }
-    return transporter;
+  if (!transporter) {
+    transporter = createTransporter();
+  }
+  return transporter;
 };
 
 export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
-    try {
-        const mailOptions: SendMailOptions = {
-            from: `"Roomify" <${env.EMAIL_FROM}>`,
-            to: options.to,
-            subject: options.subject,
-            html: options.html,
-            text: options.text,
-        };
+  try {
+    const mailOptions: SendMailOptions = {
+      from: `"Roomify" <${env.EMAIL_FROM}>`,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text,
+    };
 
-        await getTransporter().sendMail(mailOptions);
-        logger.info(`Email sent to ${options.to}: ${options.subject}`);
-        return true;
-    } catch (error) {
-        logger.error('Failed to send email:', error);
-        return false;
-    }
+    await getTransporter().sendMail(mailOptions);
+    logger.info(`Email sent to ${options.to}: ${options.subject}`);
+    return true;
+  } catch (error) {
+    logger.error('Failed to send email:', error);
+    return false;
+  }
 };
 
 export const sendVerificationEmail = async (
-    email: string,
-    name: string,
-    verificationToken: string
+  email: string,
+  name: string,
+  verificationToken: string
 ): Promise<boolean> => {
-    const verificationUrl = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+  const verificationUrl = `${env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -94,22 +94,22 @@ export const sendVerificationEmail = async (
     </html>
   `;
 
-    return sendEmail({
-        to: email,
-        subject: 'Verify Your Roomify Account',
-        html,
-        text: `Hi ${name}, Please verify your email by visiting: ${verificationUrl}`,
-    });
+  return sendEmail({
+    to: email,
+    subject: 'Verify Your Roomify Account',
+    html,
+    text: `Hi ${name}, Please verify your email by visiting: ${verificationUrl}`,
+  });
 };
 
 export const sendPasswordResetEmail = async (
-    email: string,
-    name: string,
-    resetToken: string
+  email: string,
+  name: string,
+  resetToken: string
 ): Promise<boolean> => {
-    const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+  const resetUrl = `${env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -146,26 +146,26 @@ export const sendPasswordResetEmail = async (
     </html>
   `;
 
-    return sendEmail({
-        to: email,
-        subject: 'Reset Your Roomify Password',
-        html,
-        text: `Hi ${name}, Reset your password by visiting: ${resetUrl}`,
-    });
+  return sendEmail({
+    to: email,
+    subject: 'Reset Your Roomify Password',
+    html,
+    text: `Hi ${name}, Reset your password by visiting: ${resetUrl}`,
+  });
 };
 
 export const sendVerificationStatusEmail = async (
-    email: string,
-    name: string,
-    documentType: string,
-    status: 'approved' | 'rejected',
-    reason?: string
+  email: string,
+  name: string,
+  documentType: string,
+  status: 'approved' | 'rejected',
+  reason?: string
 ): Promise<boolean> => {
-    const isApproved = status === 'approved';
-    const statusColor = isApproved ? '#10B981' : '#EF4444';
-    const statusText = isApproved ? 'Approved' : 'Rejected';
+  const isApproved = status === 'approved';
+  const statusColor = isApproved ? '#10B981' : '#EF4444';
+  const statusText = isApproved ? 'Approved' : 'Rejected';
 
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -202,39 +202,39 @@ export const sendVerificationStatusEmail = async (
     </html>
   `;
 
-    return sendEmail({
-        to: email,
-        subject: `Document ${statusText} - Roomify`,
-        html,
-        text: `Hi ${name}, Your ${documentType} has been ${status}. ${reason || ''}`,
-    });
+  return sendEmail({
+    to: email,
+    subject: `Document ${statusText} - Roomify`,
+    html,
+    text: `Hi ${name}, Your ${documentType} has been ${status}. ${reason || ''}`,
+  });
 };
 
 export const sendBookingNotificationEmail = async (
-    email: string,
-    name: string,
-    propertyTitle: string,
-    status: 'requested' | 'approved' | 'rejected',
-    message?: string
+  email: string,
+  name: string,
+  propertyTitle: string,
+  status: 'requested' | 'approved' | 'rejected',
+  message?: string
 ): Promise<boolean> => {
-    const statusMessages: Record<string, { subject: string; text: string }> = {
-        requested: {
-            subject: 'New Booking Request',
-            text: `You have received a new booking request for "${propertyTitle}".`,
-        },
-        approved: {
-            subject: 'Booking Approved!',
-            text: `Great news! Your booking request for "${propertyTitle}" has been approved.`,
-        },
-        rejected: {
-            subject: 'Booking Update',
-            text: `Your booking request for "${propertyTitle}" was not approved.`,
-        },
-    };
+  const statusMessages: Record<string, { subject: string; text: string }> = {
+    requested: {
+      subject: 'New Booking Request',
+      text: `You have received a new booking request for "${propertyTitle}".`,
+    },
+    approved: {
+      subject: 'Booking Approved!',
+      text: `Great news! Your booking request for "${propertyTitle}" has been approved.`,
+    },
+    rejected: {
+      subject: 'Booking Update',
+      text: `Your booking request for "${propertyTitle}" was not approved.`,
+    },
+  };
 
-    const { subject, text } = statusMessages[status];
+  const { subject, text } = statusMessages[status];
 
-    const html = `
+  const html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -270,18 +270,18 @@ export const sendBookingNotificationEmail = async (
     </html>
   `;
 
-    return sendEmail({
-        to: email,
-        subject: `${subject} - Roomify`,
-        html,
-        text: `Hi ${name}, ${text} ${message || ''}`,
-    });
+  return sendEmail({
+    to: email,
+    subject: `${subject} - Roomify`,
+    html,
+    text: `Hi ${name}, ${text} ${message || ''}`,
+  });
 };
 
 export default {
-    sendEmail,
-    sendVerificationEmail,
-    sendPasswordResetEmail,
-    sendVerificationStatusEmail,
-    sendBookingNotificationEmail,
+  sendEmail,
+  sendVerificationEmail,
+  sendPasswordResetEmail,
+  sendVerificationStatusEmail,
+  sendBookingNotificationEmail,
 };

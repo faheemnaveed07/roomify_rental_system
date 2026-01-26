@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { propertyService } from '../services/PropertyService';
 import { propertyCreateSchema, paginationSchema } from '../utils/validators';
-import { IPropertyFilter, IPropertyCreate } from '../types/property.types'; // ✅ Import IPropertyCreate
-import { ApiResponse } from '../types/api.types';
+import { IPropertyFilter, IPropertyCreate } from '@shared/types/property.types';
+import { ApiResponse } from '@shared/types/api.types';
 
 export class PropertyController {
     async create(req: Request, res: Response, next: NextFunction): Promise<void> {

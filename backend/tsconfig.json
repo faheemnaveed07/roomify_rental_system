@@ -6,7 +6,6 @@
             "ES2022"
         ],
         "outDir": "./dist",
-        "rootDir": "./src",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
@@ -54,6 +53,9 @@
             ],
             "@types/*": [
                 "src/types/*"
+            ],
+            "@shared/*": [
+                "../shared/*"
             ]
         },
         "typeRoots": [
@@ -62,7 +64,9 @@
         ]
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "scripts/**/*",
+        "../shared/**/*"
     ],
     "exclude": [
         "node_modules",

@@ -1,8 +1,8 @@
 import { Types } from 'mongoose';
 import { Booking, IBooking, BookingStatus, BookingType } from '../models/Booking';
 import { Property } from '../models/Property';
-import { PropertyStatus, PropertyType } from '../types/property.types';
-import { PaginationQuery } from '../types/api.types';
+import { PropertyStatus, PropertyType } from '@shared/types/property.types';
+import { PaginationQuery } from '@shared/types/api.types';
 import { logger } from '../utils/logger';
 
 interface BookingRequest {
