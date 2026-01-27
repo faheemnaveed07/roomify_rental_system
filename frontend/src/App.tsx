@@ -4,7 +4,12 @@ import AuthPage from './pages/Auth';
 import SearchPage from './pages/Search';
 import PropertyDetailPage from './pages/PropertyDetail';
 import AdminDashboardPage from './pages/AdminDashboard';
+import LandlordDashboard from './pages/LandlordDashboard';
+import AddPropertyPage from './pages/AddProperty';
+import MyBookingsPage from './pages/MyBookings';
+import DashboardLayout from './components/organisms/DashboardLayout';
 import ProtectedRoute from './components/organisms/ProtectedRoute';
+import RoleProtectedRoute from './components/atoms/RoleProtectedRoute';
 import { UserRole } from '@shared/types';
 
 const App: React.FC = () => {
@@ -48,11 +53,26 @@ const App: React.FC = () => {
                                 <PropertyDetailPage />
                             </ProtectedRoute>
                         } />
+                        <Route path="/my-bookings" element={
+                            <ProtectedRoute>
+                                <MyBookingsPage />
+                            </ProtectedRoute>
+                        } />
                         <Route path="/admin" element={
                             <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
                                 <AdminDashboardPage />
                             </ProtectedRoute>
                         } />
+
+                        {/* Landlord Dashboard Routes */}
+                        <Route element={<RoleProtectedRoute allowedRoles={[UserRole.LANDLORD]} />}>
+                            <Route path="/dashboard" element={<DashboardLayout />}>
+                                <Route index element={<LandlordDashboard />} />
+                                <Route path="requests" element={<LandlordDashboard />} />
+                                <Route path="properties" element={<LandlordDashboard />} />
+                                <Route path="properties/new" element={<AddPropertyPage />} />
+                            </Route>
+                        </Route>
 
                         <Route path="*" element={
                             <div className="container py-20 text-center">

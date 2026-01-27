@@ -123,11 +123,19 @@ export class BookingService {
         const booking = await Booking.findOne({
             _id: bookingId,
             landlord: landlordId,
-            status: BookingStatus.PENDING,
         });
 
         if (!booking) {
-            throw new Error('Booking not found or already processed');
+            throw new Error('Booking not found');
+        }
+
+        // If already approved, return gracefully (idempotency)
+        if (booking.status === BookingStatus.APPROVED) {
+            return booking;
+        }
+
+        if (booking.status !== BookingStatus.PENDING) {
+            throw new Error(`Booking cannot be approved as it is currently ${booking.status}`);
         }
 
         booking.status = BookingStatus.APPROVED;
@@ -181,11 +189,19 @@ export class BookingService {
         const booking = await Booking.findOne({
             _id: bookingId,
             landlord: landlordId,
-            status: BookingStatus.PENDING,
         });
 
         if (!booking) {
-            throw new Error('Booking not found or already processed');
+            throw new Error('Booking not found');
+        }
+
+        // If already rejected, return gracefully
+        if (booking.status === BookingStatus.REJECTED) {
+            return booking;
+        }
+
+        if (booking.status !== BookingStatus.PENDING) {
+            throw new Error(`Booking cannot be rejected as it is currently ${booking.status}`);
         }
 
         booking.status = BookingStatus.REJECTED;

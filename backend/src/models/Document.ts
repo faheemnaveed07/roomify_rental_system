@@ -29,7 +29,7 @@ export interface IDocument extends Document {
     size: number;
     url: string;
     publicId: string;
-    storageProvider: 'cloudinary' | 's3';
+    storageProvider: 'local';
     metadata: {
         extractedData?: Record<string, unknown>;
         verificationNotes?: string;
@@ -89,7 +89,7 @@ const documentSchema = new Schema<IDocument>(
         },
         storageProvider: {
             type: String,
-            enum: ['cloudinary', 's3'],
+            enum: ['local'],
             required: true,
         },
         metadata: {

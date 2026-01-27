@@ -105,6 +105,14 @@ export interface StatisticsResponse {
     completedBookings: number;
 }
 
+export interface LandlordStatistics {
+    totalProperties: number;
+    pendingRequests: number;
+    confirmedBookings: number;
+    totalRevenue: number;
+    currency: string;
+}
+
 export interface NotificationPayload {
     type: 'booking_request' | 'booking_approved' | 'booking_rejected' | 'message' | 'verification_update';
     title: string;

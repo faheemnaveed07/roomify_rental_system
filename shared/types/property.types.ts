@@ -130,6 +130,7 @@ export interface IPropertyCreate {
     location: Omit<ILocation, 'type'>;
     rent: Omit<IRent, 'currency'> & { currency?: string };
     size: ISize;
+    images: IPropertyImage[];
     amenities?: Amenity[];
     sharedRoomDetails?: ISharedRoomDetails;
     fullHouseDetails?: IFullHouseDetails;

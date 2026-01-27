@@ -35,7 +35,7 @@ export const rentSchema = z.number()
 
 // Property size validation
 export const propertySizeSchema = z.object({
-    value: z.number().positive('Size must be positive'),
+    value: z.coerce.number().positive('Size must be positive'),
     unit: z.enum(['sqft', 'sqm', 'marla', 'kanal']),
 });
 
@@ -107,22 +107,27 @@ export const propertyCreateSchema = z.object({
         postalCode: z.string().optional(),
     }),
     rent: z.object({
-        amount: rentSchema,
+        amount: z.coerce.number().min(0, 'Rent cannot be negative'),
         paymentFrequency: z.enum(['monthly', 'quarterly', 'yearly']).optional(),
-        securityDeposit: z.number().min(0).optional(),
+        securityDeposit: z.coerce.number().min(0).optional(),
     }),
     size: propertySizeSchema,
+    images: z.array(z.object({
+        url: z.string().url().or(z.string().startsWith('/uploads/')),
+        publicId: z.string(),
+        isPrimary: z.boolean().default(false),
+    })).min(1, 'At least one image is required'),
     amenities: z.array(z.string()).optional(),
     sharedRoomDetails: z.object({
-        totalBeds: z.number().int().positive(),
-        availableBeds: z.number().int().min(0),
+        totalBeds: z.coerce.number().int().positive(),
+        availableBeds: z.coerce.number().int().min(0),
         genderPreference: z.enum(['male', 'female', 'any']).optional(),
     }).optional(),
     fullHouseDetails: z.object({
-        bedrooms: z.number().int().positive(),
-        bathrooms: z.number().int().positive(),
-        floors: z.number().int().positive().optional(),
-        parkingSpaces: z.number().int().min(0).optional(),
+        bedrooms: z.coerce.number().int().positive(),
+        bathrooms: z.coerce.number().int().positive(),
+        floors: z.coerce.number().int().positive().optional(),
+        parkingSpaces: z.coerce.number().int().min(0).optional(),
         furnishingStatus: z.enum(['furnished', 'semi-furnished', 'unfurnished']).optional(),
     }).optional(),
 });

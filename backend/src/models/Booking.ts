@@ -1,48 +1,13 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
 
-export enum BookingStatus {
-    PENDING = 'pending',
-    APPROVED = 'approved',
-    REJECTED = 'rejected',
-    CANCELLED = 'cancelled',
-    COMPLETED = 'completed',
-    EXPIRED = 'expired',
-}
+import { BookingStatus, BookingType, IBooking as ISharedBooking } from '@shared/types';
 
-export enum BookingType {
-    FULL_PROPERTY = 'full_property',
-    SHARED_ROOM_BED = 'shared_room_bed',
-}
+export { BookingStatus, BookingType };
 
-export interface IBooking extends Document {
+export interface IBooking extends Document, Omit<ISharedBooking, '_id' | 'property' | 'tenant' | 'landlord' | 'cancellation' | 'notes'> {
     property: Types.ObjectId;
     tenant: Types.ObjectId;
     landlord: Types.ObjectId;
-    bookingType: BookingType;
-    status: BookingStatus;
-    requestMessage: string;
-    responseMessage?: string;
-    proposedMoveInDate: Date;
-    proposedDuration: {
-        value: number;
-        unit: 'months' | 'years';
-    };
-    rentDetails: {
-        monthlyRent: number;
-        securityDeposit: number;
-        totalAmount: number;
-        currency: string;
-    };
-    bedNumber?: number;
-    timeline: {
-        requestedAt: Date;
-        respondedAt?: Date;
-        approvedAt?: Date;
-        rejectedAt?: Date;
-        cancelledAt?: Date;
-        completedAt?: Date;
-        expiredAt?: Date;
-    };
     cancellation?: {
         cancelledBy: Types.ObjectId;
         reason: string;
@@ -53,9 +18,6 @@ export interface IBooking extends Document {
         content: string;
         createdAt: Date;
     }[];
-    expiresAt: Date;
-    createdAt: Date;
-    updatedAt: Date;
 }
 
 const bookingSchema = new Schema<IBooking>(

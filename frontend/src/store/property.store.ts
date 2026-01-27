@@ -23,13 +23,22 @@ export const usePropertyStore = create<PropertyState>((set, get) => ({
     loading: false,
     error: null,
     filters: {
-        city: 'Multan',
+        city: '',
     },
     fetchProperties: async (newFilters, pagination) => {
         const currentFilters = { ...get().filters, ...newFilters };
+
+        // Transform 'all' values to undefined
+        const sanitizedFilters = Object.entries(currentFilters).reduce((acc, [key, value]) => {
+            return {
+                ...acc,
+                [key]: value === 'all' ? undefined : value
+            };
+        }, {} as IPropertyFilter);
+
         set({ loading: true, error: null });
         try {
-            const result = await propertyService.getProperties(currentFilters, pagination);
+            const result = await propertyService.getProperties(sanitizedFilters, pagination);
             set({
                 properties: result.properties,
                 total: result.total,
@@ -49,7 +58,7 @@ export const usePropertyStore = create<PropertyState>((set, get) => ({
     },
     clearFilters: () => {
         set({
-            filters: { city: 'Multan' },
+            filters: { city: '' },
         });
     },
 }));

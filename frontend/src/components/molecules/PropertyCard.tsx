@@ -1,6 +1,6 @@
-import React from 'react';
 import { Badge, VerificationBadge } from '../atoms/Badge';
 import { colors, spacing, borderRadius } from '../../styles/theme';
+import { ASSETS_URL } from '../../services/api';
 
 interface PropertyCardProps {
     id: string;
@@ -168,7 +168,11 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         >
             <div style={imageContainerStyles}>
                 {imageUrl ? (
-                    <img src={imageUrl} alt={title} style={imageStyles} />
+                    <img
+                        src={imageUrl.startsWith('/uploads/') ? `${ASSETS_URL}${imageUrl}` : imageUrl}
+                        alt={title}
+                        style={imageStyles}
+                    />
                 ) : (
                     <div
                         style={{

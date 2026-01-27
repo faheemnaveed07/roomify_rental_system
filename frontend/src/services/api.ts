@@ -7,10 +7,13 @@ import {
     IProperty,
     IPropertySearchResult,
     IPropertyFilter,
-    PaginationQuery
+    PaginationQuery,
+    LandlordStatistics,
+    IPropertyCreate
 } from '@shared/types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+export const ASSETS_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -83,7 +86,7 @@ export const propertyService = {
         const response = await api.get<ApiResponse<IProperty>>(`/properties/${id}`);
         return response.data.data!;
     },
-    create: async (propertyData: any): Promise<IProperty> => {
+    create: async (propertyData: IPropertyCreate | (IPropertyCreate & { owner: string })): Promise<IProperty> => {
         const response = await api.post<ApiResponse<IProperty>>('/properties', propertyData);
         return response.data.data!;
     },
@@ -94,6 +97,31 @@ export const bookingService = {
         const response = await api.post<ApiResponse<any>>('/bookings/request', bookingData);
         return response.data.data!;
     },
+    updateStatus: async (bookingId: string, status: 'approved' | 'rejected', message?: string): Promise<any> => {
+        const endpoint = status === 'approved' ? 'approve' : 'reject';
+        const response = await api.post<ApiResponse<any>>(`/bookings/${bookingId}/${endpoint}`, { responseMessage: message });
+        return response.data.data!;
+    },
+    getMyBookings: async (pagination: PaginationQuery = {}): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>('/bookings/my-bookings', { params: pagination });
+        return response.data.data!;
+    }
+};
+
+export const landlordService = {
+    getStats: async (): Promise<LandlordStatistics> => {
+        const response = await api.get<ApiResponse<LandlordStatistics>>('/landlord/stats');
+        return response.data.data!;
+    },
+    getMyProperties: async (): Promise<IProperty[]> => {
+        const response = await api.get<ApiResponse<IProperty[]>>('/landlord/properties');
+        return response.data.data!;
+    },
+    getBookings: async (pagination: PaginationQuery = {}): Promise<any> => {
+        // This will call the landlord-specific bookings view
+        const response = await api.get<ApiResponse<any>>('/bookings/landlord', { params: pagination });
+        return response.data.data!;
+    }
 };
 
 export default api;

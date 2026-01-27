@@ -1,10 +1,9 @@
 import { Types } from 'mongoose';
+import fs from 'fs';
 import { DocumentModel, IDocument, DocumentType, DocumentStatus } from '../models/Document';
 import { User } from '../models/User';
 import { Property } from '../models/Property';
 import { UserStatus } from '@shared/types/user.types';
-import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary';
-import { uploadToS3, deleteFromS3 } from '../config/aws-s3';
 import { sendVerificationStatusEmail } from '../utils/email';
 import { logger } from '../utils/logger';
 
@@ -21,20 +20,11 @@ interface VerificationResult {
     message: string;
 }
 
-// ✅ FIXED: Explicit discriminated union types
-interface CloudinaryResult {
-    secureUrl: string;
-    publicId: string;
-    provider: 'cloudinary';
-}
-
-interface S3Result {
+type UploadResult = {
     location: string;
     key: string;
-    provider: 's3';
-}
-
-type UploadResult = CloudinaryResult | S3Result;
+    provider: 'local';
+};
 
 export class VerificationService {
     async uploadDocument(
@@ -43,37 +33,18 @@ export class VerificationService {
         documentType: DocumentType,
         propertyId?: string
     ): Promise<IDocument> {
-        const isImage = file.mimetype.startsWith('image/');
+        // Since we are using local storage, the file is already in the uploads/ folder
+        // We just need to store the relative path
+        const relativePath = file.path.includes('uploads')
+            ? file.path.substring(file.path.indexOf('uploads') - 1).replace(/\\/g, '/')
+            : `/uploads/${file.path}`;
 
-        // ✅ FIXED: Properly typed result with discriminator
-        let uploadResult: UploadResult;
+        const uploadResult: UploadResult = {
+            location: relativePath,
+            key: file.originalname,
+            provider: 'local'
+        };
 
-        if (isImage) {
-            const cloudinaryResult = await uploadToCloudinary(file.path, {
-                folder: `roomify/documents/${userId}`,
-                resource_type: 'image',
-            });
-            uploadResult = {
-                secureUrl: cloudinaryResult.secureUrl,
-                publicId: cloudinaryResult.publicId,
-                provider: 'cloudinary'
-            };
-        } else {
-            const key = `documents/${userId}/${Date.now()}-${file.originalname}`;
-            const buffer = await require('fs').promises.readFile(file.path);
-            const s3Result = await uploadToS3({
-                key,
-                body: buffer,
-                contentType: file.mimetype,
-            });
-            uploadResult = {
-                location: s3Result.location,
-                key: s3Result.key,
-                provider: 's3'
-            };
-        }
-
-        // ✅ FIXED: Type-safe property access using discriminant
         const document = await DocumentModel.create({
             user: new Types.ObjectId(userId),
             property: propertyId ? new Types.ObjectId(propertyId) : undefined,
@@ -83,12 +54,8 @@ export class VerificationService {
             originalName: file.originalname,
             mimeType: file.mimetype,
             size: file.size,
-            url: uploadResult.provider === 'cloudinary'
-                ? uploadResult.secureUrl
-                : uploadResult.location,
-            publicId: uploadResult.provider === 'cloudinary'
-                ? uploadResult.publicId
-                : uploadResult.key,
+            url: uploadResult.location,
+            publicId: uploadResult.key,
             storageProvider: uploadResult.provider,
         });
 
@@ -96,7 +63,6 @@ export class VerificationService {
         return document;
     }
 
-    // ... keep all other methods unchanged ...
     async getUserDocuments(
         userId: string,
         documentType?: DocumentType
@@ -206,10 +172,14 @@ export class VerificationService {
             throw new Error('Document not found');
         }
 
-        if (document.storageProvider === 'cloudinary') {
-            await deleteFromCloudinary(document.publicId);
-        } else {
-            await deleteFromS3(document.publicId);
+        // Delete from local storage
+        if (document.storageProvider === 'local') {
+            const fs = require('fs');
+            const path = require('path');
+            const absolutePath = path.join(process.cwd(), document.url);
+            if (fs.existsSync(absolutePath)) {
+                fs.unlinkSync(absolutePath);
+            }
         }
 
         await document.deleteOne();

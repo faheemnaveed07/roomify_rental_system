@@ -22,10 +22,31 @@ router.post('/request', bookingController.requestBooking);
 router.get('/my-bookings', bookingController.getMyBookings);
 
 /**
+ * @route   GET /api/bookings/landlord
+ * @desc    Get bookings for current landlord
+ * @access  Private
+ */
+router.get('/landlord', bookingController.getLandlordBookings);
+
+/**
  * @route   GET /api/bookings/:id
  * @desc    Get booking details
  * @access  Private
  */
 router.get('/:id', bookingController.getBookingDetails);
+
+/**
+ * @route   POST /api/bookings/:id/approve
+ * @desc    Approve a booking request
+ * @access  Private
+ */
+router.post('/:id/approve', bookingController.approveBooking);
+
+/**
+ * @route   POST /api/bookings/:id/reject
+ * @desc    Reject a booking request
+ * @access  Private
+ */
+router.post('/:id/reject', bookingController.rejectBooking);
 
 export default router;

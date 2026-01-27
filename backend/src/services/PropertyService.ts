@@ -89,7 +89,7 @@ export class PropertyService {
         };
 
         // Apply filters
-        if (filters.city) {
+        if (filters.city && filters.city.toLowerCase() !== 'all') {
             query['location.city'] = { $regex: filters.city, $options: 'i' };
         }
 
@@ -97,7 +97,7 @@ export class PropertyService {
             query['location.area'] = { $regex: filters.area, $options: 'i' };
         }
 
-        if (filters.propertyType) {
+        if (filters.propertyType && filters.propertyType.toLowerCase() !== 'all') {
             query.propertyType = filters.propertyType;
         }
 
