@@ -24,11 +24,13 @@ const SearchPage: React.FC = () => {
     useEffect(() => {
         const initialSearch = initialSearchRef.current;
         if (initialSearch) {
-            const areaQuery = initialSearch.query?.trim();
+            const q = initialSearch.query?.trim();
+            const { minPrice, maxPrice, ...restFilters } = initialSearch.filters || {};
             fetchProperties({
-                ...initialSearch.filters,
-                ...(areaQuery ? { area: areaQuery } : {}),
-                city: initialSearch.filters?.city || 'Multan',
+                ...restFilters,
+                ...(q ? { q } : {}),
+                ...(minPrice !== undefined ? { minRent: minPrice } : {}),
+                ...(maxPrice !== undefined ? { maxRent: maxPrice } : {}),
             });
         } else {
             fetchProperties();
@@ -36,11 +38,13 @@ const SearchPage: React.FC = () => {
     }, [fetchProperties]);
 
     const handleSearch = (query: string, searchFilters: any) => {
-        const areaQuery = query?.trim();
+        const q = query?.trim();
+        const { minPrice, maxPrice, ...restFilters } = searchFilters || {};
         fetchProperties({
-            ...searchFilters,
-            ...(areaQuery ? { area: areaQuery } : {}),
-            city: searchFilters.city || 'Multan',
+            ...restFilters,
+            ...(q ? { q } : {}),
+            ...(minPrice !== undefined ? { minRent: minPrice } : {}),
+            ...(maxPrice !== undefined ? { maxRent: maxPrice } : {}),
         });
     };
 

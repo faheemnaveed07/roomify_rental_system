@@ -124,6 +124,7 @@ export class PropertyController {
             const pagination = paginationSchema.parse(req.query);
 
             const filters: IPropertyFilter = {
+                q: req.query.q as string,
                 city: req.query.city as string,
                 area: req.query.area as string,
                 propertyType: req.query.propertyType as IPropertyFilter['propertyType'],

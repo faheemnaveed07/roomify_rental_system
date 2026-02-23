@@ -150,6 +150,7 @@ export interface IPropertyUpdate {
 }
 
 export interface IPropertyFilter {
+    q?: string;
     city?: string;
     area?: string;
     propertyType?: PropertyType;

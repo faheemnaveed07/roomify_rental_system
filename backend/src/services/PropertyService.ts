@@ -88,6 +88,16 @@ export class PropertyService {
             status: PropertyStatus.ACTIVE,
         };
 
+        if (filters.q) {
+            const regex = { $regex: filters.q, $options: 'i' };
+            query.$or = [
+                { title: regex },
+                { 'location.city': regex },
+                { 'location.area': regex },
+                { 'location.address': regex },
+            ];
+        }
+
         // Apply filters
         if (filters.city && filters.city.toLowerCase() !== 'all') {
             query['location.city'] = { $regex: filters.city, $options: 'i' };
