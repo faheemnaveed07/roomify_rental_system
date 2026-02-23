@@ -38,6 +38,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error: AxiosError<ApiResponse>) => {
+        console.error('API Error:', {
+            message: error.message,
+            status: error.response?.status,
+            url: error.config?.url,
+            method: error.config?.method,
+            data: error.response?.data,
+        });
         const status = error.response?.status;
 
         if (status === 401) {

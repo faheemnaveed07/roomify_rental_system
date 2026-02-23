@@ -10,6 +10,7 @@ const TopBar: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
             <div className="flex items-center gap-4">
                 <button
                     onClick={onMenuClick}
+                    aria-label="Open dashboard menu"
                     className="p-2 text-neutral-500 hover:bg-neutral-100 rounded-lg lg:hidden"
                 >
                     <Search size={20} /> {/* Toggle menu icon placeholder */}
@@ -27,7 +28,10 @@ const TopBar: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
             </div>
 
             <div className="flex items-center gap-4">
-                <button className="p-2.5 text-neutral-500 hover:bg-neutral-100 rounded-xl relative transition-all">
+                <button
+                    aria-label="Notifications"
+                    className="p-2.5 text-neutral-500 hover:bg-neutral-100 rounded-xl relative transition-all"
+                >
                     <Bell size={20} />
                     <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#2563EB] rounded-full border-2 border-white"></span>
                 </button>

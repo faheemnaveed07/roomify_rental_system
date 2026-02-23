@@ -15,6 +15,15 @@ import errorMiddleware from './middleware/error.middleware';
 
 const app = express();
 
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  })
+);
+app.options('*', cors());
+
 app.use(helmet({
   crossOriginResourcePolicy: false, // Allow cross-origin images
 }));
@@ -22,12 +31,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined', { stream: httpLogStream as any }));
 
-app.use(
-  cors({
-    origin: [env.FRONTEND_URL, 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:5173'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  })
-);
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
@@ -38,12 +41,15 @@ app.use('/api', routes);
 // Is line ko change karein
 app.use(errorMiddleware.errorHandler); // .errorHandler add karein
 
+// Use explicit PORT from environment with fallback for local dev
+const PORT = process.env.PORT ? Number(process.env.PORT) : 5001;
+
 const start = async () => {
   try {
     await connectDatabase();
 
-    const server = app.listen(env.PORT, () => {
-      logger.info(`Server running on port ${env.PORT}`);
+    const server = app.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT}`);
     });
 
     const shutdown = async () => {

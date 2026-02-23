@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Input } from '../atoms/Input';
 import { Button } from '../atoms/Button';
-import { colors, spacing, borderRadius } from '../../styles/theme';
 
 interface SearchBarProps {
     placeholder?: string;
@@ -37,60 +36,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         }
     };
 
-    const containerStyles: React.CSSProperties = {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: spacing[3],
-        width: '100%',
-    };
-
-    const searchRowStyles: React.CSSProperties = {
-        display: 'flex',
-        gap: spacing[2],
-        width: '100%',
-    };
-
-    const inputWrapperStyles: React.CSSProperties = {
-        flex: 1,
-        position: 'relative',
-    };
-
-    const filtersContainerStyles: React.CSSProperties = {
-        display: isFiltersOpen ? 'flex' : 'none',
-        flexWrap: 'wrap',
-        gap: spacing[4],
-        padding: spacing[4],
-        backgroundColor: colors.neutral[50],
-        borderRadius: borderRadius.lg,
-        border: `1px solid ${colors.neutral[200]}`,
-    };
-
-    const filterGroupStyles: React.CSSProperties = {
-        display: 'flex',
-        flexDirection: 'column',
-        gap: spacing[1],
-        minWidth: '150px',
-    };
-
-    const filterLabelStyles: React.CSSProperties = {
-        fontSize: '0.75rem',
-        fontWeight: 500,
-        color: colors.neutral[600],
-        textTransform: 'uppercase',
-        letterSpacing: '0.05em',
-    };
-
-    const selectStyles: React.CSSProperties = {
-        padding: '0.5rem 0.75rem',
-        fontSize: '0.875rem',
-        border: `1px solid ${colors.neutral[300]}`,
-        borderRadius: borderRadius.md,
-        backgroundColor: colors.white,
-        color: colors.neutral[900],
-        outline: 'none',
-        cursor: 'pointer',
-    };
-
     const SearchIcon = () => (
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path
@@ -116,9 +61,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     );
 
     return (
-        <div style={containerStyles}>
-            <div style={searchRowStyles}>
-                <div style={inputWrapperStyles}>
+        <div className="flex flex-col gap-3 w-full">
+            <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <div className="flex-1">
                     <Input
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
@@ -141,11 +86,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 </Button>
             </div>
 
-            <div style={filtersContainerStyles}>
-                <div style={filterGroupStyles}>
-                    <label style={filterLabelStyles}>Property Type</label>
+            <div
+                className={`${isFiltersOpen ? 'flex' : 'hidden'} flex-wrap gap-4 p-4 bg-neutral-50 rounded-2xl border border-neutral-200`}
+            >
+                <div className="flex flex-col gap-1 min-w-[150px]">
+                    <label htmlFor="filter-property-type" className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">
+                        Property Type
+                    </label>
                     <select
-                        style={selectStyles}
+                        id="filter-property-type"
+                        className="px-3 py-2 text-sm border border-neutral-300 rounded-lg bg-white text-neutral-900 outline-none"
                         value={filters.propertyType || ''}
                         onChange={(e) =>
                             setFilters({ ...filters, propertyType: e.target.value as SearchFilters['propertyType'] })
@@ -157,10 +107,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     </select>
                 </div>
 
-                <div style={filterGroupStyles}>
-                    <label style={filterLabelStyles}>City</label>
+                <div className="flex flex-col gap-1 min-w-[150px]">
+                    <label htmlFor="filter-city" className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">
+                        City
+                    </label>
                     <select
-                        style={selectStyles}
+                        id="filter-city"
+                        className="px-3 py-2 text-sm border border-neutral-300 rounded-lg bg-white text-neutral-900 outline-none"
                         value={filters.city || ''}
                         onChange={(e) => setFilters({ ...filters, city: e.target.value })}
                     >
@@ -175,9 +128,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     </select>
                 </div>
 
-                <div style={filterGroupStyles}>
-                    <label style={filterLabelStyles}>Min Price (PKR)</label>
+                <div className="flex flex-col gap-1 min-w-[150px]">
+                    <label htmlFor="filter-min-price" className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">
+                        Min Price (PKR)
+                    </label>
                     <Input
+                        id="filter-min-price"
                         type="number"
                         placeholder="0"
                         value={filters.minPrice || ''}
@@ -185,9 +141,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     />
                 </div>
 
-                <div style={filterGroupStyles}>
-                    <label style={filterLabelStyles}>Max Price (PKR)</label>
+                <div className="flex flex-col gap-1 min-w-[150px]">
+                    <label htmlFor="filter-max-price" className="text-xs font-semibold text-neutral-600 uppercase tracking-wider">
+                        Max Price (PKR)
+                    </label>
                     <Input
+                        id="filter-max-price"
                         type="number"
                         placeholder="Any"
                         value={filters.maxPrice || ''}
@@ -195,7 +154,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     />
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                <div className="flex items-end">
                     <Button
                         variant="ghost"
                         onClick={() => {

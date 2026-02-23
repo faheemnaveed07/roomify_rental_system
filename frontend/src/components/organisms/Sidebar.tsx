@@ -34,7 +34,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                 {/* Sidebar Header */}
                 <div className="flex items-center justify-between h-20 px-6 bg-[#0F172A]">
                     <span className="text-2xl font-bold tracking-tight text-[#2563EB]">Roomify</span>
-                    <button onClick={onToggle} className="lg:hidden text-neutral-400 hover:text-white">
+                    <button type="button" aria-label="Close sidebar" onClick={onToggle} className="lg:hidden text-neutral-400 hover:text-white">
                         <X size={24} />
                     </button>
                 </div>

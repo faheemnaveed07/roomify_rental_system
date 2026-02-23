@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { usePropertyStore } from '../store/property.store';
 import PropertyCard from '../components/molecules/PropertyCard';
 import SearchBar from '../components/molecules/SearchBar';
@@ -15,13 +16,32 @@ const SearchPage: React.FC = () => {
         page
     } = usePropertyStore();
 
+    const location = useLocation();
+    const initialSearchRef = useRef<{ query?: string; filters?: any } | null>(
+        (location.state as { query?: string; filters?: any }) || null
+    );
+
     useEffect(() => {
-        // Initial fetch
-        fetchProperties();
+        const initialSearch = initialSearchRef.current;
+        if (initialSearch) {
+            const areaQuery = initialSearch.query?.trim();
+            fetchProperties({
+                ...initialSearch.filters,
+                ...(areaQuery ? { area: areaQuery } : {}),
+                city: initialSearch.filters?.city || 'Multan',
+            });
+        } else {
+            fetchProperties();
+        }
     }, [fetchProperties]);
 
-    const handleSearch = (_query: string, searchFilters: any) => {
-        fetchProperties({ ...searchFilters, city: searchFilters.city || 'Multan' });
+    const handleSearch = (query: string, searchFilters: any) => {
+        const areaQuery = query?.trim();
+        fetchProperties({
+            ...searchFilters,
+            ...(areaQuery ? { area: areaQuery } : {}),
+            city: searchFilters.city || 'Multan',
+        });
     };
 
     const handleLoadMore = () => {
@@ -38,6 +58,7 @@ const SearchPage: React.FC = () => {
                     onSearch={handleSearch}
                     showFilters
                     placeholder="Search by area or property name..."
+                    initialValue={initialSearchRef.current?.query || ''}
                 />
             </header>
 

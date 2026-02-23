@@ -44,7 +44,7 @@ const MyBookingsPage: React.FC = () => {
             {bookings.length === 0 ? (
                 <div className="text-center py-20 bg-neutral-50 rounded-3xl border-2 border-dashed border-neutral-200">
                     <p className="text-xl text-neutral-500">You haven't made any booking requests yet.</p>
-                    <Button variant="primary" onClick={() => window.location.href = '/search'} className="mt-6">
+                    <Button variant="primary" onClick={() => window.location.href = '/browse'} className="mt-6">
                         Browse Properties
                     </Button>
                 </div>

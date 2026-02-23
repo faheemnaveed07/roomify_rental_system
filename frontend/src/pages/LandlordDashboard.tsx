@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useBookingStore } from '../store/booking.store';
 import StatCard from '../components/molecules/StatCard';
 import BookingRequestCard from '../components/organisms/BookingRequestCard';
@@ -22,11 +23,21 @@ const LandlordDashboard: React.FC = () => {
         rejectBooking
     } = useBookingStore();
 
+    const location = useLocation();
+
     const [activeTab, setActiveTab] = useState<'requests' | 'properties'>('requests');
 
     useEffect(() => {
         fetchDashboardData();
     }, [fetchDashboardData]);
+
+    useEffect(() => {
+        if (location.pathname.includes('/dashboard/properties')) {
+            setActiveTab('properties');
+        } else {
+            setActiveTab('requests');
+        }
+    }, [location.pathname]);
 
     if (error) {
         return (

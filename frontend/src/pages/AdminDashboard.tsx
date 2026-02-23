@@ -4,7 +4,7 @@ import { Badge } from '../components/atoms/Badge';
 import Button from '../components/atoms/Button';
 
 const AdminDashboardPage: React.FC = () => {
-    const [pendingDocs, setPendingDocs] = useState<any[]>([]);
+    const [pendingProperties, setPendingProperties] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -13,8 +13,8 @@ const AdminDashboardPage: React.FC = () => {
 
     const fetchPending = async () => {
         try {
-            const response = await api.get('/admin/pending-documents');
-            setPendingDocs(response.data.data);
+            const response = await api.get('/admin/properties/pending');
+            setPendingProperties(response.data.data);
         } catch (err) {
             console.error(err);
         } finally {
@@ -22,13 +22,9 @@ const AdminDashboardPage: React.FC = () => {
         }
     };
 
-    const handleVerify = async (id: string, action: 'approve' | 'reject') => {
+    const handleApprove = async (id: string) => {
         try {
-            if (action === 'approve') {
-                await api.patch(`/admin/approve-document/${id}`);
-            } else {
-                await api.patch(`/admin/reject-document/${id}`, { reason: 'Document unclear' });
-            }
+            await api.post(`/admin/properties/${id}/approve`);
             fetchPending();
         } catch (err) {
             alert('Action failed');
@@ -37,7 +33,7 @@ const AdminDashboardPage: React.FC = () => {
 
     return (
         <div className="container py-12">
-            <h1 className="text-3xl font-bold mb-8">Admin Verification Queue</h1>
+            <h1 className="text-3xl font-bold mb-8">Pending Property Approvals</h1>
 
             {loading ? (
                 <div>Loading queue...</div>
@@ -46,39 +42,49 @@ const AdminDashboardPage: React.FC = () => {
                     <table className="w-full text-left">
                         <thead className="bg-neutral-50 border-b border-neutral-200">
                             <tr>
-                                <th className="px-6 py-4 font-semibold text-neutral-600">User</th>
-                                <th className="px-6 py-4 font-semibold text-neutral-600">Document Type</th>
+                                <th className="px-6 py-4 font-semibold text-neutral-600">Property</th>
+                                <th className="px-6 py-4 font-semibold text-neutral-600">Owner</th>
                                 <th className="px-6 py-4 font-semibold text-neutral-600">Status</th>
                                 <th className="px-6 py-4 font-semibold text-neutral-600">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-neutral-100">
-                            {pendingDocs.map((doc) => (
-                                <tr key={doc._id}>
+                            {pendingProperties.map((property) => (
+                                <tr key={property._id}>
                                     <td className="px-6 py-4">
                                         <div>
-                                            <div className="font-semibold text-neutral-900">{doc.user?.firstName} {doc.user?.lastName}</div>
-                                            <div className="text-sm text-neutral-500">{doc.user?.email}</div>
+                                            <div className="font-semibold text-neutral-900">{property.title}</div>
+                                            <div className="text-sm text-neutral-500">
+                                                {property.location?.area}, {property.location?.city}
+                                            </div>
+                                            <div className="text-xs text-neutral-400 mt-1">
+                                                {property.rent?.currency} {property.rent?.amount?.toLocaleString()} / {property.rent?.paymentFrequency}
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <Badge variant="neutral">{doc.documentType}</Badge>
+                                        <div>
+                                            <div className="font-semibold text-neutral-900">
+                                                {property.owner?.firstName} {property.owner?.lastName}
+                                            </div>
+                                            <div className="text-sm text-neutral-500">{property.owner?.email}</div>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <Badge variant="secondary">Pending</Badge>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex gap-2">
-                                            <Button variant="primary" size="sm" onClick={() => handleVerify(doc._id, 'approve')}>Approve</Button>
-                                            <Button variant="outline" size="sm" onClick={() => handleVerify(doc._id, 'reject')}>Reject</Button>
-                                            <a href={doc.url} target="_blank" rel="noreferrer" className="text-primary-600 text-sm font-medium hover:underline ml-2">View File</a>
+                                            <Button variant="primary" size="sm" onClick={() => handleApprove(property._id)}>
+                                                Approve
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>
                             ))}
-                            {pendingDocs.length === 0 && (
+                            {pendingProperties.length === 0 && (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-neutral-500">No pending verifications.</td>
+                                    <td colSpan={4} className="px-6 py-12 text-center text-neutral-500">No pending properties.</td>
                                 </tr>
                             )}
                         </tbody>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
 import Button from '../components/atoms/Button';
 import Input from '../components/atoms/Input';
@@ -16,10 +16,13 @@ const AuthPage: React.FC = () => {
         role: UserRole.TENANT,
     });
 
-    const { login, register, loading, error } = useAuthStore();
+    const { login, register, loading, error, user } = useAuthStore();
     const navigate = useNavigate();
-    const location = useLocation();
-    const from = (location.state as any)?.from?.pathname || '/search';
+    const resolveRedirect = (role?: string) => {
+        if (role === UserRole.ADMIN) return '/admin';
+        if (role === UserRole.LANDLORD) return '/dashboard';
+        return '/browse';
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -34,7 +37,8 @@ const AuthPage: React.FC = () => {
             } else {
                 await register(formData);
             }
-            navigate(from, { replace: true });
+            const nextRole = useAuthStore.getState().user?.role || user?.role || formData.role;
+            navigate(resolveRedirect(nextRole), { replace: true });
         } catch (err) {
             console.error('Auth error:', err);
         }
@@ -118,10 +122,11 @@ const AuthPage: React.FC = () => {
 
                 {!isLogin && (
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        <label htmlFor="role" className="block text-sm font-medium text-neutral-700 mb-2">
                             I want to join as a
                         </label>
                         <select
+                            id="role"
                             name="role"
                             value={formData.role}
                             onChange={handleInputChange as any}

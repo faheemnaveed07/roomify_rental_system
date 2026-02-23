@@ -13,7 +13,13 @@ const connectedUsers: Map<string, SocketUser> = new Map();
 
 const socketOptions: Partial<ServerOptions> = {
     cors: {
-        origin: env.FRONTEND_URL,
+        origin: [
+            env.FRONTEND_URL,
+            'http://localhost:3000',
+            'http://localhost:3001',
+            'http://localhost:3002',
+            'http://localhost:5173',
+        ].filter(Boolean),
         methods: ['GET', 'POST'],
         credentials: true,
     },
