@@ -1,0 +1,93 @@
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+
+.main{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 12px;
+  font-size:14px;
+  font-weight:500;
+  border-radius:9999px;
+  border:1px solid #E5E7EB;
+  background-color:#FFFFFF;
+  color:#374151;
+  cursor:pointer;
+  transition:all 150ms ease;
+}
+
+.mainActive{
+  border-color: var(--color-primary-500);
+  background-color: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+.main:disabled{
+  cursor:not-allowed;
+  opacity:0.6;
+}
+
+.icon{display:flex;align-items:center}
+
+.count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:20px;
+  height:20px;
+  padding:0 4px;
+  font-size:12px;
+  font-weight:700;
+  border-radius:9999px;
+  background-color:#F3F4F6;
+  color:#374151;
+}
+
+.countActive{
+  background-color: var(--color-primary-600);
+  color: #ffffff;
+}
+
+.remove{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  padding:0;
+  border:none;
+  border-radius:9999px;
+  background:transparent;
+  color:#6B7280;
+  cursor:pointer;
+}
+
+.removeActive{
+  color: var(--color-primary-600);
+}
+
+.remove:hover{color:#374151}
+
+.group{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+
+.clearAll{
+  padding:6px 10px;
+  font-size:14px;
+  color:#6B7280;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  text-decoration:underline;
+}
+
+.clearAll:hover{
+  color:#374151;
+}

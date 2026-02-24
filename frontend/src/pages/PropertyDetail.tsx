@@ -124,6 +124,7 @@ const PropertyDetailPage: React.FC = () => {
                                 <select
                                     value={selectedBedNumber}
                                     onChange={(e) => setSelectedBedNumber(Number(e.target.value))}
+                                    aria-label="Select Bed Number"
                                     className="w-full p-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
                                 >
                                     <option value="">Choose a bed...</option>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import AuthPage from './pages/Auth';
 import HomePage from '@pages/Home';
 import SearchPage from './pages/Search';
@@ -12,54 +12,15 @@ import DashboardLayout from './components/organisms/DashboardLayout';
 import ProtectedRoute from './components/organisms/ProtectedRoute';
 import RoleProtectedRoute from './components/atoms/RoleProtectedRoute';
 import { UserRole } from '@shared/types';
-import { useAuthStore } from './store/auth.store';
+import Header from './components/organisms/Header';
+import AdminLayout from './components/organisms/AdminLayout';
+import AdminUsersPage from './pages/AdminUsers';
+import AdminAnalyticsPage from './pages/AdminAnalytics';
 
 const AppLayout: React.FC = () => {
-    const { isAuthenticated, user, logout } = useAuthStore();
-    const navigate = useNavigate();
-    const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.email || 'Account';
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/');
-    };
-
     return (
         <div className="min-h-screen bg-neutral-50 flex flex-col">
-            <nav className="bg-white shadow-sm border-b border-neutral-200 sticky top-0 z-50">
-                <div className="container">
-                    <div className="flex items-center justify-between h-16">
-                        <Link to="/" className="text-xl font-bold text-primary-500 flex items-center gap-2">
-                            <span className="bg-primary-500 text-white p-1 rounded-lg">R</span>
-                            Roomify
-                        </Link>
-                        <div className="flex items-center gap-6">
-                            <Link to="/browse" className="text-neutral-600 hover:text-primary-500 font-medium">
-                                Browse
-                            </Link>
-                            {isAuthenticated ? (
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm font-semibold text-neutral-700">{displayName}</span>
-                                    <button
-                                        type="button"
-                                        onClick={handleLogout}
-                                        className="px-4 py-2 bg-neutral-900 text-white rounded-xl font-semibold hover:bg-neutral-800 transition-colors"
-                                    >
-                                        Logout
-                                    </button>
-                                </div>
-                            ) : (
-                                <Link
-                                    to="/auth"
-                                    className="px-4 py-2 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
-                                >
-                                    Sign In
-                                </Link>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <Header />
 
             <main className="flex-grow">
                 <Routes>
@@ -82,18 +43,23 @@ const AppLayout: React.FC = () => {
                             <MyBookingsPage />
                         </ProtectedRoute>
                     } />
-                    <Route path="/admin" element={
-                        <ProtectedRoute allowedRoles={[UserRole.ADMIN]}>
-                            <AdminDashboardPage />
-                        </ProtectedRoute>
-                    } />
+                    <Route element={<RoleProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>
+                        <Route path="/admin" element={<AdminLayout />}>
+                            <Route index element={<AdminDashboardPage />} />
+                            <Route path="users" element={<AdminUsersPage />} />
+                            <Route path="analytics" element={<AdminAnalyticsPage />} />
+                        </Route>
+                    </Route>
 
                     <Route element={<RoleProtectedRoute allowedRoles={[UserRole.LANDLORD]} />}>
                         <Route path="/dashboard" element={<DashboardLayout />}>
                             <Route index element={<LandlordDashboard />} />
                             <Route path="requests" element={<LandlordDashboard />} />
                             <Route path="properties" element={<LandlordDashboard />} />
-                            <Route path="properties/new" element={<AddPropertyPage />} />
+                            <Route path="properties/new" element={<Navigate to="/add-property" replace />} />
+                        </Route>
+                        <Route element={<DashboardLayout />}>
+                            <Route path="/add-property" element={<AddPropertyPage />} />
                         </Route>
                     </Route>
 

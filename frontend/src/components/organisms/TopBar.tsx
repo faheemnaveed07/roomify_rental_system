@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuthStore } from '../../store/auth.store';
-import { Bell, Search } from 'lucide-react';
+import { Bell, Search, Menu } from 'lucide-react';
 
 const TopBar: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { user } = useAuthStore();
@@ -13,7 +13,7 @@ const TopBar: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
                     aria-label="Open dashboard menu"
                     className="p-2 text-neutral-500 hover:bg-neutral-100 rounded-lg lg:hidden"
                 >
-                    <Search size={20} /> {/* Toggle menu icon placeholder */}
+                    <Menu size={20} />
                 </button>
 
                 {/* Search Bar Placeholder */}

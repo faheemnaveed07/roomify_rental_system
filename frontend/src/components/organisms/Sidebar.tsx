@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
     Home,
@@ -23,18 +23,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         { icon: <LayoutDashboard size={20} />, label: 'Overview', path: '/dashboard' },
         { icon: <Home size={20} />, label: 'My Properties', path: '/dashboard/properties' },
         { icon: <CalendarCheck size={20} />, label: 'Booking Requests', path: '/dashboard/requests' },
+        { icon: <PlusCircle size={20} />, label: 'Add Property', path: '/add-property' },
     ];
 
     return (
         <aside
-            className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1E293B] text-white transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
-                } lg:translate-x-0 lg:static lg:inset-0`}
+            className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out ${
+                isOpen ? 'translate-x-0' : '-translate-x-full'
+            } lg:translate-x-0 lg:static lg:inset-0`}
         >
             <div className="flex flex-col h-full">
                 {/* Sidebar Header */}
-                <div className="flex items-center justify-between h-20 px-6 bg-[#0F172A]">
-                    <span className="text-2xl font-bold tracking-tight text-[#2563EB]">Roomify</span>
-                    <button type="button" aria-label="Close sidebar" onClick={onToggle} className="lg:hidden text-neutral-400 hover:text-white">
+                <div className="flex items-center justify-between h-20 px-6">
+                    <Link to="/" className="flex items-center gap-3 font-black text-slate-900">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-600 text-white shadow-md">
+                            R
+                        </span>
+                        <span className="text-lg tracking-tight">Roomify</span>
+                    </Link>
+                    <button type="button" aria-label="Close sidebar" onClick={onToggle} className="lg:hidden text-slate-400 hover:text-slate-700">
                         <X size={24} />
                     </button>
                 </div>
@@ -42,8 +49,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                 {/* Quick Action Button */}
                 <div className="px-4 py-6">
                     <button
-                        onClick={() => navigate('/dashboard/properties/new')}
-                        className="flex items-center justify-center w-full gap-2 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] rounded-xl font-semibold transition-all shadow-lg shadow-blue-900/20"
+                        onClick={() => navigate('/add-property')}
+                        className="flex items-center justify-center w-full gap-2 py-3 bg-primary-600 hover:bg-primary-700 rounded-2xl font-semibold transition-all shadow-sm"
                     >
                         <PlusCircle size={20} />
                         <span>Add Property</span>
@@ -57,9 +64,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                             key={item.path}
                             to={item.path}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive
-                                    ? 'bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20'
-                                    : 'text-neutral-400 hover:bg-white/5 hover:text-white'
+                                `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all ${isActive
+                                    ? 'bg-primary-50 text-primary-700 border border-primary-100 shadow-sm'
+                                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
                                 }`
                             }
                         >
@@ -70,10 +77,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                 </nav>
 
                 {/* Sidebar Footer */}
-                <div className="p-4 border-t border-white/10">
+                <div className="p-4 border-t border-slate-100">
                     <button
                         onClick={logout}
-                        className="flex items-center gap-3 w-full px-4 py-3 text-neutral-400 hover:bg-red-500/10 hover:text-red-400 rounded-xl transition-all"
+                        className="flex items-center gap-3 w-full px-4 py-3 text-slate-500 hover:bg-red-50 hover:text-red-600 rounded-2xl transition-all"
                     >
                         <LogOut size={20} />
                         <span className="font-medium">Sign Out</span>

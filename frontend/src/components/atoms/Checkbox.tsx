@@ -1,5 +1,6 @@
 import React, { InputHTMLAttributes, forwardRef, useId } from 'react';
 import { colors, spacing } from '../../styles/theme';
+import './Checkbox.css';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
     label?: string;
@@ -12,57 +13,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         const id = useId();
         const inputId = props.id || id;
 
-        const containerStyles: React.CSSProperties = {
-            display: 'inline-flex',
-            alignItems: 'flex-start',
-            gap: spacing[2],
-            cursor: disabled ? 'not-allowed' : 'pointer',
-            opacity: disabled ? 0.6 : 1,
-        };
-
-        const checkboxWrapperStyles: React.CSSProperties = {
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '1.25rem',
-            height: '1.25rem',
-            flexShrink: 0,
-        };
-
-        const inputStyles: React.CSSProperties = {
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            margin: 0,
-            opacity: 0,
-            cursor: disabled ? 'not-allowed' : 'pointer',
-        };
-
         const customCheckboxStyles: React.CSSProperties = {
-            width: '1.25rem',
-            height: '1.25rem',
-            borderRadius: '0.25rem',
-            border: `2px solid ${error ? colors.error[500] : checked || indeterminate ? colors.primary[500] : colors.neutral[300]}`,
+            borderColor: error ? colors.error[500] : checked || indeterminate ? colors.primary[500] : colors.neutral[300],
             backgroundColor: checked || indeterminate ? colors.primary[500] : colors.white,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
-            pointerEvents: 'none',
-        };
-
-        const labelStyles: React.CSSProperties = {
-            fontSize: '0.875rem',
-            color: colors.neutral[700],
-            lineHeight: 1.5,
-            userSelect: 'none',
-        };
-
-        const errorStyles: React.CSSProperties = {
-            fontSize: '0.75rem',
-            color: colors.error[500],
-            marginTop: spacing[1],
         };
 
         const CheckIcon = () => (
@@ -102,19 +55,19 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 
         return (
             <div>
-                <label htmlFor={inputId} style={containerStyles}>
-                    <div style={checkboxWrapperStyles}>
+                <label htmlFor={inputId} className={`checkbox-container ${disabled ? 'disabled' : ''}`}>
+                    <div className="checkbox-wrapper">
                         <input
                             ref={ref}
                             type="checkbox"
                             id={inputId}
                             checked={checked}
                             disabled={disabled}
-                            style={inputStyles}
+                            className="checkbox-input"
                             aria-invalid={!!error}
                             {...props}
                         />
-                        <div style={customCheckboxStyles}>
+                        <div className="checkbox-custom" style={customCheckboxStyles}>
                             {indeterminate ? (
                                 <IndeterminateIcon />
                             ) : checked ? (
@@ -122,9 +75,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
                             ) : null}
                         </div>
                     </div>
-                    {label && <span style={labelStyles}>{label}</span>}
+                    {label && <span className="checkbox-label">{label}</span>}
                 </label>
-                {error && <div style={errorStyles}>{error}</div>}
+                {error && <div className="checkbox-error">{error}</div>}
             </div>
         );
     }

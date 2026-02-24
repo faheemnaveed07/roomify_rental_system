@@ -159,13 +159,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         </svg>
     );
 
-    return (
-        <div
-            style={cardStyles}
-            onClick={onClick}
-            role={onClick ? 'button' : undefined}
-            tabIndex={onClick ? 0 : undefined}
-        >
+    const content = (
+        <>
             <div style={imageContainerStyles}>
                 {imageUrl ? (
                     <img
@@ -236,6 +231,30 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                     <span style={priceUnitStyles}>/month</span>
                 </div>
             </div>
+        </>
+    );
+
+    if (onClick) {
+        return (
+            <button
+                type="button"
+                style={{
+                    ...cardStyles,
+                    border: 'none',
+                    padding: 0,
+                    textAlign: 'left',
+                    background: 'transparent',
+                }}
+                onClick={onClick}
+            >
+                {content}
+            </button>
+        );
+    }
+
+    return (
+        <div style={cardStyles}>
+            {content}
         </div>
     );
 };
