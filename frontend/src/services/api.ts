@@ -131,4 +131,95 @@ export const landlordService = {
     }
 };
 
+// Chat Service
+export const chatService = {
+    getConversations: async (page = 1, limit = 20): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>('/chat/conversations', { params: { page, limit } });
+        return response.data;
+    },
+    getConversation: async (conversationId: string): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>(`/chat/conversations/${conversationId}`);
+        return response.data.data!;
+    },
+    getMessages: async (conversationId: string, page = 1, limit = 50): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>(`/chat/conversations/${conversationId}/messages`, { 
+            params: { page, limit } 
+        });
+        return response.data;
+    },
+    sendMessage: async (data: { conversationId?: string; receiverId: string; propertyId?: string; content: string }): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>('/chat/messages', data);
+        return response.data.data!;
+    },
+    markAsRead: async (conversationId: string): Promise<void> => {
+        await api.post(`/chat/conversations/${conversationId}/read`);
+    },
+    getUnreadCount: async (): Promise<number> => {
+        const response = await api.get<ApiResponse<{ unreadCount: number }>>('/chat/unread');
+        return response.data.data?.unreadCount || 0;
+    },
+    startPropertyInquiry: async (landlordId: string, propertyId: string, message: string): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>('/chat/inquiry', { landlordId, propertyId, message });
+        return response.data.data!;
+    },
+};
+
+// Payment Service
+export const paymentService = {
+    // Bank accounts (landlord)
+    getBankAccounts: async (): Promise<any[]> => {
+        const response = await api.get<ApiResponse<any[]>>('/payments/bank-accounts');
+        return response.data.data!;
+    },
+    addBankAccount: async (data: { bankName: string; accountTitle: string; accountNumber: string; iban?: string; branchCode?: string; isDefault?: boolean }): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>('/payments/bank-accounts', data);
+        return response.data.data!;
+    },
+    updateBankAccount: async (accountId: string, data: any): Promise<any> => {
+        const response = await api.put<ApiResponse<any>>(`/payments/bank-accounts/${accountId}`, data);
+        return response.data.data!;
+    },
+    deleteBankAccount: async (accountId: string): Promise<void> => {
+        await api.delete(`/payments/bank-accounts/${accountId}`);
+    },
+
+    // Payments
+    createPayment: async (data: any): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>('/payments', data);
+        return response.data.data!;
+    },
+    submitPaymentProof: async (paymentId: string, data: { transactionReference: string; proofOfPayment: string }): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>(`/payments/${paymentId}/proof`, data);
+        return response.data.data!;
+    },
+    scheduleCashCollection: async (paymentId: string, data: { scheduledDate: string; location: string; notes?: string }): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>(`/payments/${paymentId}/schedule-cash`, data);
+        return response.data.data!;
+    },
+    confirmPayment: async (paymentId: string, data: { confirmed: boolean; notes?: string; rejectionReason?: string }): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>(`/payments/${paymentId}/confirm`, data);
+        return response.data.data!;
+    },
+    getPaymentById: async (paymentId: string): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>(`/payments/${paymentId}`);
+        return response.data.data!;
+    },
+    getBookingPayments: async (bookingId: string): Promise<any[]> => {
+        const response = await api.get<ApiResponse<any[]>>(`/payments/booking/${bookingId}`);
+        return response.data.data!;
+    },
+    getTenantPayments: async (page = 1, limit = 20): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>('/payments/tenant', { params: { page, limit } });
+        return response.data;
+    },
+    getLandlordPayments: async (page = 1, limit = 20, status?: string): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>('/payments/landlord', { params: { page, limit, status } });
+        return response.data;
+    },
+    getLandlordPaymentStats: async (): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>('/payments/landlord/stats');
+        return response.data.data!;
+    },
+};
+
 export default api;

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { bookingService } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import { bookingService, paymentService } from '../services/api';
 import { Badge } from '../components/atoms/Badge';
 import Button from '../components/atoms/Button';
 import { ASSETS_URL } from '../services/api';
+import { CreditCard } from 'lucide-react';
 
 const MyBookingsPage: React.FC = () => {
+    const navigate = useNavigate();
     const [bookings, setBookings] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [paymentLoading, setPaymentLoading] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -31,6 +35,31 @@ const MyBookingsPage: React.FC = () => {
             case 'rejected': return 'secondary';
             case 'cancelled': return 'neutral';
             default: return 'neutral';
+        }
+    };
+
+    const handleInitiatePayment = async (booking: any, method: 'bank_transfer' | 'cash') => {
+        setPaymentLoading(booking._id);
+        try {
+            const landlordId = typeof booking.property.owner === 'string' 
+                ? booking.property.owner 
+                : booking.property.owner._id;
+            
+            await paymentService.createPayment({
+                bookingId: booking._id,
+                landlordId,
+                propertyId: booking.property._id,
+                paymentType: 'rent',
+                paymentMethod: method,
+                amount: booking.rentDetails?.monthlyRent,
+                currency: 'PKR',
+                dueDate: new Date().toISOString()
+            });
+            navigate('/payments');
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setPaymentLoading(null);
         }
     };
 
@@ -91,6 +120,40 @@ const MyBookingsPage: React.FC = () => {
                                         <p className="font-semibold">{booking.proposedDuration?.value} {booking.proposedDuration?.unit}</p>
                                     </div>
                                 </div>
+
+                                {booking.status === 'approved' && (
+                                    <div className="mt-4 pt-4 border-t border-neutral-100">
+                                        <p className="text-sm font-semibold text-neutral-700 mb-3">
+                                            Your booking is approved! Choose payment method:
+                                        </p>
+                                        <div className="flex flex-wrap gap-3">
+                                            <Button
+                                                variant="primary"
+                                                onClick={() => handleInitiatePayment(booking, 'bank_transfer')}
+                                                disabled={paymentLoading === booking._id}
+                                                className="flex items-center gap-2"
+                                            >
+                                                <CreditCard size={16} />
+                                                Pay via Bank Transfer
+                                            </Button>
+                                            <Button
+                                                variant="secondary"
+                                                onClick={() => handleInitiatePayment(booking, 'cash')}
+                                                disabled={paymentLoading === booking._id}
+                                                className="flex items-center gap-2"
+                                            >
+                                                💵 Pay Cash
+                                            </Button>
+                                            <Button
+                                                variant="secondary"
+                                                onClick={() => navigate('/payments')}
+                                                className="flex items-center gap-2"
+                                            >
+                                                View Payments
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

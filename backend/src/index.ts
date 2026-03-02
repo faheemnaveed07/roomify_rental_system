@@ -5,19 +5,24 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
+import { createServer } from 'http';
 
 import path from 'path';
 import routes from './routes/index';
 import { connectDatabase } from './config/database';
-import { env } from './config/environment';
 import { logger, httpLogStream } from './utils/logger';
 import errorMiddleware from './middleware/error.middleware';
+import { initializeSocket } from './config/socket';
 
 const app = express();
+const httpServer = createServer(app);
+
+// Initialize Socket.IO
+const io = initializeSocket(httpServer);
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'http://localhost:5173'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   })
@@ -48,13 +53,14 @@ const start = async () => {
   try {
     await connectDatabase();
 
-    const server = app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`);
+      logger.info(`Socket.IO initialized`);
     });
 
     const shutdown = async () => {
       logger.info('Shutting down server');
-      server.close(() => {
+      httpServer.close(() => {
         process.exit(0);
       });
     };
@@ -69,4 +75,5 @@ const start = async () => {
 
 start();
 
+export { io };
 export default app;

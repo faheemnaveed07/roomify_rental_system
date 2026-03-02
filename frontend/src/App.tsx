@@ -8,6 +8,8 @@ import AdminDashboardPage from './pages/AdminDashboard';
 import LandlordDashboard from './pages/LandlordDashboard';
 import AddPropertyPage from './pages/AddProperty';
 import MyBookingsPage from './pages/MyBookings';
+import MessagesPage from './pages/Messages';
+import PaymentsPage from './pages/Payments';
 import DashboardLayout from './components/organisms/DashboardLayout';
 import ProtectedRoute from './components/organisms/ProtectedRoute';
 import RoleProtectedRoute from './components/atoms/RoleProtectedRoute';
@@ -41,6 +43,16 @@ const AppLayout: React.FC = () => {
                     <Route path="/my-bookings" element={
                         <ProtectedRoute>
                             <MyBookingsPage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/messages" element={
+                        <ProtectedRoute>
+                            <MessagesPage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/payments" element={
+                        <ProtectedRoute>
+                            <PaymentsPage />
                         </ProtectedRoute>
                     } />
                     <Route element={<RoleProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>

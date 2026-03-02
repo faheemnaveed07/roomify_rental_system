@@ -8,16 +8,27 @@ import {
     CalendarCheck,
     Sparkles,
     Home,
-    Users
+    Users,
+    MessageCircle,
+    CreditCard
 } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
+import { useChatStore } from '../../store/chat.store';
 import { UserRole } from '@shared/types';
 
 const Header: React.FC = () => {
     const { isAuthenticated, user, logout } = useAuthStore();
+    const { unreadCount, fetchUnreadCount } = useChatStore();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
+
+    // Fetch unread count on mount
+    useEffect(() => {
+        if (isAuthenticated) {
+            fetchUnreadCount();
+        }
+    }, [isAuthenticated]);
 
     const displayName = useMemo(() => {
         return [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.email || 'Account';
@@ -193,6 +204,29 @@ const Header: React.FC = () => {
                                                     Manage Users
                                                 </Link>
                                             )}
+                                            <Link
+                                                to="/messages"
+                                                onClick={() => setMenuOpen(false)}
+                                                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                                            >
+                                                <div className="relative">
+                                                    <MessageCircle size={16} />
+                                                    {unreadCount > 0 && (
+                                                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center">
+                                                            {unreadCount > 9 ? '9+' : unreadCount}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                Messages
+                                            </Link>
+                                            <Link
+                                                to="/payments"
+                                                onClick={() => setMenuOpen(false)}
+                                                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                                            >
+                                                <CreditCard size={16} />
+                                                Payments
+                                            </Link>
                                         </div>
                                         <div className="border-t border-slate-100 p-2">
                                             <button

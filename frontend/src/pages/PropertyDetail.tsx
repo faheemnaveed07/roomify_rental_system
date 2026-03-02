@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { propertyService, bookingService, ASSETS_URL } from '../services/api';
+import { propertyService, bookingService, chatService, ASSETS_URL } from '../services/api';
 import { IProperty } from '@shared/types';
 import Button from '../components/atoms/Button';
 import { Badge } from '../components/atoms/Badge';
+import { MessageCircle } from 'lucide-react';
 
 const PropertyDetailPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -163,6 +164,29 @@ const PropertyDetailPage: React.FC = () => {
                             }
                         >
                             {bookingLoading ? 'Sending...' : 'Request Booking'}
+                        </Button>
+
+                        <Button
+                            variant="secondary"
+                            className="w-full py-4 text-lg mt-3 flex items-center justify-center gap-2"
+                            onClick={async () => {
+                                try {
+                                    const landlordId = typeof property.owner === 'string' 
+                                        ? property.owner 
+                                        : (property.owner as any)._id;
+                                    await chatService.startPropertyInquiry(
+                                        landlordId,
+                                        property._id!,
+                                        `Hi, I'm interested in "${property.title}". Can we discuss the details?`
+                                    );
+                                    navigate('/messages');
+                                } catch (error) {
+                                    console.error('Failed to start conversation:', error);
+                                }
+                            }}
+                        >
+                            <MessageCircle size={20} />
+                            Contact Landlord
                         </Button>
                     </div>
                 </div>

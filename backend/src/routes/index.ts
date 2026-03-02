@@ -5,6 +5,8 @@ import adminRoutes from './admin.routes';
 import bookingRoutes from './booking.routes';
 import landlordRoutes from './landlord.routes';
 import uploadRoutes from './upload.routes';
+import chatRoutes from './chat.routes';
+import paymentRoutes from './payment.routes';
 
 const router = Router();
 
@@ -24,5 +26,7 @@ router.use('/admin', adminRoutes);
 router.use('/bookings', bookingRoutes);
 router.use('/landlord', landlordRoutes);
 router.use('/upload', uploadRoutes);
+router.use('/chat', chatRoutes);
+router.use('/payments', paymentRoutes);
 
 export default router;
