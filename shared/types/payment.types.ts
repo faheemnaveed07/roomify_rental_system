@@ -1,6 +1,7 @@
 export enum PaymentMethod {
     BANK_TRANSFER = 'bank_transfer',
     CASH = 'cash',
+    SANDBOX = 'sandbox',
 }
 
 export enum PaymentStatus {
@@ -55,7 +56,8 @@ export interface IPayment {
     confirmedBy?: string | any;
     confirmedAt?: Date;
     rejectionReason?: string;
-    
+    adminNotes?: string;
+
     // Metadata
     dueDate: Date;
     paidAt?: Date;

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { paymentService } from '../services/api';
+import { paymentService, adminPaymentService } from '../services/api';
 
 export enum PaymentMethod {
     BANK_TRANSFER = 'bank_transfer',
@@ -62,6 +62,7 @@ interface PaymentStats {
 
 interface PaymentState {
     payments: Payment[];
+    adminPayments: Payment[];
     bankAccounts: BankAccount[];
     currentPayment: Payment | null;
     stats: PaymentStats | null;
@@ -83,10 +84,15 @@ interface PaymentState {
     confirmPayment: (paymentId: string, confirmed: boolean, notes?: string, rejectionReason?: string) => Promise<void>;
     fetchPaymentById: (paymentId: string) => Promise<Payment>;
     fetchBookingPayments: (bookingId: string) => Promise<Payment[]>;
+    submitPaymentWithReceipt: (data: { bookingId: string; paymentType: string; paymentMethod: string; transactionReference: string; receiptFile: File }) => Promise<Payment>;
+    adminFetchAllPayments: (page?: number, limit?: number, status?: string) => Promise<void>;
+    adminApprovePayment: (paymentId: string, adminNotes?: string) => Promise<void>;
+    adminRejectPayment: (paymentId: string, reason: string) => Promise<void>;
 }
 
 export const usePaymentStore = create<PaymentState>((set, get) => ({
     payments: [],
+    adminPayments: [],
     bankAccounts: [],
     currentPayment: null,
     stats: null,
@@ -263,6 +269,63 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
             const payments = await paymentService.getBookingPayments(bookingId);
             set({ payments, loading: false });
             return payments;
+        } catch (error: any) {
+            set({ error: error.message, loading: false });
+            throw error;
+        }
+    },
+
+    submitPaymentWithReceipt: async (data) => {
+        set({ loading: true, error: null });
+        try {
+            const payment = await paymentService.submitPaymentWithReceipt(data);
+            set((state) => ({
+                payments: [payment, ...state.payments],
+                loading: false,
+            }));
+            return payment;
+        } catch (error: any) {
+            set({ error: error.message, loading: false });
+            throw error;
+        }
+    },
+
+    adminFetchAllPayments: async (page = 1, limit = 20, status) => {
+        set({ loading: true, error: null });
+        try {
+            const response = await adminPaymentService.getAllPayments(page, limit, status);
+            set({ adminPayments: response.data || [], loading: false });
+        } catch (error: any) {
+            set({ error: error.message, loading: false });
+        }
+    },
+
+    adminApprovePayment: async (paymentId, adminNotes) => {
+        set({ loading: true, error: null });
+        try {
+            const updated = await adminPaymentService.approvePayment(paymentId, adminNotes);
+            set((state) => ({
+                adminPayments: state.adminPayments.map(p =>
+                    p._id === paymentId ? updated : p
+                ),
+                loading: false,
+            }));
+        } catch (error: any) {
+            set({ error: error.message, loading: false });
+            throw error;
+        }
+    },
+
+    adminRejectPayment: async (paymentId, reason) => {
+        set({ loading: true, error: null });
+        try {
+            const updated = await adminPaymentService.rejectPayment(paymentId, reason);
+            set((state) => ({
+                adminPayments: state.adminPayments.map(p =>
+                    p._id === paymentId ? updated : p
+                ),
+                loading: false,
+            }));
         } catch (error: any) {
             set({ error: error.message, loading: false });
             throw error;

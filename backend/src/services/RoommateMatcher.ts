@@ -1,4 +1,5 @@
 import { RoommateProfile, IRoommateProfile } from '../models/RoommateProfile';
+import { IPropertyDocument } from '../models/Property';
 import { logger } from '../utils/logger';
 
 interface CompatibilityBreakdown {
@@ -13,6 +14,20 @@ interface CompatibilityResult {
     matchedUserId: string;
     overallScore: number;
     breakdown: CompatibilityBreakdown[];
+}
+
+// NEW: Property compatibility types
+export interface PropertyCompatibilityBreakdown {
+    category: string;
+    score: number;
+    weight: number;
+    weightedScore: number;
+}
+
+export interface PropertyCompatibilityResult {
+    propertyId: string;
+    overallScore: number;
+    breakdown: PropertyCompatibilityBreakdown[];
 }
 
 interface MatchingWeights {
@@ -455,6 +470,283 @@ export class RoommateMatcher {
             await profile.save();
             logger.info(`Compatibility cache cleared for profile: ${profileId}`);
         }
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // NEW: Profile-to-Property Matching
+    // ─────────────────────────────────────────────────────────────────
+
+    /**
+     * Calculate how well a roommate profile matches a property.
+     * Reuses the same weighted-category philosophy as roommate matching.
+     *
+     * Categories & weights (sum = 1.0):
+     *   Budget:      0.30  — rent within profile budget range
+     *   Location:    0.25  — property city/area in preferred locations
+     *   Preferences: 0.25  — smoking/pets rules alignment
+     *   Lifestyle:   0.10  — gender pref (shared rooms), availability
+     *   Schedule:    0.10  — move-in date closeness
+     */
+    calculatePropertyCompatibility(
+        profile: IRoommateProfile,
+        property: IPropertyDocument
+    ): PropertyCompatibilityResult {
+        const weights = {
+            budget: 0.30,
+            location: 0.25,
+            preferences: 0.25,
+            lifestyle: 0.10,
+            schedule: 0.10,
+        };
+
+        const breakdown: PropertyCompatibilityBreakdown[] = [];
+
+        // 1. Budget
+        const budgetScore = this.calcPropertyBudgetScore(profile, property);
+        breakdown.push({
+            category: 'Budget',
+            score: budgetScore,
+            weight: weights.budget,
+            weightedScore: budgetScore * weights.budget,
+        });
+
+        // 2. Location
+        const locationScore = this.calcPropertyLocationScore(profile, property);
+        breakdown.push({
+            category: 'Location',
+            score: locationScore,
+            weight: weights.location,
+            weightedScore: locationScore * weights.location,
+        });
+
+        // 3. Preferences (rules alignment)
+        const preferencesScore = this.calcPropertyPreferencesScore(profile, property);
+        breakdown.push({
+            category: 'Preferences',
+            score: preferencesScore,
+            weight: weights.preferences,
+            weightedScore: preferencesScore * weights.preferences,
+        });
+
+        // 4. Lifestyle (gender, room type)
+        const lifestyleScore = this.calcPropertyLifestyleScore(profile, property);
+        breakdown.push({
+            category: 'Lifestyle',
+            score: lifestyleScore,
+            weight: weights.lifestyle,
+            weightedScore: lifestyleScore * weights.lifestyle,
+        });
+
+        // 5. Schedule (move-in date proximity)
+        const scheduleScore = this.calcPropertyScheduleScore(profile, property);
+        breakdown.push({
+            category: 'Schedule',
+            score: scheduleScore,
+            weight: weights.schedule,
+            weightedScore: scheduleScore * weights.schedule,
+        });
+
+        const overallScore = Math.round(
+            breakdown.reduce((sum, item) => sum + item.weightedScore, 0)
+        );
+
+        return {
+            propertyId: property._id.toString(),
+            overallScore,
+            breakdown,
+        };
+    }
+
+    /**
+     * Score all provided properties against a user's roommate profile.
+     * Returns sorted results (highest score first).
+     * If the user has no profile, returns null.
+     */
+    async matchPropertiesForUser(
+        userId: string,
+        properties: IPropertyDocument[]
+    ): Promise<PropertyCompatibilityResult[] | null> {
+        const profile = await RoommateProfile.findOne({ user: userId, isActive: true });
+        if (!profile) return null;
+
+        const results = properties.map((prop) =>
+            this.calculatePropertyCompatibility(profile, prop)
+        );
+        results.sort((a, b) => b.overallScore - a.overallScore);
+        return results;
+    }
+
+    /**
+     * Score a single property for a user. Returns null if no profile.
+     */
+    async scorePropertyForUser(
+        userId: string,
+        property: IPropertyDocument
+    ): Promise<PropertyCompatibilityResult | null> {
+        const profile = await RoommateProfile.findOne({ user: userId, isActive: true });
+        if (!profile) return null;
+        return this.calculatePropertyCompatibility(profile, property);
+    }
+
+    /**
+     * Budget: How well does the property rent fit the user's budget range?
+     */
+    private calcPropertyBudgetScore(
+        profile: IRoommateProfile,
+        property: IPropertyDocument
+    ): number {
+        const rent = property.rent?.amount ?? 0;
+        const { min, max } = profile.budget;
+
+        if (rent >= min && rent <= max) return 100; // perfect fit
+        if (rent < min) {
+            // Cheaper than min — still good but slightly off
+            const gap = min - rent;
+            const tolerance = min * 0.3;
+            return gap <= tolerance ? 80 : 60;
+        }
+        // Over budget
+        const overBy = rent - max;
+        const tolerance = max * 0.15;
+        if (overBy <= tolerance) return 60;
+        const tolerance2 = max * 0.40;
+        if (overBy <= tolerance2) return 30;
+        return 10;
+    }
+
+    /**
+     * Location: Does the property city/area appear in preferred locations?
+     */
+    private calcPropertyLocationScore(
+        profile: IRoommateProfile,
+        property: IPropertyDocument
+    ): number {
+        if (!profile.preferredLocations || profile.preferredLocations.length === 0) {
+            return 50; // neutral — no preference set
+        }
+        const preferred = profile.preferredLocations.map((l) => l.toLowerCase().trim());
+        const city = (property.location?.city || '').toLowerCase().trim();
+        const area = (property.location?.area || '').toLowerCase().trim();
+
+        if (preferred.includes(city) && preferred.includes(area)) return 100;
+        if (preferred.includes(area)) return 90;
+        if (preferred.includes(city)) return 70;
+
+        // Partial match — check if any preferred location is a substring
+        const anyPartial = preferred.some(
+            (loc) => city.includes(loc) || area.includes(loc) || loc.includes(city) || loc.includes(area)
+        );
+        return anyPartial ? 40 : 0;
+    }
+
+    /**
+     * Preferences: Do the property rules align with user smoking/pet preferences?
+     */
+    private calcPropertyPreferencesScore(
+        profile: IRoommateProfile,
+        property: IPropertyDocument
+    ): number {
+        let score = 0;
+        let factors = 0;
+
+        // Smoking
+        const smokingAllowed = property.rules?.smokingAllowed ?? false;
+        const userSmokingPref = profile.preferences.smokingPreference;
+        if (userSmokingPref === 'no_preference') {
+            score += 100;
+        } else if (userSmokingPref === 'smoker' || userSmokingPref === 'outdoor_only') {
+            score += smokingAllowed ? 100 : 40;
+        } else {
+            // non_smoker
+            score += smokingAllowed ? 20 : 100;
+        }
+        factors++;
+
+        // Pets
+        const petsAllowed = property.rules?.petsAllowed ?? false;
+        const userPetPref = profile.preferences.petPreference;
+        if (userPetPref === 'no_preference') {
+            score += 100;
+        } else if (userPetPref === 'has_pets' || userPetPref === 'loves_pets') {
+            score += petsAllowed ? 100 : 30;
+        } else {
+            // no_pets
+            score += petsAllowed ? 30 : 100;
+        }
+        factors++;
+
+        // Visitors
+        const visitorsAllowed = property.rules?.visitorsAllowed ?? true;
+        const guestFreq = profile.lifestyle.guestsFrequency;
+        if (guestFreq === 'often' || guestFreq === 'sometimes') {
+            score += visitorsAllowed ? 100 : 30;
+        } else {
+            score += 100; // rarely/never — doesn't matter
+        }
+        factors++;
+
+        return Math.round(score / factors);
+    }
+
+    /**
+     * Lifestyle: Gender preference match for shared rooms; room type match.
+     */
+    private calcPropertyLifestyleScore(
+        profile: IRoommateProfile,
+        property: IPropertyDocument
+    ): number {
+        const propType = property.propertyType;
+
+        if (propType === 'shared_room') {
+            const propGenderPref = property.sharedRoomDetails?.genderPreference || 'any';
+            const userGenderPref = profile.preferences.genderPreference;
+            const userGender = profile.gender;
+
+            let genderScore = 100;
+            // Check if the property gender pref excludes the user
+            if (propGenderPref !== 'any' && propGenderPref !== userGender) {
+                genderScore = 0; // hard mismatch
+            } else if (userGenderPref !== 'any' && propGenderPref !== 'any' && userGenderPref !== propGenderPref) {
+                genderScore = 30;
+            }
+
+            // Bed availability
+            const availBeds = property.sharedRoomDetails?.availableBeds ?? 0;
+            const availScore = availBeds > 0 ? 100 : 20;
+
+            return Math.round((genderScore + availScore) / 2);
+        }
+
+        // Full property — lifestyle is neutral
+        return 70;
+    }
+
+    /**
+     * Schedule: How close is the user's desired move-in to property availability?
+     */
+    private calcPropertyScheduleScore(
+        profile: IRoommateProfile,
+        property: IPropertyDocument
+    ): number {
+        const profileDate = new Date(profile.moveInDate).getTime();
+        const propDate = property.availability?.availableFrom
+            ? new Date(property.availability.availableFrom).getTime()
+            : Date.now();
+
+        // Property should be available on or before move-in
+        if (propDate <= profileDate) {
+            const daysEarly = (profileDate - propDate) / (1000 * 60 * 60 * 24);
+            if (daysEarly <= 30) return 100;
+            if (daysEarly <= 90) return 70;
+            return 50; // available way too early
+        }
+
+        // Property available after desired move-in
+        const daysLate = (propDate - profileDate) / (1000 * 60 * 60 * 24);
+        if (daysLate <= 14) return 80;
+        if (daysLate <= 30) return 50;
+        if (daysLate <= 60) return 25;
+        return 10;
     }
 }
 

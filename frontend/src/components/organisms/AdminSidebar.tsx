@@ -4,6 +4,7 @@ import {
     ShieldCheck,
     Users,
     BarChart3,
+    CreditCard,
     LogOut,
     X
 } from 'lucide-react';
@@ -22,6 +23,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
         { icon: <ShieldCheck size={20} />, label: 'Pending Approvals', path: '/admin' },
         { icon: <Users size={20} />, label: 'Manage Users', path: '/admin/users' },
         { icon: <BarChart3 size={20} />, label: 'Property Analytics', path: '/admin/analytics' },
+        { icon: <CreditCard size={20} />, label: 'Payment Verifications', path: '/admin/payments' },
     ];
 
     return (

@@ -3,6 +3,7 @@ import paymentController from '../controllers/payment.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { requireRole } from '../middleware/role.middleware';
 import { UserRole } from '@shared/types/user.types';
+import { paymentProofUpload } from '../middleware/upload.middleware';
 
 const router = Router();
 
@@ -24,10 +25,21 @@ router.get('/landlord', requireRole(UserRole.LANDLORD), paymentController.getLan
 // Tenant payments
 router.get('/tenant', requireRole(UserRole.TENANT), paymentController.getTenantPayments as RequestHandler);
 
+// NEW: Tenant submits payment with receipt upload (multipart/form-data) in one step
+router.post(
+    '/submit-with-receipt',
+    requireRole(UserRole.TENANT),
+    paymentProofUpload.single('receipt'),
+    paymentController.submitPaymentWithReceipt as RequestHandler
+);
+
+// Get a landlord's bank accounts (any authenticated user — tenant needs this to submit payment)
+router.get('/landlord/:landlordId/bank-accounts', paymentController.getLandlordPublicBankAccounts as RequestHandler);
+
 // Create payment (tenant)
 router.post('/', requireRole(UserRole.TENANT), paymentController.createPayment as RequestHandler);
 
-// Submit payment proof (tenant - for bank transfer)
+// Submit payment proof (tenant - for bank transfer, URL-based)
 router.post('/:paymentId/proof', requireRole(UserRole.TENANT), paymentController.submitPaymentProof as RequestHandler);
 
 // Schedule cash collection (tenant)

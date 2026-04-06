@@ -1,5 +1,5 @@
 import React, { InputHTMLAttributes, forwardRef, useId } from 'react';
-import { colors, spacing } from '../../styles/theme';
+import { colors } from '../../styles/theme';
 import './Checkbox.css';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {

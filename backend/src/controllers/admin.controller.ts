@@ -4,6 +4,8 @@ import { propertyService } from '../services/PropertyService';
 import { PropertyStatus } from '@shared/types/property.types';
 import { paginationSchema } from '../utils/validators';
 import { ApiResponse } from '@shared/types/api.types';
+import PaymentService from '../services/PaymentService';
+import { PaymentStatus } from '../models/Payment';
 
 export class AdminController {
     // Document Verification
@@ -291,6 +293,93 @@ export class AdminController {
                     },
                     documents: documentStats,
                 },
+            };
+
+            res.json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // ─── Payment Management ───────────────────────────────────────────────
+    async getAllPayments(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 20;
+            const status = req.query.status as PaymentStatus | undefined;
+
+            const result = await PaymentService.adminGetAllPayments(page, limit, status);
+
+            const response: ApiResponse = {
+                success: true,
+                message: 'Payments retrieved successfully',
+                data: result.payments,
+                meta: {
+                    page: result.page,
+                    limit: result.limit,
+                    total: result.total,
+                    totalPages: result.totalPages,
+                    hasNextPage: result.page < result.totalPages,
+                    hasPrevPage: result.page > 1,
+                },
+            };
+
+            res.json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async approvePayment(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const adminId = req.user?.userId;
+            const { id } = req.params;
+            const { adminNotes } = req.body;
+
+            if (!adminId) {
+                res.status(401).json({ success: false, message: 'Unauthorized' });
+                return;
+            }
+
+            const payment = await PaymentService.adminApprovePayment(id, adminId, adminNotes);
+
+            const response: ApiResponse = {
+                success: true,
+                message: 'Payment approved and booking confirmed',
+                data: payment,
+            };
+
+            res.json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async rejectPayment(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const adminId = req.user?.userId;
+            const { id } = req.params;
+            const { reason } = req.body;
+
+            if (!adminId) {
+                res.status(401).json({ success: false, message: 'Unauthorized' });
+                return;
+            }
+
+            if (!reason || reason.trim().length === 0) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Rejection reason is required',
+                });
+                return;
+            }
+
+            const payment = await PaymentService.adminRejectPayment(id, adminId, reason.trim());
+
+            const response: ApiResponse = {
+                success: true,
+                message: 'Payment rejected',
+                data: payment,
             };
 
             res.json(response);

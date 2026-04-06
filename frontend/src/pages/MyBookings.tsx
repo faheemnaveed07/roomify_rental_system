@@ -4,7 +4,7 @@ import { bookingService, paymentService } from '../services/api';
 import { Badge } from '../components/atoms/Badge';
 import Button from '../components/atoms/Button';
 import { ASSETS_URL } from '../services/api';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, FileText } from 'lucide-react';
 
 const MyBookingsPage: React.FC = () => {
     const navigate = useNavigate();
@@ -121,6 +121,24 @@ const MyBookingsPage: React.FC = () => {
                                     </div>
                                 </div>
 
+                                {booking.status === 'completed' && (
+                                    <div className="mt-4 pt-4 border-t border-neutral-100">
+                                        <p className="text-sm font-semibold text-green-700 mb-3">
+                                            ✓ Booking completed — your lease agreement is ready.
+                                        </p>
+                                        <div className="flex flex-wrap gap-3">
+                                            <Button
+                                                variant="primary"
+                                                onClick={() => navigate(`/agreement/${booking._id}`)}
+                                                className="flex items-center gap-2"
+                                            >
+                                                <FileText size={16} />
+                                                View / Generate Agreement
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {booking.status === 'approved' && (
                                     <div className="mt-4 pt-4 border-t border-neutral-100">
                                         <p className="text-sm font-semibold text-neutral-700 mb-3">
@@ -129,8 +147,7 @@ const MyBookingsPage: React.FC = () => {
                                         <div className="flex flex-wrap gap-3">
                                             <Button
                                                 variant="primary"
-                                                onClick={() => handleInitiatePayment(booking, 'bank_transfer')}
-                                                disabled={paymentLoading === booking._id}
+                                                onClick={() => navigate(`/payment/submit/${booking._id}`)}
                                                 className="flex items-center gap-2"
                                             >
                                                 <CreditCard size={16} />

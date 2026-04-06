@@ -220,6 +220,106 @@ export const paymentService = {
         const response = await api.get<ApiResponse<any>>('/payments/landlord/stats');
         return response.data.data!;
     },
+
+    // NEW: combined submit with receipt file upload (multipart/form-data)
+    submitPaymentWithReceipt: async (data: {
+        bookingId: string;
+        paymentType: string;
+        paymentMethod: string;
+        transactionReference: string;
+        receiptFile: File;
+    }): Promise<any> => {
+        const formData = new FormData();
+        formData.append('bookingId', data.bookingId);
+        formData.append('paymentType', data.paymentType);
+        formData.append('paymentMethod', data.paymentMethod);
+        formData.append('transactionReference', data.transactionReference);
+        formData.append('receipt', data.receiptFile);
+
+        const response = await api.post<ApiResponse<any>>('/payments/submit-with-receipt', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return response.data.data!;
+    },
+
+    // Booking bank details for payment form
+    getBookingById: async (bookingId: string): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>(`/bookings/${bookingId}`);
+        return response.data.data!;
+    },
+
+    // Fetch landlord's bank accounts so tenant knows where to transfer
+    getLandlordBankAccounts: async (landlordId: string): Promise<any[]> => {
+        const response = await api.get<ApiResponse<any[]>>(`/payments/landlord/${landlordId}/bank-accounts`);
+        return response.data.data || [];
+    },
+};
+
+// Admin Payment Service (UPDATED)
+export const adminPaymentService = {
+    getAllPayments: async (page = 1, limit = 20, status?: string): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>('/admin/payments', {
+            params: { page, limit, ...(status ? { status } : {}) },
+        });
+        return response.data;
+    },
+    approvePayment: async (paymentId: string, adminNotes?: string): Promise<any> => {
+        const response = await api.put<ApiResponse<any>>(`/admin/payments/${paymentId}/approve`, { adminNotes });
+        return response.data.data!;
+    },
+    rejectPayment: async (paymentId: string, reason: string): Promise<any> => {
+        const response = await api.put<ApiResponse<any>>(`/admin/payments/${paymentId}/reject`, { reason });
+        return response.data.data!;
+    },
+};
+
+export const agreementService = {
+    generate: async (bookingId: string): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>(`/agreements/generate/${bookingId}`);
+        return response.data.data!;
+    },
+    getByBooking: async (bookingId: string): Promise<any> => {
+        const response = await api.get<ApiResponse<any>>(`/agreements/booking/${bookingId}`);
+        return response.data.data!;
+    },
+    download: async (agreementId: string): Promise<Blob> => {
+        const response = await api.get(`/agreements/download/${agreementId}`, { responseType: 'blob' });
+        return response.data as Blob;
+    },
+    sign: async (agreementId: string): Promise<any> => {
+        const response = await api.put<ApiResponse<any>>(`/agreements/${agreementId}/sign`);
+        return response.data.data!;
+    },
+};
+
+// Matching / Recommendation Service
+export const matchingService = {
+    getMatchedProperties: async (
+        filters: IPropertyFilter = {},
+        pagination: PaginationQuery = {}
+    ): Promise<{
+        hasProfile: boolean;
+        properties: IProperty[];
+        scores: { propertyId: string; overallScore: number; breakdown: { category: string; score: number; weight: number; weightedScore: number }[] }[];
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }> => {
+        const response = await api.get<ApiResponse<any>>('/matching/properties', {
+            params: { ...filters, ...pagination },
+        });
+        return response.data.data!;
+    },
+    getPropertyScore: async (
+        propertyId: string
+    ): Promise<{
+        hasProfile: boolean;
+        score: { propertyId: string; overallScore: number; breakdown: { category: string; score: number; weight: number; weightedScore: number }[] } | null;
+    }> => {
+        const response = await api.get<ApiResponse<any>>(`/matching/property/${propertyId}`);
+        return response.data.data!;
+    },
 };
 
 export default api;

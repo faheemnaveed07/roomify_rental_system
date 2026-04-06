@@ -7,6 +7,8 @@ import landlordRoutes from './landlord.routes';
 import uploadRoutes from './upload.routes';
 import chatRoutes from './chat.routes';
 import paymentRoutes from './payment.routes';
+import agreementRoutes from './agreement.routes';
+import matchingRoutes from './matching.routes';
 
 const router = Router();
 
@@ -28,5 +30,7 @@ router.use('/landlord', landlordRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/chat', chatRoutes);
 router.use('/payments', paymentRoutes);
+router.use('/agreements', agreementRoutes);
+router.use('/matching', matchingRoutes);
 
 export default router;

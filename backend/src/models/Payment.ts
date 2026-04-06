@@ -93,6 +93,10 @@ const paymentSchema = new Schema<IPaymentDocument>(
         rejectionReason: {
             type: String,
         },
+        adminNotes: {
+            type: String,
+            maxlength: [1000, 'Admin notes cannot exceed 1000 characters'],
+        },
         dueDate: {
             type: Date,
             required: [true, 'Due date is required'],

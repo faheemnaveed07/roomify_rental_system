@@ -18,6 +18,9 @@ import Header from './components/organisms/Header';
 import AdminLayout from './components/organisms/AdminLayout';
 import AdminUsersPage from './pages/AdminUsers';
 import AdminAnalyticsPage from './pages/AdminAnalytics';
+import AdminPaymentsPage from './pages/AdminPayments';
+import PaymentSubmitPage from './pages/PaymentSubmit';
+import AgreementPage from './pages/Agreement';
 
 const AppLayout: React.FC = () => {
     return (
@@ -55,11 +58,22 @@ const AppLayout: React.FC = () => {
                             <PaymentsPage />
                         </ProtectedRoute>
                     } />
+                    <Route path="/payment/submit/:bookingId" element={
+                        <ProtectedRoute>
+                            <PaymentSubmitPage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/agreement/:bookingId" element={
+                        <ProtectedRoute>
+                            <AgreementPage />
+                        </ProtectedRoute>
+                    } />
                     <Route element={<RoleProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>
                         <Route path="/admin" element={<AdminLayout />}>
                             <Route index element={<AdminDashboardPage />} />
                             <Route path="users" element={<AdminUsersPage />} />
                             <Route path="analytics" element={<AdminAnalyticsPage />} />
+                            <Route path="payments" element={<AdminPaymentsPage />} />
                         </Route>
                     </Route>
 

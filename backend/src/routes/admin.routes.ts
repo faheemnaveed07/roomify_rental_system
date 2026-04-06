@@ -26,4 +26,9 @@ router.post('/properties/:id/reject', adminController.rejectProperty.bind(adminC
 router.get('/users', adminController.getUsers.bind(adminController));
 router.patch('/users/:id/status', adminController.updateUserStatus.bind(adminController));
 
+// Payment management (admin approval)
+router.get('/payments', adminController.getAllPayments.bind(adminController));
+router.put('/payments/:id/approve', adminController.approvePayment.bind(adminController));
+router.put('/payments/:id/reject', adminController.rejectPayment.bind(adminController));
+
 export default router;

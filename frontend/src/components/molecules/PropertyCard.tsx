@@ -19,6 +19,8 @@ interface PropertyCardProps {
     amenities?: string[];
     isVerified?: boolean;
     isFeatured?: boolean;
+    compatibilityScore?: number;
+    isBestMatch?: boolean;
     onClick?: () => void;
 }
 
@@ -37,6 +39,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     amenities = [],
     isVerified = false,
     isFeatured = false,
+    compatibilityScore,
+    isBestMatch = false,
     onClick,
 }) => {
     const cardStyles: React.CSSProperties = {
@@ -144,6 +148,18 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         return amount.toString();
     };
 
+    const getScoreColor = (score: number): string => {
+        if (score >= 80) return '#16a34a'; // green
+        if (score >= 60) return '#ca8a04'; // yellow/amber
+        return '#dc2626'; // red
+    };
+
+    const getScoreBgColor = (score: number): string => {
+        if (score >= 80) return '#dcfce7';
+        if (score >= 60) return '#fef9c3';
+        return '#fee2e2';
+    };
+
     const LocationIcon = () => (
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path
@@ -187,6 +203,42 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                         {propertyType === 'shared_room' ? 'Shared Room' : 'Full House'}
                     </Badge>
                 </div>
+                {compatibilityScore != null && (
+                    <div style={{
+                        position: 'absolute',
+                        top: spacing[3],
+                        right: spacing[3],
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end',
+                        gap: spacing[1],
+                    }}>
+                        <div style={{
+                            backgroundColor: getScoreBgColor(compatibilityScore),
+                            color: getScoreColor(compatibilityScore),
+                            fontWeight: 700,
+                            fontSize: '0.8rem',
+                            padding: '4px 8px',
+                            borderRadius: borderRadius.md,
+                            lineHeight: 1,
+                        }}>
+                            {compatibilityScore}% Match
+                        </div>
+                        {isBestMatch && (
+                            <div style={{
+                                backgroundColor: '#7c3aed',
+                                color: '#fff',
+                                fontWeight: 600,
+                                fontSize: '0.7rem',
+                                padding: '3px 7px',
+                                borderRadius: borderRadius.md,
+                                lineHeight: 1,
+                            }}>
+                                ⭐ Best Match
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div style={contentStyles}>

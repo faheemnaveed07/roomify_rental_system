@@ -1,6 +1,6 @@
 import { Payment, IPaymentDocument, PaymentMethod, PaymentStatus, PaymentType } from '../models/Payment';
 import { LandlordBankAccount, ILandlordBankAccountDocument } from '../models/LandlordBankAccount';
-import { Booking } from '../models/Booking';
+import { Booking, BookingStatus } from '../models/Booking';
 import { User } from '../models/User';
 import mongoose from 'mongoose';
 import { logger } from '../utils/logger';
@@ -34,6 +34,15 @@ export interface CreatePaymentDTO {
         notes?: string;
     };
     notes?: string;
+}
+
+export interface SubmitPaymentWithReceiptDTO {
+    bookingId: string;
+    tenantId: string;
+    paymentType: PaymentType;
+    paymentMethod: PaymentMethod;
+    transactionReference: string;
+    receiptUrl: string;
 }
 
 export interface ConfirmPaymentDTO {
@@ -414,6 +423,179 @@ class PaymentService {
         await payment.save();
 
         logger.info(`Cash collection scheduled for payment ${paymentId}`);
+        return payment;
+    }
+
+    /**
+     * Combined: Tenant submits payment with receipt in one operation.
+     * Prevents duplicate pending/awaiting payments for same booking.
+     */
+    async submitPaymentWithReceipt(data: SubmitPaymentWithReceiptDTO): Promise<IPaymentDocument> {
+        const { bookingId, tenantId, paymentType, paymentMethod, transactionReference, receiptUrl } = data;
+
+        const booking = await Booking.findById(bookingId).populate('property');
+        if (!booking) {
+            throw new Error('Booking not found');
+        }
+
+        if (booking.tenant.toString() !== tenantId) {
+            throw new Error('Unauthorized: Not your booking');
+        }
+
+        // Prevent duplicate submission
+        const existingPayment = await Payment.findOne({
+            booking: booking._id,
+            tenant: new mongoose.Types.ObjectId(tenantId),
+            status: { $in: [PaymentStatus.PENDING, PaymentStatus.AWAITING_CONFIRMATION, PaymentStatus.CONFIRMED] },
+        });
+
+        if (existingPayment) {
+            throw new Error('A payment has already been submitted for this booking');
+        }
+
+        const property = booking.property as any;
+        const amount = booking.rentDetails?.monthlyRent || property?.rent?.amount || 0;
+
+        // Get landlord bank details if bank transfer
+        let bankDetails;
+        if (paymentMethod === PaymentMethod.BANK_TRANSFER) {
+            const bankAccount = await LandlordBankAccount.findOne({
+                landlord: booking.landlord,
+                isDefault: true,
+            }) || await LandlordBankAccount.findOne({ landlord: booking.landlord });
+
+            if (bankAccount) {
+                bankDetails = {
+                    bankName: bankAccount.bankName,
+                    accountTitle: bankAccount.accountTitle,
+                    accountNumber: bankAccount.accountNumber,
+                    iban: bankAccount.iban,
+                    branchCode: bankAccount.branchCode,
+                };
+            }
+        }
+
+        const payment = await Payment.create({
+            booking: booking._id,
+            tenant: new mongoose.Types.ObjectId(tenantId),
+            landlord: booking.landlord,
+            property: booking.property,
+            amount,
+            paymentType,
+            paymentMethod,
+            status: PaymentStatus.AWAITING_CONFIRMATION,
+            transactionReference,
+            proofOfPayment: receiptUrl,
+            bankDetails,
+            dueDate: new Date(),
+            paidAt: new Date(),
+        });
+
+        logger.info(`Payment with receipt submitted: ${payment._id} for booking ${bookingId}`);
+        return payment;
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // ADMIN METHODS
+    // ─────────────────────────────────────────────────────────────────
+
+    /**
+     * Admin: Get all payments with optional status filter (paginated)
+     */
+    async adminGetAllPayments(page = 1, limit = 20, status?: PaymentStatus) {
+        const query: Record<string, unknown> = {};
+        if (status) {
+            query.status = status;
+        }
+
+        const [payments, total] = await Promise.all([
+            Payment.find(query)
+                .populate('tenant', 'firstName lastName email phone')
+                .populate('landlord', 'firstName lastName email')
+                .populate('property', 'title location')
+                .populate('booking', 'status proposedMoveInDate rentDetails bookingType')
+                .sort({ createdAt: -1 })
+                .skip((page - 1) * limit)
+                .limit(limit),
+            Payment.countDocuments(query),
+        ]);
+
+        return {
+            payments,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        };
+    }
+
+    /**
+     * Admin: Approve payment and auto-confirm the booking
+     */
+    async adminApprovePayment(
+        paymentId: string,
+        adminId: string,
+        adminNotes?: string
+    ): Promise<IPaymentDocument> {
+        const payment = await Payment.findById(paymentId);
+        if (!payment) {
+            throw new Error('Payment not found');
+        }
+
+        if (payment.status === PaymentStatus.CONFIRMED) {
+            throw new Error('Payment is already confirmed');
+        }
+
+        if (payment.status === PaymentStatus.REJECTED) {
+            throw new Error('Cannot approve a rejected payment');
+        }
+
+        payment.status = PaymentStatus.CONFIRMED;
+        payment.confirmedBy = new mongoose.Types.ObjectId(adminId);
+        payment.confirmedAt = new Date();
+        if (adminNotes) {
+            payment.adminNotes = adminNotes;
+        }
+        if (!payment.paidAt) {
+            payment.paidAt = new Date();
+        }
+        await payment.save();
+
+        // Auto-confirm the booking
+        await Booking.findByIdAndUpdate(payment.booking, {
+            status: BookingStatus.COMPLETED,
+            'timeline.completedAt': new Date(),
+        });
+
+        logger.info(`Admin ${adminId} approved payment ${paymentId}; booking ${payment.booking} marked COMPLETED`);
+        return payment;
+    }
+
+    /**
+     * Admin: Reject payment with a mandatory reason
+     */
+    async adminRejectPayment(
+        paymentId: string,
+        adminId: string,
+        reason: string
+    ): Promise<IPaymentDocument> {
+        const payment = await Payment.findById(paymentId);
+        if (!payment) {
+            throw new Error('Payment not found');
+        }
+
+        if (payment.status === PaymentStatus.CONFIRMED) {
+            throw new Error('Cannot reject an already confirmed payment');
+        }
+
+        payment.status = PaymentStatus.REJECTED;
+        payment.rejectionReason = reason;
+        payment.adminNotes = reason;
+        payment.confirmedBy = new mongoose.Types.ObjectId(adminId);
+        payment.confirmedAt = new Date();
+        await payment.save();
+
+        logger.info(`Admin ${adminId} rejected payment ${paymentId}`);
         return payment;
     }
 

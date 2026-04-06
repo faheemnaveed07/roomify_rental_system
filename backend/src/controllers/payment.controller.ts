@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import PaymentService from '../services/PaymentService';
-import { PaymentStatus } from '../models/Payment';
+import { PaymentMethod, PaymentStatus, PaymentType } from '../models/Payment';
+import { sanitizeText } from '../utils/sanitize';
+import path from 'path';
 
 // Bank Account Controllers
 export const getBankAccounts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -364,13 +366,90 @@ export const getLandlordPaymentStats = async (req: Request, res: Response, next:
     }
 };
 
+// NEW: Combined create + receipt upload in one request (multipart/form-data)
+export const submitPaymentWithReceipt = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            res.status(401).json({ success: false, message: 'Unauthorized' });
+            return;
+        }
+
+        const file = req.file;
+        if (!file) {
+            res.status(400).json({ success: false, message: 'Receipt file is required' });
+            return;
+        }
+
+        const { bookingId, paymentType, paymentMethod, transactionReference } = req.body;
+
+        if (!bookingId || !paymentType || !paymentMethod || !transactionReference) {
+            res.status(400).json({
+                success: false,
+                message: 'bookingId, paymentType, paymentMethod, and transactionReference are required',
+            });
+            return;
+        }
+
+        // Sanitize transaction reference
+        const sanitizedRef = sanitizeText(transactionReference.trim());
+        if (!sanitizedRef) {
+            res.status(400).json({ success: false, message: 'Invalid transaction reference' });
+            return;
+        }
+
+        // Build receipt URL (served as static file)
+        const receiptUrl = `/uploads/payments/${path.basename(file.path)}`;
+
+        const payment = await PaymentService.submitPaymentWithReceipt({
+            bookingId,
+            tenantId: userId,
+            paymentType: paymentType as PaymentType,
+            paymentMethod: paymentMethod as PaymentMethod,
+            transactionReference: sanitizedRef,
+            receiptUrl,
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Payment submitted successfully. Awaiting admin verification.',
+            data: payment,
+        });
+    } catch (error: any) {
+        // Clean up uploaded file on error
+        if (req.file?.path) {
+            const fs = await import('fs');
+            if (fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+        }
+        next(error);
+    }
+};
+
+export const getLandlordPublicBankAccounts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const { landlordId } = req.params;
+        if (!landlordId) {
+            res.status(400).json({ success: false, message: 'landlordId is required' });
+            return;
+        }
+        const accounts = await PaymentService.getLandlordBankAccounts(landlordId);
+        res.status(200).json({ success: true, data: accounts });
+    } catch (error) {
+        next(error);
+    }
+};
+
 export default {
     getBankAccounts,
     addBankAccount,
     updateBankAccount,
     deleteBankAccount,
+    getLandlordPublicBankAccounts,
     createPayment,
     submitPaymentProof,
+    submitPaymentWithReceipt,
     confirmPayment,
     getTenantPayments,
     getLandlordPayments,
