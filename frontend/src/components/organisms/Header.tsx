@@ -10,7 +10,9 @@ import {
     Home,
     Users,
     MessageCircle,
-    CreditCard
+    CreditCard,
+    UserCheck,
+    Star
 } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { useChatStore } from '../../store/chat.store';
@@ -128,6 +130,22 @@ const Header: React.FC = () => {
                             </NavLink>
                         )}
 
+                        {isAuthenticated && user?.role === UserRole.TENANT && (
+                            <NavLink
+                                to="/roommate-matches"
+                                className={({ isActive }) =>
+                                    `hidden lg:inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                                        isActive
+                                            ? 'border-primary-300 bg-primary-50 text-primary-700'
+                                            : 'border-slate-200 bg-white text-slate-700 hover:border-primary-200 hover:text-primary-700'
+                                    }`
+                                }
+                            >
+                                <Star size={16} />
+                                Matches
+                            </NavLink>
+                        )}
+
                         {!isAuthenticated ? (
                             <NavLink
                                 to="/auth"
@@ -182,6 +200,26 @@ const Header: React.FC = () => {
                                                 >
                                                     <CalendarCheck size={16} />
                                                     My Bookings
+                                                </Link>
+                                            )}
+                                            {user?.role === UserRole.TENANT && (
+                                                <Link
+                                                    to="/roommate-matches"
+                                                    onClick={() => setMenuOpen(false)}
+                                                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+                                                >
+                                                    <Star size={16} />
+                                                    Matched Properties
+                                                </Link>
+                                            )}
+                                            {user?.role === UserRole.TENANT && (
+                                                <Link
+                                                    to="/roommate-profile"
+                                                    onClick={() => setMenuOpen(false)}
+                                                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                                                >
+                                                    <UserCheck size={16} />
+                                                    My Roommate Profile
                                                 </Link>
                                             )}
                                             {user?.role === UserRole.LANDLORD && (

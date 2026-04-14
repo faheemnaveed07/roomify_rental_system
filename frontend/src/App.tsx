@@ -14,6 +14,8 @@ import AddPropertyPage from './pages/AddProperty';
 import MyBookingsPage from './pages/MyBookings';
 import MessagesPage from './pages/Messages';
 import PaymentsPage from './pages/Payments';
+import RoommateProfilePage from './pages/RoommateProfile';
+import RoommateMatchesPage from './pages/RoommateMatches';
 import DashboardLayout from './components/organisms/DashboardLayout';
 import ProtectedRoute from './components/organisms/ProtectedRoute';
 import RoleProtectedRoute from './components/atoms/RoleProtectedRoute';
@@ -73,6 +75,16 @@ const AppLayout: React.FC = () => {
                     <Route path="/agreement/:bookingId" element={
                         <ProtectedRoute>
                             <AgreementPage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/roommate-profile" element={
+                        <ProtectedRoute>
+                            <RoommateProfilePage />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/roommate-matches" element={
+                        <ProtectedRoute>
+                            <RoommateMatchesPage />
                         </ProtectedRoute>
                     } />
                     <Route element={<RoleProtectedRoute allowedRoles={[UserRole.ADMIN]} />}>

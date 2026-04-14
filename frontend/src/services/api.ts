@@ -11,6 +11,7 @@ import {
     LandlordStatistics,
     IPropertyCreate
 } from '@shared/types';
+import { IRoommateProfileForm, IRoommateProfileResponse } from '../types/roommate.types';
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 export const ASSETS_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -357,3 +358,23 @@ export const matchingService = {
 };
 
 export default api;
+
+// ─── Roommate Profile Service ─────────────────────────────────────────────────
+export const roommateProfileService = {
+    getProfile: async (): Promise<IRoommateProfileResponse | null> => {
+        try {
+            const response = await api.get<ApiResponse<IRoommateProfileResponse>>('/roommate-profile');
+            return response.data.data ?? null;
+        } catch {
+            return null;
+        }
+    },
+    createProfile: async (data: IRoommateProfileForm): Promise<IRoommateProfileResponse> => {
+        const response = await api.post<ApiResponse<IRoommateProfileResponse>>('/roommate-profile', data);
+        return response.data.data!;
+    },
+    updateProfile: async (data: Partial<IRoommateProfileForm>): Promise<IRoommateProfileResponse> => {
+        const response = await api.put<ApiResponse<IRoommateProfileResponse>>('/roommate-profile', data);
+        return response.data.data!;
+    },
+};

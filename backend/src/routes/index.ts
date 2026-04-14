@@ -9,6 +9,7 @@ import chatRoutes from './chat.routes';
 import paymentRoutes from './payment.routes';
 import agreementRoutes from './agreement.routes';
 import matchingRoutes from './matching.routes';
+import roommateProfileRoutes from './roommateProfile.routes';
 
 const router = Router();
 
@@ -32,5 +33,6 @@ router.use('/chat', chatRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/agreements', agreementRoutes);
 router.use('/matching', matchingRoutes);
+router.use('/roommate-profile', roommateProfileRoutes);
 
 export default router;
