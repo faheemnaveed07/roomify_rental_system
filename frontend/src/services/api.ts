@@ -20,37 +20,58 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    // ✅ Enable httpOnly cookies in requests
+    withCredentials: true,
 });
 
-// Request interceptor to attach token
+// ✅ Request interceptor — attach token from header for mobile apps (optional fallback)
 api.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem('token');
-        if (token && config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
+        // Cookies are automatically sent by browser, no need to manually attach
+        // This is kept for backward compatibility with mobile apps
         return config;
     },
     (error) => Promise.reject(error)
 );
 
-// Response interceptor for error handling
+// ✅ Enhanced response interceptor for automatic token refresh
 api.interceptors.response.use(
     (response) => response,
-    (error: AxiosError<ApiResponse>) => {
+    async (error: AxiosError<ApiResponse>) => {
+        const config = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+
         console.error('API Error:', {
             message: error.message,
             status: error.response?.status,
-            url: error.config?.url,
-            method: error.config?.method,
+            url: config?.url,
+            method: config?.method,
             data: error.response?.data,
         });
-        const status = error.response?.status;
 
-        if (status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            // Optional: window.location.href = '/auth';
+        // ✅ If 401 and not already retrying, attempt refresh
+        if (error.response?.status === 401 && !config?._retry) {
+            config._retry = true;
+
+            try {
+                // Call refresh endpoint — cookies are automatically sent
+                const refreshResponse = await api.post<ApiResponse<{ tokens: { accessToken: string } }>>('/auth/refresh-token');
+                
+                if (refreshResponse.data.success) {
+                    // New cookies are automatically set by the server
+                    // Retry the original request
+                    return api(config);
+                }
+            } catch (refreshError) {
+                console.error('Token refresh failed:', refreshError);
+                // Refresh failed — redirect to login
+                // Cookies will be cleared by server
+                window.location.href = '/auth';
+            }
+        }
+
+        if (error.response?.status === 401) {
+            // Final 401 — redirect to login
+            window.location.href = '/auth';
         }
 
         const message = error.response?.data?.message || 'Something went wrong';
@@ -61,16 +82,29 @@ api.interceptors.response.use(
 export const authService = {
     login: async (credentials: IUserLogin): Promise<AuthResponse> => {
         const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', credentials);
+        // ✅ Tokens are now in httpOnly cookies, not in response
         return response.data.data!;
     },
     register: async (userData: IUserRegistration): Promise<AuthResponse> => {
         const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', userData);
+        // ✅ Tokens are now in httpOnly cookies, not in response
         return response.data.data!;
     },
     logout: async (): Promise<void> => {
         await api.post('/auth/logout');
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        // ✅ Cookies are automatically cleared by server
+    },
+    forgotPassword: async (email: string): Promise<string> => {
+        const response = await api.post<ApiResponse<never>>('/auth/forgot-password', { email });
+        return response.data.message;
+    },
+    resetPassword: async (token: string, password: string): Promise<string> => {
+        const response = await api.post<ApiResponse<never>>('/auth/reset-password', { token, password });
+        return response.data.message;
+    },
+    verifyEmail: async (token: string): Promise<string> => {
+        const response = await api.get<ApiResponse<never>>(`/auth/verify-email/${token}`);
+        return response.data.message;
     },
 };
 

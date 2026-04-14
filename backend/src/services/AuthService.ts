@@ -1,4 +1,4 @@
-import jwt, { SignOptions } from 'jsonwebtoken'; // Unused JwtPayload removed
+import jwt, { SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { env } from '../config/environment';
 import { User, IUserDocument } from '../models/User';
@@ -11,14 +11,17 @@ import {
     UserStatus,
 } from '@shared/types/user.types';
 import { logger } from '../utils/logger';
+import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/email';
+
+/** Hash a raw token with SHA-256 for safe DB storage */
+const hashToken = (raw: string): string =>
+    crypto.createHash('sha256').update(raw).digest('hex');
 
 export class AuthService {
     private readonly accessTokenExpiry: string;
     private readonly refreshTokenExpiry: string;
 
     constructor() {
-        // Environment variables se string milti hai, 
-        // par JWT options ko specific format chahiye hota hai.
         this.accessTokenExpiry = env.JWT_EXPIRES_IN || '1h';
         this.refreshTokenExpiry = '30d';
     }
@@ -29,16 +32,28 @@ export class AuthService {
             throw new Error('Email already registered');
         }
 
+        // Generate a one-time email verification token (raw → hashed in DB)
+        const rawVerifyToken = crypto.randomBytes(32).toString('hex');
+        const hashedVerifyToken = hashToken(rawVerifyToken);
+        const verifyExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 h
+
         const user = await User.create({
             ...userData,
             email: userData.email.toLowerCase(),
             role: userData.role || UserRole.TENANT,
             status: UserStatus.PENDING,
+            emailVerificationToken: hashedVerifyToken,
+            emailVerificationExpires: verifyExpires,
         });
 
         const tokens = this.generateTokens(user);
         user.refreshToken = tokens.refreshToken;
         await user.save();
+
+        // Best-effort: send verification email (don't fail registration if SMTP is down)
+        sendVerificationEmail(user.email, user.firstName, rawVerifyToken).catch((err) =>
+            logger.warn('Failed to send verification email:', err)
+        );
 
         logger.info(`User registered: ${user.email}`);
         return { user, tokens };
@@ -95,18 +110,21 @@ export class AuthService {
         return tokens;
     }
 
-    async verifyEmail(token: string): Promise<IUserDocument> {
-        const payload = this.verifyAccessToken(token);
-        if (!payload) {
-            throw new Error('Invalid verification token');
-        }
+    async verifyEmail(rawToken: string): Promise<IUserDocument> {
+        const hashed = hashToken(rawToken);
 
-        const user = await User.findById(payload.userId);
+        const user = await User.findOne({
+            emailVerificationToken: hashed,
+            emailVerificationExpires: { $gt: new Date() },
+        }).select('+emailVerificationToken +emailVerificationExpires');
+
         if (!user) {
-            throw new Error('User not found');
+            throw new Error('Verification link is invalid or has expired');
         }
 
         user.emailVerified = true;
+        user.emailVerificationToken = undefined;
+        user.emailVerificationExpires = undefined;
         if (user.status === UserStatus.PENDING) {
             user.status = UserStatus.ACTIVE;
         }
@@ -116,43 +134,70 @@ export class AuthService {
         return user;
     }
 
-    async requestPasswordReset(email: string): Promise<string> {
+    async requestPasswordReset(email: string): Promise<void> {
         const user = await User.findOne({ email: email.toLowerCase() });
+        // Always return success — don't leak whether email exists
         if (!user) {
-            throw new Error('No account found with this email');
+            logger.info(`Password reset requested for non-existent email: ${email}`);
+            return;
         }
 
-        const resetToken = crypto.randomBytes(32).toString('hex');
-        // Unused variable tokenExpiry removed as per TS error
+        const rawToken = crypto.randomBytes(32).toString('hex');
+        const hashedToken = hashToken(rawToken);
+        const expires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-        logger.info(`Password reset requested for: ${email}`);
-        return resetToken;
+        user.passwordResetToken = hashedToken;
+        user.passwordResetExpires = expires;
+        // Save without re-hashing password
+        await user.save({ validateModifiedOnly: true });
+
+        sendPasswordResetEmail(user.email, user.firstName, rawToken).catch((err) =>
+            logger.warn('Failed to send password reset email:', err)
+        );
+
+        logger.info(`Password reset email sent to: ${email}`);
     }
 
-    async resetPassword(_token: string, _newPassword: string): Promise<void> {
-        // Commented out logic as it was incomplete in original.
-        // Unused variables prefixed with _ to ignore TS warnings.
-        logger.info('Password reset completed');
+    async resetPassword(rawToken: string, newPassword: string): Promise<void> {
+        const hashed = hashToken(rawToken);
+
+        const user = await User.findOne({
+            passwordResetToken: hashed,
+            passwordResetExpires: { $gt: new Date() },
+        }).select('+passwordResetToken +passwordResetExpires');
+
+        if (!user) {
+            throw new Error('Password reset link is invalid or has expired');
+        }
+
+        user.password = newPassword;
+        user.passwordResetToken = undefined;
+        user.passwordResetExpires = undefined;
+        // Invalidate all existing sessions
+        user.refreshToken = undefined as unknown as string;
+        await user.save();
+
+        logger.info(`Password reset for user: ${user.email}`);
     }
 
     generateTokens(user: IUserDocument): IAuthTokens {
-        // 'as any' cast is used for expiresIn to bypass StringValue mismatch
         const payload: ITokenPayload = {
-            userId: (user._id as any).toString(),
+            userId: (user._id as unknown as { toString(): string }).toString(),
             email: user.email,
             role: user.role,
         };
 
         const accessTokenOptions: SignOptions = {
-            expiresIn: this.accessTokenExpiry as any,
+            expiresIn: this.accessTokenExpiry as SignOptions['expiresIn'],
         };
 
         const refreshTokenOptions: SignOptions = {
-            expiresIn: this.refreshTokenExpiry as any,
+            expiresIn: this.refreshTokenExpiry as SignOptions['expiresIn'],
         };
 
         const accessToken = jwt.sign(payload, env.JWT_SECRET, accessTokenOptions);
-        const refreshToken = jwt.sign(payload, env.JWT_SECRET, refreshTokenOptions);
+        // Use a separate secret for refresh tokens
+        const refreshToken = jwt.sign(payload, env.JWT_REFRESH_SECRET, refreshTokenOptions);
 
         return { accessToken, refreshToken };
     }
@@ -167,7 +212,7 @@ export class AuthService {
 
     verifyRefreshToken(token: string): ITokenPayload | null {
         try {
-            return jwt.verify(token, env.JWT_SECRET) as ITokenPayload;
+            return jwt.verify(token, env.JWT_REFRESH_SECRET) as ITokenPayload;
         } catch {
             return null;
         }
@@ -175,12 +220,11 @@ export class AuthService {
 
     generateEmailVerificationToken(user: IUserDocument): string {
         const payload: ITokenPayload = {
-            userId: (user._id as any).toString(),
+            userId: (user._id as unknown as { toString(): string }).toString(),
             email: user.email,
             role: user.role,
         };
-
-        return jwt.sign(payload, env.JWT_SECRET, { expiresIn: '24h' as any });
+        return jwt.sign(payload, env.JWT_SECRET, { expiresIn: '24h' as SignOptions['expiresIn'] });
     }
 }
 

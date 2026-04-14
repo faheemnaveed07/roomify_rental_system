@@ -1,6 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import AuthPage from './pages/Auth';
+import ForgotPasswordPage from './pages/ForgotPassword';
+import ResetPasswordPage from './pages/ResetPassword';
+import VerifyEmailPage from './pages/VerifyEmail';
 import HomePage from '@pages/Home';
 import SearchPage from './pages/Search';
 import PropertyDetailPage from './pages/PropertyDetail';
@@ -31,6 +35,9 @@ const AppLayout: React.FC = () => {
                 <Routes>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/auth" element={<AuthPage />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
+                    <Route path="/verify-email" element={<VerifyEmailPage />} />
 
                     <Route path="/browse" element={
                         <ProtectedRoute>
@@ -130,6 +137,7 @@ const AppLayout: React.FC = () => {
 const App: React.FC = () => (
     <Router>
         <AppLayout />
+        <Toaster richColors position="top-right" />
     </Router>
 );
 

@@ -1,14 +1,12 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { IPropertyImage } from '@shared/types';
+import api from '../services/api';
 
 interface UseLocalUploadReturn {
     uploadImages: (files: File[]) => Promise<IPropertyImage[]>;
     uploading: boolean;
     error: string | null;
 }
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 export const useLocalUpload = (): UseLocalUploadReturn => {
     const [uploading, setUploading] = useState(false);
@@ -24,11 +22,10 @@ export const useLocalUpload = (): UseLocalUploadReturn => {
                 formData.append('images', file);
             });
 
-            const token = localStorage.getItem('token');
-            const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
+            // ✅ Use the shared axios instance with httpOnly cookies + auto-refresh
+            const response = await api.post('/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${token}`
                 }
             });
 

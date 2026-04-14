@@ -1,43 +1,42 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AuthResponse } from '@shared/types';
+import { AuthResponse, IUserRegistration } from '@shared/types';
 import { authService } from '../services/api';
 
 interface AuthState {
     user: AuthResponse['user'] | null;
-    token: string | null;
     isAuthenticated: boolean;
     loading: boolean;
     error: string | null;
     setAuth: (response: AuthResponse) => void;
     clearAuth: () => void;
-    login: (credentials: any) => Promise<void>;
-    register: (userData: any) => Promise<void>;
+    login: (credentials: { email: string; password: string }) => Promise<void>;
+    register: (userData: IUserRegistration) => Promise<void>;
     logout: () => Promise<void>;
+    forgotPassword: (email: string) => Promise<string>;
+    resetPassword: (token: string, password: string) => Promise<string>;
+    verifyEmail: (token: string) => Promise<string>;
 }
 
 export const useAuthStore = create<AuthState>()(
     persist(
         (set) => ({
             user: null,
-            token: null,
             isAuthenticated: false,
             loading: false,
             error: null,
             setAuth: (response) => {
-                localStorage.setItem('token', response.tokens.accessToken);
+                // ✅ No localStorage — tokens are in httpOnly cookies
                 set({
                     user: response.user,
-                    token: response.tokens.accessToken,
                     isAuthenticated: true,
                     error: null,
                 });
             },
             clearAuth: () => {
-                localStorage.removeItem('token');
+                // ✅ No localStorage — cookies cleared by server
                 set({
                     user: null,
-                    token: null,
                     isAuthenticated: false,
                     error: null,
                 });
@@ -46,15 +45,15 @@ export const useAuthStore = create<AuthState>()(
                 set({ loading: true, error: null });
                 try {
                     const response = await authService.login(credentials);
-                    localStorage.setItem('token', response.tokens.accessToken);
+                    // ✅ Tokens are in httpOnly cookies, only set user in store
                     set({
                         user: response.user,
-                        token: response.tokens.accessToken,
                         isAuthenticated: true,
                         loading: false,
                     });
-                } catch (error: any) {
-                    set({ error: error.message, loading: false });
+                } catch (error: unknown) {
+                    const msg = error instanceof Error ? error.message : 'Login failed';
+                    set({ error: msg, loading: false });
                     throw error;
                 }
             },
@@ -62,15 +61,15 @@ export const useAuthStore = create<AuthState>()(
                 set({ loading: true, error: null });
                 try {
                     const response = await authService.register(userData);
-                    localStorage.setItem('token', response.tokens.accessToken);
+                    // ✅ Tokens are in httpOnly cookies, only set user in store
                     set({
                         user: response.user,
-                        token: response.tokens.accessToken,
                         isAuthenticated: true,
                         loading: false,
                     });
-                } catch (error: any) {
-                    set({ error: error.message, loading: false });
+                } catch (error: unknown) {
+                    const msg = error instanceof Error ? error.message : 'Registration failed';
+                    set({ error: msg, loading: false });
                     throw error;
                 }
             },
@@ -78,21 +77,57 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     await authService.logout();
                 } finally {
-                    localStorage.removeItem('token');
+                    // ✅ Tokens cleared by server via cookies
                     set({
                         user: null,
-                        token: null,
                         isAuthenticated: false,
+                        error: null,
                     });
+                }
+            },
+            forgotPassword: async (email) => {
+                set({ loading: true, error: null });
+                try {
+                    const msg = await authService.forgotPassword(email);
+                    set({ loading: false });
+                    return msg;
+                } catch (error: unknown) {
+                    const msg = error instanceof Error ? error.message : 'Request failed';
+                    set({ error: msg, loading: false });
+                    throw error;
+                }
+            },
+            resetPassword: async (token, password) => {
+                set({ loading: true, error: null });
+                try {
+                    const msg = await authService.resetPassword(token, password);
+                    set({ loading: false });
+                    return msg;
+                } catch (error: unknown) {
+                    const msg = error instanceof Error ? error.message : 'Reset failed';
+                    set({ error: msg, loading: false });
+                    throw error;
+                }
+            },
+            verifyEmail: async (token) => {
+                set({ loading: true, error: null });
+                try {
+                    const msg = await authService.verifyEmail(token);
+                    set({ loading: false });
+                    return msg;
+                } catch (error: unknown) {
+                    const msg = error instanceof Error ? error.message : 'Verification failed';
+                    set({ error: msg, loading: false });
+                    throw error;
                 }
             },
         }),
         {
             name: 'auth-storage',
+            // ✅ Only persist user data, NOT tokens (tokens are in httpOnly cookies)
             partialize: (state) => ({
                 user: state.user,
-                token: state.token,
-                isAuthenticated: state.isAuthenticated
+                isAuthenticated: state.isAuthenticated,
             }),
         }
     )

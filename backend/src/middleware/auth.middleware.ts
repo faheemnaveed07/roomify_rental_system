@@ -18,17 +18,24 @@ export const authenticate = (
     next: NextFunction
 ): void => {
     try {
-        const authHeader = req.headers.authorization;
+        // ✅ Try to read from httpOnly cookie first
+        let token = req.cookies.accessToken;
 
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        // Fallback to Authorization header for mobile/API clients
+        if (!token) {
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];
+            }
+        }
+
+        if (!token) {
             res.status(401).json({
                 success: false,
                 message: 'Access token is required',
             });
             return;
         }
-
-        const token = authHeader.split(' ')[1];
 
         try {
             const decoded = jwt.verify(token, env.JWT_SECRET) as ITokenPayload;
@@ -51,10 +58,18 @@ export const optionalAuth = (
     next: NextFunction
 ): void => {
     try {
-        const authHeader = req.headers.authorization;
+        // ✅ Try to read from httpOnly cookie first
+        let token = req.cookies.accessToken;
 
-        if (authHeader && authHeader.startsWith('Bearer ')) {
-            const token = authHeader.split(' ')[1];
+        // Fallback to Authorization header
+        if (!token) {
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.split(' ')[1];
+            }
+        }
+
+        if (token) {
             try {
                 const decoded = jwt.verify(token, env.JWT_SECRET) as ITokenPayload;
                 req.user = decoded;

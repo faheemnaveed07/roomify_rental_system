@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "ignoreDeprecations": "5.0",
         "target": "ES2022",
         "useDefineForClassFields": true,
         "lib": [
@@ -16,6 +17,7 @@
         "noEmit": true,
         "jsx": "react-jsx",
         "strict": true,
+        "forceConsistentCasingInFileNames": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,

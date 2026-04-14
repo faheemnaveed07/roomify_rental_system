@@ -13,6 +13,10 @@ const envSchema = z.object({
         .string()
         .min(32)
         .default('dev-secret-please-change-this-to-a-long-secure-string-12345'),
+    JWT_REFRESH_SECRET: z
+        .string()
+        .min(32)
+        .default('dev-refresh-secret-please-change-this-different-from-access-12345'),
     JWT_EXPIRES_IN: z.string().default('7d'),
 
     // Cloudinary (optional for local dev)

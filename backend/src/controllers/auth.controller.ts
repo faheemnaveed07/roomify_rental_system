@@ -3,6 +3,37 @@ import { authService } from '../services/AuthService';
 import { userRegistrationSchema, userLoginSchema } from '../utils/validators';
 import { ApiResponse, AuthResponse } from '@shared/types/api.types';
 import { IUserRegistration } from '@shared/types/user.types';
+import { User } from '../models/User';
+import { env } from '../config/environment';
+
+// ─── Helper: Set Auth Cookies ────────────────────────────────────────
+const setAuthCookies = (res: Response, tokens: { accessToken: string; refreshToken: string }) => {
+    const isProduction = env.NODE_ENV === 'production';
+
+    // Access token: 1 hour
+    res.cookie('accessToken', tokens.accessToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 1000, // 1 hour
+        path: '/',
+    });
+
+    // Refresh token: 30 days
+    res.cookie('refreshToken', tokens.refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        path: '/',
+    });
+};
+
+// ─── Helper: Clear Auth Cookies ──────────────────────────────────────
+const clearAuthCookies = (res: Response) => {
+    res.clearCookie('accessToken', { path: '/' });
+    res.clearCookie('refreshToken', { path: '/' });
+};
 
 export class AuthController {
     async register(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -10,6 +41,9 @@ export class AuthController {
             // validatedData ko explicit type cast kiya hai taake Enum mismatch khatam ho jaye
             const validatedData = userRegistrationSchema.parse(req.body) as IUserRegistration;
             const { user, tokens } = await authService.register(validatedData);
+
+            // ✅ Set httpOnly cookies for tokens
+            setAuthCookies(res, tokens);
 
             const response: ApiResponse<AuthResponse> = {
                 success: true,
@@ -24,7 +58,7 @@ export class AuthController {
                         role: user.role,
                         avatar: user.avatar,
                     },
-                    tokens,
+                    tokens, // Still send tokens for mobile apps (optional)
                 },
             };
 
@@ -39,6 +73,9 @@ export class AuthController {
             const validatedData = userLoginSchema.parse(req.body);
             const { user, tokens } = await authService.login(validatedData);
 
+            // ✅ Set httpOnly cookies for tokens
+            setAuthCookies(res, tokens);
+
             const response: ApiResponse<AuthResponse> = {
                 success: true,
                 message: 'Login successful',
@@ -51,7 +88,7 @@ export class AuthController {
                         role: user.role,
                         avatar: user.avatar,
                     },
-                    tokens,
+                    tokens, // Still send tokens for mobile apps (optional)
                 },
             };
 
@@ -69,6 +106,9 @@ export class AuthController {
                 await authService.logout(userId);
             }
 
+            // ✅ Clear httpOnly cookies
+            clearAuthCookies(res);
+
             const response: ApiResponse = {
                 success: true,
                 message: 'Logged out successfully',
@@ -82,7 +122,8 @@ export class AuthController {
 
     async refreshToken(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { refreshToken } = req.body;
+            // ✅ Read refresh token from httpOnly cookie
+            const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
             if (!refreshToken) {
                 res.status(400).json({
                     success: false,
@@ -92,6 +133,9 @@ export class AuthController {
             }
 
             const tokens = await authService.refreshTokens(refreshToken);
+
+            // ✅ Set new cookies
+            setAuthCookies(res, tokens);
 
             const response: ApiResponse<{ tokens: typeof tokens }> = {
                 success: true,
@@ -107,7 +151,12 @@ export class AuthController {
 
     async verifyEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { token } = req.params;
+            // Support both GET /verify-email/:token and GET /verify-email?token=...
+            const token = (req.params.token as string | undefined) || (req.query.token as string | undefined);
+            if (!token) {
+                res.status(400).json({ success: false, message: 'Verification token is required' });
+                return;
+            }
             await authService.verifyEmail(token);
 
             const response: ApiResponse = {
@@ -124,11 +173,16 @@ export class AuthController {
     async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { email } = req.body;
+            if (!email) {
+                res.status(400).json({ success: false, message: 'Email is required' });
+                return;
+            }
+            // Always return 200 — don't leak whether email exists
             await authService.requestPasswordReset(email);
 
             const response: ApiResponse = {
                 success: true,
-                message: 'Password reset email sent',
+                message: 'If an account with that email exists, a reset link has been sent.',
             };
 
             res.json(response);
@@ -139,13 +193,18 @@ export class AuthController {
 
     async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { token } = req.params;
+            // Support both /reset-password/:token and ?token= query param
+            const token = (req.params.token as string | undefined) || (req.query.token as string | undefined);
             const { password } = req.body;
+            if (!token || !password) {
+                res.status(400).json({ success: false, message: 'Token and new password are required' });
+                return;
+            }
             await authService.resetPassword(token, password);
 
             const response: ApiResponse = {
                 success: true,
-                message: 'Password reset successfully',
+                message: 'Password reset successfully. Please log in.',
             };
 
             res.json(response);
@@ -156,10 +215,8 @@ export class AuthController {
 
     async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const userId = (req as any).user?.userId;
+            const userId = req.user?.userId;
 
-            // Dynamic import logic ko simple kiya gaya hai
-            const { User } = await import('../models/User');
             const user = await User.findById(userId);
 
             if (!user) {
