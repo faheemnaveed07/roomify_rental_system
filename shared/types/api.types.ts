@@ -105,6 +105,25 @@ export interface StatisticsResponse {
     completedBookings: number;
 }
 
+export interface AdminAnalyticsData {
+    overview: {
+        totalUsers: number;
+        totalProperties: number;
+        totalBookings: number;
+        totalRevenue: number;
+        currency: string;
+    };
+    usersByRole: { role: string; count: number }[];
+    propertiesByStatus: { status: string; count: number }[];
+    bookingsByStatus: { status: string; count: number }[];
+    revenueByMonth: { month: string; revenue: number }[];
+    recentActivity: {
+        newUsersThisMonth: number;
+        newPropertiesThisMonth: number;
+        newBookingsThisMonth: number;
+    };
+}
+
 export interface LandlordStatistics {
     totalProperties: number;
     pendingRequests: number;

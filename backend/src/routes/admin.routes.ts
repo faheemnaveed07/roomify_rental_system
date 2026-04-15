@@ -11,6 +11,7 @@ router.use(requireAdmin);
 
 // Dashboard
 router.get('/dashboard/stats', adminController.getDashboardStats.bind(adminController));
+router.get('/dashboard/analytics', adminController.getAnalytics.bind(adminController));
 
 // Document verification
 router.get('/documents/pending', adminController.getPendingDocuments.bind(adminController));
@@ -18,6 +19,7 @@ router.post('/documents/:id/approve', adminController.approveDocument.bind(admin
 router.post('/documents/:id/reject', adminController.rejectDocument.bind(adminController));
 
 // Property verification
+router.get('/properties', adminController.getAllProperties.bind(adminController));
 router.get('/properties/pending', adminController.getPendingProperties.bind(adminController));
 router.post('/properties/:id/approve', adminController.approveProperty.bind(adminController));
 router.post('/properties/:id/reject', adminController.rejectProperty.bind(adminController));
@@ -25,6 +27,7 @@ router.post('/properties/:id/reject', adminController.rejectProperty.bind(adminC
 // User management
 router.get('/users', adminController.getUsers.bind(adminController));
 router.patch('/users/:id/status', adminController.updateUserStatus.bind(adminController));
+router.patch('/users/:id/role', adminController.updateUserRole.bind(adminController));
 
 // Payment management (admin approval)
 router.get('/payments', adminController.getAllPayments.bind(adminController));

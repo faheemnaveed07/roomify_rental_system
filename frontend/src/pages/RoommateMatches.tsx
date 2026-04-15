@@ -5,19 +5,21 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     Sparkles, SlidersHorizontal, Search, MapPin, Home, RefreshCw,
     ArrowRight, ChevronLeft, ChevronRight, Loader2, UserCheck,
+    SearchX, ChevronDown,
 } from 'lucide-react';
 import { matchingService, roommateProfileService, ASSETS_URL } from '../services/api';
 import { useAuthStore } from '../store/auth.store';
 import { IProperty } from '@shared/types';
 import { PropertyType } from '@shared/types';
 import { IPropertyCompatibilityScore } from '../types/roommate.types';
-import { MatchScoreRing } from '../components/molecules/MatchScoreRing';
 import ProfileDisplayCard from '../components/molecules/ProfileDisplayCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -118,68 +120,160 @@ interface FilterBarProps {
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({ pending, onChange, onApply, loading }) => {
+    const [isOpen, setIsOpen] = useState(false);
     const set = (key: keyof Filters, val: string) => onChange({ ...pending, [key]: val });
+    const activeCount = [pending.city, pending.propertyType, pending.minPrice, pending.maxPrice].filter(Boolean).length;
 
     return (
-        <div className="flex flex-wrap gap-3 items-center bg-white rounded-2xl border border-slate-200 shadow-sm p-3">
-            <SlidersHorizontal size={16} className="text-slate-400 ml-1 shrink-0" />
-
-            <div className="flex items-center gap-2 rounded-xl border border-input px-3 py-2 flex-1 min-w-[140px] focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0 transition">
-                <MapPin size={14} className="text-slate-400 shrink-0" />
-                <input
-                    value={pending.city}
-                    onChange={(e) => set('city', e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && onApply()}
-                    placeholder="City or area…"
-                    className="text-sm outline-none w-full text-slate-700 placeholder:text-muted-foreground bg-transparent"
-                />
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            {/* Mobile toggle header */}
+            <div className="flex sm:hidden items-center justify-between px-3 py-2.5">
+                <button
+                    type="button"
+                    onClick={() => setIsOpen((v) => !v)}
+                    className="flex items-center gap-2 text-sm font-medium text-slate-700"
+                >
+                    <SlidersHorizontal size={15} className="text-slate-400" />
+                    Filters
+                    {activeCount > 0 && (
+                        <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-bold">
+                            {activeCount}
+                        </Badge>
+                    )}
+                    <ChevronDown
+                        size={14}
+                        className={cn('text-slate-400 transition-transform duration-200', isOpen && 'rotate-180')}
+                    />
+                </button>
+                <Button onClick={onApply} disabled={loading} size="sm" className="rounded-xl gap-1.5">
+                    {loading ? <Loader2 size={13} className="animate-spin" /> : <Search size={13} />}
+                    Search
+                </Button>
             </div>
 
-            <Select
-                value={pending.propertyType || 'all'}
-                onValueChange={(v) => set('propertyType', v === 'all' ? '' : v)}
-            >
-                <SelectTrigger className="w-[140px] rounded-xl">
-                    <SelectValue placeholder="All Types" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="shared_room">Shared Room</SelectItem>
-                    <SelectItem value="full_house">Full House</SelectItem>
-                </SelectContent>
-            </Select>
+            {/* Mobile collapsible filter body */}
+            <AnimatePresence initial={false}>
+                {isOpen && (
+                    <motion.div
+                        key="mobile-filters"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="sm:hidden overflow-hidden border-t border-slate-100"
+                    >
+                        <div className="flex flex-col gap-3 p-3">
+                            <div className="flex items-center gap-2 rounded-xl border border-input px-3 py-2 focus-within:ring-2 focus-within:ring-ring transition">
+                                <MapPin size={14} className="text-slate-400 shrink-0" />
+                                <input
+                                    value={pending.city}
+                                    onChange={(e) => set('city', e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && onApply()}
+                                    placeholder="City or area…"
+                                    className="text-sm outline-none w-full text-slate-700 placeholder:text-muted-foreground bg-transparent"
+                                />
+                            </div>
+                            <Select
+                                value={pending.propertyType || 'all'}
+                                onValueChange={(v) => set('propertyType', v === 'all' ? '' : v)}
+                            >
+                                <SelectTrigger className="rounded-xl">
+                                    <SelectValue placeholder="All Types" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Types</SelectItem>
+                                    <SelectItem value="shared_room">Shared Room</SelectItem>
+                                    <SelectItem value="full_house">Full House</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1.5 rounded-xl border border-input px-3 py-2 flex-1 focus-within:ring-2 focus-within:ring-ring transition">
+                                    <span className="text-xs text-muted-foreground">PKR</span>
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        step={1000}
+                                        value={pending.minPrice}
+                                        onChange={(e) => set('minPrice', e.target.value)}
+                                        placeholder="Min"
+                                        className="w-full text-sm outline-none text-slate-700 bg-transparent"
+                                    />
+                                </div>
+                                <span className="text-slate-300 text-sm">–</span>
+                                <div className="flex items-center gap-1.5 rounded-xl border border-input px-3 py-2 flex-1 focus-within:ring-2 focus-within:ring-ring transition">
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        step={1000}
+                                        value={pending.maxPrice}
+                                        onChange={(e) => set('maxPrice', e.target.value)}
+                                        placeholder="Max"
+                                        className="w-full text-sm outline-none text-slate-700 bg-transparent"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
-            <div className="flex items-center gap-1">
-                <div className="flex items-center gap-1.5 rounded-xl border border-input px-3 py-2 focus-within:ring-2 focus-within:ring-ring transition">
-                    <span className="text-xs text-muted-foreground">PKR</span>
+            {/* Desktop filter bar — always visible */}
+            <div className="hidden sm:flex flex-wrap gap-3 items-center p-3">
+                <SlidersHorizontal size={16} className="text-slate-400 ml-1 shrink-0" />
+                <div className="flex items-center gap-2 rounded-xl border border-input px-3 py-2 flex-1 min-w-[140px] focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0 transition">
+                    <MapPin size={14} className="text-slate-400 shrink-0" />
                     <input
-                        type="number"
-                        min={0}
-                        step={1000}
-                        value={pending.minPrice}
-                        onChange={(e) => set('minPrice', e.target.value)}
-                        placeholder="Min"
-                        className="w-16 text-sm outline-none text-slate-700 bg-transparent"
+                        value={pending.city}
+                        onChange={(e) => set('city', e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && onApply()}
+                        placeholder="City or area…"
+                        className="text-sm outline-none w-full text-slate-700 placeholder:text-muted-foreground bg-transparent"
                     />
                 </div>
-                <span className="text-slate-300 text-sm font-light">–</span>
-                <div className="flex items-center gap-1.5 rounded-xl border border-input px-3 py-2 focus-within:ring-2 focus-within:ring-ring transition">
-                    <input
-                        type="number"
-                        min={0}
-                        step={1000}
-                        value={pending.maxPrice}
-                        onChange={(e) => set('maxPrice', e.target.value)}
-                        placeholder="Max"
-                        className="w-16 text-sm outline-none text-slate-700 bg-transparent"
-                    />
+                <Select
+                    value={pending.propertyType || 'all'}
+                    onValueChange={(v) => set('propertyType', v === 'all' ? '' : v)}
+                >
+                    <SelectTrigger className="w-[140px] rounded-xl">
+                        <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="shared_room">Shared Room</SelectItem>
+                        <SelectItem value="full_house">Full House</SelectItem>
+                    </SelectContent>
+                </Select>
+                <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5 rounded-xl border border-input px-3 py-2 focus-within:ring-2 focus-within:ring-ring transition">
+                        <span className="text-xs text-muted-foreground">PKR</span>
+                        <input
+                            type="number"
+                            min={0}
+                            step={1000}
+                            value={pending.minPrice}
+                            onChange={(e) => set('minPrice', e.target.value)}
+                            placeholder="Min"
+                            className="w-16 text-sm outline-none text-slate-700 bg-transparent"
+                        />
+                    </div>
+                    <span className="text-slate-300 text-sm font-light">–</span>
+                    <div className="flex items-center gap-1.5 rounded-xl border border-input px-3 py-2 focus-within:ring-2 focus-within:ring-ring transition">
+                        <input
+                            type="number"
+                            min={0}
+                            step={1000}
+                            value={pending.maxPrice}
+                            onChange={(e) => set('maxPrice', e.target.value)}
+                            placeholder="Max"
+                            className="w-16 text-sm outline-none text-slate-700 bg-transparent"
+                        />
+                    </div>
                 </div>
+                <Button onClick={onApply} disabled={loading} className="rounded-xl gap-2" size="sm">
+                    {loading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
+                    Search
+                </Button>
             </div>
-
-            <Button onClick={onApply} disabled={loading} className="rounded-xl gap-2" size="sm">
-                {loading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
-                Search
-            </Button>
         </div>
     );
 };
@@ -224,6 +318,7 @@ const PropertyMatchCard: React.FC<PropertyMatchCardProps> = ({ property, score, 
                     <img
                         src={imageUrl}
                         alt={property.title}
+                        loading="lazy"
                         className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                 ) : (
@@ -234,7 +329,9 @@ const PropertyMatchCard: React.FC<PropertyMatchCardProps> = ({ property, score, 
 
                 {overallScore !== undefined && (
                     <div className="absolute top-3 right-3">
-                        <MatchScoreRing score={overallScore} size="sm" />
+                        <span className={`text-xs font-bold px-2 py-1 rounded-full border backdrop-blur-sm bg-white/90 ${scoreColor}`}>
+                            {overallScore}%
+                        </span>
                     </div>
                 )}
 
@@ -264,6 +361,19 @@ const PropertyMatchCard: React.FC<PropertyMatchCardProps> = ({ property, score, 
                     {property.location.area}, {property.location.city}
                 </p>
 
+                {/* Overall compatibility */}
+                {overallScore !== undefined && (
+                    <div className="mb-3">
+                        <div className="flex items-center justify-between mb-1">
+                            <span className="text-[11px] text-slate-500 font-medium">Compatibility</span>
+                            <Badge className={`text-[10px] font-bold px-2 py-0 border ${scoreColor}`}>
+                                {overallScore}% Match
+                            </Badge>
+                        </div>
+                        <Progress value={overallScore} className="h-1.5" />
+                    </div>
+                )}
+
                 {/* Score breakdown mini bars */}
                 {score && score.breakdown.length > 0 && (
                     <div className="mb-3 space-y-1.5">
@@ -292,7 +402,7 @@ const PropertyMatchCard: React.FC<PropertyMatchCardProps> = ({ property, score, 
                     </div>
                 )}
 
-                <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center mt-1">
                     <div className="flex items-baseline gap-0.5">
                         <span className="text-lg font-black text-primary">
                             PKR {property.rent.amount >= 1000
@@ -301,11 +411,6 @@ const PropertyMatchCard: React.FC<PropertyMatchCardProps> = ({ property, score, 
                         </span>
                         <span className="text-xs text-slate-400">/mo</span>
                     </div>
-                    {overallScore !== undefined && (
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${scoreColor}`}>
-                            {overallScore}% Match
-                        </span>
-                    )}
                 </div>
 
                 <Button
@@ -361,7 +466,7 @@ const RoommateMatchesPage: React.FC = () => {
         queryKey: ['matchedProperties', filterParams, page],
         queryFn: () =>
             matchingService.getMatchedProperties(filterParams, { page, limit: LIMIT }),
-        staleTime: 2 * 60 * 1000,
+        staleTime: 5 * 60 * 1000,
         placeholderData: (prev) => prev,
     });
 
@@ -516,13 +621,13 @@ const RoommateMatchesPage: React.FC = () => {
                                             className="flex flex-col items-center justify-center py-24 text-center"
                                         >
                                             <div className="h-20 w-20 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
-                                                <Home size={32} className="text-slate-300" />
+                                                <SearchX size={32} className="text-slate-300" />
                                             </div>
                                             <h3 className="font-semibold text-slate-700 mb-1 text-lg">
                                                 No properties found
                                             </h3>
-                                            <p className="text-sm text-slate-400 mb-5">
-                                                Try adjusting your filters or expanding the search area
+                                            <p className="text-sm text-slate-400 mb-5 max-w-xs">
+                                                No matches for your current filters. Try a different city, price range, or property type.
                                             </p>
                                             <Button
                                                 variant="outline"
@@ -534,8 +639,8 @@ const RoommateMatchesPage: React.FC = () => {
                                                 }}
                                                 className="gap-2"
                                             >
-                                                <RefreshCw size={13} />
-                                                Clear Filters
+                                                <SlidersHorizontal size={13} />
+                                                Adjust Filters
                                             </Button>
                                         </motion.div>
                                     ) : (

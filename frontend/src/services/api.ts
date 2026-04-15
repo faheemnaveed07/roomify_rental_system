@@ -308,6 +308,58 @@ export const adminPaymentService = {
     },
 };
 
+// Admin Analytics Service
+export const adminAnalyticsService = {
+    getAnalytics: async () => {
+        const response = await api.get<ApiResponse<any>>('/admin/dashboard/analytics');
+        return response.data.data;
+    },
+};
+
+// Admin User Management Service
+export const adminUserService = {
+    getUsers: async (params: {
+        page?: number;
+        limit?: number;
+        search?: string;
+        role?: string;
+        status?: string;
+    }) => {
+        const response = await api.get<ApiResponse<any[]>>('/admin/users', { params });
+        return response.data;
+    },
+    updateStatus: async (userId: string, status: string): Promise<any> => {
+        const response = await api.patch<ApiResponse<any>>(`/admin/users/${userId}/status`, { status });
+        return response.data.data!;
+    },
+    updateRole: async (userId: string, role: string): Promise<any> => {
+        const response = await api.patch<ApiResponse<any>>(`/admin/users/${userId}/role`, { role });
+        return response.data.data!;
+    },
+};
+
+// Admin Property Management Service
+export const adminPropertyService = {
+    getAll: async (params: {
+        page?: number;
+        limit?: number;
+        status?: string;
+        city?: string;
+        search?: string;
+    }) => {
+        const response = await api.get<ApiResponse<any[]>>('/admin/properties', { params });
+        return response.data;
+    },
+    approve: async (propertyId: string): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>(`/admin/properties/${propertyId}/approve`);
+        return response.data.data!;
+    },
+    reject: async (propertyId: string, reason: string): Promise<any> => {
+        const response = await api.post<ApiResponse<any>>(`/admin/properties/${propertyId}/reject`, { reason });
+        return response.data.data!;
+    },
+};
+
 export const agreementService = {
     generate: async (bookingId: string): Promise<any> => {
         const response = await api.post<ApiResponse<any>>(`/agreements/generate/${bookingId}`);
