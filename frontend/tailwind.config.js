@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+import tailwindcssAnimate from 'tailwindcss-animate';
+
 export default {
     content: [
         "./index.html",
@@ -6,6 +8,9 @@ export default {
     ],
     theme: {
         extend: {
+            transitionTimingFunction: {
+                smooth: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            },
             colors: {
                 /* shadcn/ui semantic tokens */
                 border: 'hsl(var(--border))',
@@ -153,5 +158,5 @@ export default {
             },
         },
     },
-    plugins: [require('tailwindcss-animate')],
+    plugins: [tailwindcssAnimate],
 };

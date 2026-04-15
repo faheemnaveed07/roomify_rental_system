@@ -203,7 +203,7 @@ const roommateProfileSchema = new Schema<IRoommateProfile>(
 );
 
 // Indexes
-roommateProfileSchema.index({ user: 1 });
+// Note: { user: 1 } index is already created by unique: true on the field
 roommateProfileSchema.index({ isActive: 1 });
 roommateProfileSchema.index({ 'budget.min': 1, 'budget.max': 1 });
 roommateProfileSchema.index({ preferredLocations: 1 });
