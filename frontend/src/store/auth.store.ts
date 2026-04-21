@@ -10,6 +10,7 @@ interface AuthState {
     error: string | null;
     setAuth: (response: AuthResponse) => void;
     clearAuth: () => void;
+    validateSession: () => Promise<void>;
     login: (credentials: { email: string; password: string }) => Promise<void>;
     register: (userData: IUserRegistration) => Promise<void>;
     logout: () => Promise<void>;
@@ -40,6 +41,16 @@ export const useAuthStore = create<AuthState>()(
                     isAuthenticated: false,
                     error: null,
                 });
+            },
+            validateSession: async () => {
+                // Called once on app boot - verifies the httpOnly cookie with the server
+                try {
+                    const user = await authService.getMe();
+                    set({ user, isAuthenticated: true });
+                } catch {
+                    // Token invalid / expired / DB wiped — clear stale state
+                    set({ user: null, isAuthenticated: false });
+                }
             },
             login: async (credentials) => {
                 set({ loading: true, error: null });

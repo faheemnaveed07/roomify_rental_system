@@ -69,10 +69,16 @@ const AgreementPage: React.FC = () => {
 
     const isUserSigned = () => {
         if (!agreement || !user) return false;
-        const isTenant = agreement.tenant === user.id;
-        const isLandlord = agreement.landlord === user.id;
-        if (isTenant && agreement.tenantSignedAt) return true;
-        if (isLandlord && agreement.landlordSignedAt) return true;
+        // Normalise both sides to string — tenant/landlord may be ObjectId objects
+        const tenantId = (typeof agreement.tenant === 'object' && agreement.tenant !== null)
+            ? (agreement.tenant as any)._id?.toString() ?? String(agreement.tenant)
+            : String(agreement.tenant);
+        const landlordId = (typeof agreement.landlord === 'object' && agreement.landlord !== null)
+            ? (agreement.landlord as any)._id?.toString() ?? String(agreement.landlord)
+            : String(agreement.landlord);
+        const userId = String(user.id);
+        if (tenantId === userId && agreement.tenantSignedAt) return true;
+        if (landlordId === userId && agreement.landlordSignedAt) return true;
         return false;
     };
 

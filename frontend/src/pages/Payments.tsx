@@ -39,6 +39,7 @@ const PaymentsPage: React.FC = () => {
     const [showAddBankModal, setShowAddBankModal] = useState(false);
     const [showPaymentModal, setShowPaymentModal] = useState<any>(null);
     const [statusFilter, setStatusFilter] = useState<string>('');
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const isLandlord = user?.role === 'landlord';
 
@@ -50,7 +51,7 @@ const PaymentsPage: React.FC = () => {
         } else {
             fetchTenantPayments();
         }
-    }, [isLandlord, statusFilter]);
+    }, [isLandlord, statusFilter, refreshKey]);
 
     const getStatusBadge = (status: PaymentStatus) => {
         const statusConfig = {
@@ -159,7 +160,7 @@ const PaymentsPage: React.FC = () => {
                                     <p className="text-xs text-neutral-500 mt-1">IBAN: {account.iban}</p>
                                 )}
                                 <button
-                                    onClick={() => deleteBankAccount(account._id)}
+                                    onClick={async () => { await deleteBankAccount(account._id); setRefreshKey(k => k + 1); }}
                                     className="mt-4 text-red-500 hover:text-red-700 text-sm flex items-center gap-1"
                                 >
                                     <Trash2 className="w-4 h-4" />
@@ -283,7 +284,7 @@ const PaymentsPage: React.FC = () => {
                                         <div className="flex gap-2">
                                             <Button 
                                                 size="sm"
-                                                onClick={() => confirmPayment(payment._id, true)}
+                                                onClick={async () => { await confirmPayment(payment._id, true); setRefreshKey(k => k + 1); }}
                                             >
                                                 <CheckCircle className="w-4 h-4 mr-2" />
                                                 Confirm
@@ -352,6 +353,7 @@ const PaymentsPage: React.FC = () => {
                     onSubmit={async (data) => {
                         await addBankAccount(data);
                         setShowAddBankModal(false);
+                        setRefreshKey(k => k + 1);
                     }}
                 />
             )}
@@ -364,14 +366,17 @@ const PaymentsPage: React.FC = () => {
                     onSubmitProof={async (data) => {
                         await submitPaymentProof(showPaymentModal._id, data);
                         setShowPaymentModal(null);
+                        setRefreshKey(k => k + 1);
                     }}
                     onScheduleCash={async (data) => {
                         await scheduleCashCollection(showPaymentModal._id, data);
                         setShowPaymentModal(null);
+                        setRefreshKey(k => k + 1);
                     }}
                     onReject={async (reason) => {
                         await confirmPayment(showPaymentModal._id, false, undefined, reason);
                         setShowPaymentModal(null);
+                        setRefreshKey(k => k + 1);
                     }}
                 />
             )}

@@ -68,6 +68,7 @@ const AdminPaymentsPage: React.FC = () => {
     const [totalPages, setTotalPages] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
 
     // Confirmation modals
@@ -82,6 +83,7 @@ const AdminPaymentsPage: React.FC = () => {
     // ── Fetch payments ────────────────────────────────────────────────────────
     const fetchPayments = useCallback(async (tab: FilterTab, currentPage: number) => {
         setLoading(true);
+        setFetchError(false);
         try {
             const params: Record<string, any> = { page: currentPage, limit: LIMIT };
             if (tab !== 'all') params.status = tab;
@@ -91,6 +93,7 @@ const AdminPaymentsPage: React.FC = () => {
             setTotalPages(data.pagination?.totalPages ?? 1);
             setTotalCount(data.pagination?.total ?? 0);
         } catch (err) {
+            setFetchError(true);
             toastError('Failed to load payments.');
         } finally {
             setLoading(false);
@@ -261,6 +264,16 @@ const AdminPaymentsPage: React.FC = () => {
                         <div style={{ width: 36, height: 36, border: '4px solid #e2e8f0', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
                         <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
                         <p style={{ color: '#94a3b8', fontSize: 14 }}>Loading payments…</p>
+                    </div>
+                ) : fetchError ? (
+                    <div style={{ padding: 60, textAlign: 'center' }}>
+                        <p style={{ color: '#ef4444', fontSize: 15, fontWeight: 500, marginBottom: 12 }}>Failed to load payments</p>
+                        <button
+                            onClick={() => fetchPayments(activeTab, page)}
+                            style={{ padding: '8px 20px', background: '#6366f1', color: '#fff', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 14 }}
+                        >
+                            Try Again
+                        </button>
                     </div>
                 ) : payments.length === 0 ? (
                     <div style={{ padding: 60, textAlign: 'center' }}>

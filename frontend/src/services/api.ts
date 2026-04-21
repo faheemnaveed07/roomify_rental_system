@@ -41,14 +41,6 @@ api.interceptors.response.use(
     async (error: AxiosError<ApiResponse>) => {
         const config = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-        console.error('API Error:', {
-            message: error.message,
-            status: error.response?.status,
-            url: config?.url,
-            method: config?.method,
-            data: error.response?.data,
-        });
-
         // ✅ If 401 and not already retrying, attempt refresh
         if (error.response?.status === 401 && !config?._retry) {
             config._retry = true;
@@ -56,23 +48,26 @@ api.interceptors.response.use(
             try {
                 // Call refresh endpoint — cookies are automatically sent
                 const refreshResponse = await api.post<ApiResponse<{ tokens: { accessToken: string } }>>('/auth/refresh-token');
-                
+
                 if (refreshResponse.data.success) {
                     // New cookies are automatically set by the server
                     // Retry the original request
                     return api(config);
                 }
-            } catch (refreshError) {
-                console.error('Token refresh failed:', refreshError);
-                // Refresh failed — redirect to login
-                // Cookies will be cleared by server
-                window.location.href = '/auth';
+            } catch {
+                // Refresh failed — clear state and redirect via React Router
+                // Import store lazily to avoid circular dep at module load time
+                const { useAuthStore } = await import('../store/auth.store');
+                useAuthStore.getState().clearAuth();
+                window.location.replace('/auth');
             }
         }
 
         if (error.response?.status === 401) {
-            // Final 401 — redirect to login
-            window.location.href = '/auth';
+            // Final 401 after retry — clear state
+            const { useAuthStore } = await import('../store/auth.store');
+            useAuthStore.getState().clearAuth();
+            window.location.replace('/auth');
         }
 
         const message = error.response?.data?.message || 'Something went wrong';
@@ -81,6 +76,19 @@ api.interceptors.response.use(
 );
 
 export const authService = {
+    getMe: async (): Promise<AuthResponse['user']> => {
+        const response = await api.get<ApiResponse<{ user: AuthResponse['user'] }>>('/auth/profile');
+        // /auth/profile returns the full user object; normalise to match AuthResponse['user']
+        const raw = response.data.data as any;
+        return {
+            id: (raw._id ?? raw.id ?? '').toString(),
+            email: raw.email,
+            firstName: raw.firstName,
+            lastName: raw.lastName,
+            role: raw.role,
+            avatar: raw.avatar ?? null,
+        };
+    },
     login: async (credentials: IUserLogin): Promise<AuthResponse> => {
         const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', credentials);
         // ✅ Tokens are now in httpOnly cookies, not in response

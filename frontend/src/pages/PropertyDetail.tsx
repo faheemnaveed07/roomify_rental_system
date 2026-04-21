@@ -23,6 +23,7 @@ const PropertyDetailPage: React.FC = () => {
     const [bookingLoading, setBookingLoading] = useState(false);
     const [selectedBedNumber, setSelectedBedNumber] = useState<number | ''>('');
     const [requestMessage, setRequestMessage] = useState('Hi, I am interested in this property.');
+    const [moveInDate, setMoveInDate] = useState('');
     const [error, setError] = useState<string | null>(null);
 
     // Matching
@@ -72,7 +73,7 @@ const PropertyDetailPage: React.FC = () => {
         try {
             await bookingService.requestBooking({
                 propertyId: id,
-                proposedMoveInDate: new Date(),
+                proposedMoveInDate: new Date(moveInDate),
                 proposedDuration: { value: 6, unit: 'months' },
                 bedNumber: property?.propertyType === 'shared_room' ? Number(selectedBedNumber) : undefined,
                 requestMessage
@@ -224,6 +225,19 @@ const PropertyDetailPage: React.FC = () => {
 
                         <div className="mb-6">
                             <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                                Preferred Move-in Date
+                            </label>
+                            <input
+                                type="date"
+                                value={moveInDate}
+                                min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+                                onChange={(e) => setMoveInDate(e.target.value)}
+                                className="w-full p-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-primary-500 outline-none"
+                            />
+                        </div>
+
+                        <div className="mb-6">
+                            <label className="block text-sm font-semibold text-neutral-700 mb-2">
                                 Message to Landlord
                             </label>
                             <textarea
@@ -240,6 +254,7 @@ const PropertyDetailPage: React.FC = () => {
                             onClick={handleBookingRequest}
                             disabled={
                                 bookingLoading ||
+                                !moveInDate ||
                                 (property.propertyType === 'shared_room' && !selectedBedNumber) ||
                                 !requestMessage.trim()
                             }

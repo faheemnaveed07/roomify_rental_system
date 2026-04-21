@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Link, Outlet } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { useAuthStore } from './store/auth.store';
 import AuthPage from './pages/Auth';
 import ForgotPasswordPage from './pages/ForgotPassword';
 import ResetPasswordPage from './pages/ResetPassword';
@@ -62,7 +63,19 @@ const PublicLayout: React.FC = () => (
     </div>
 );
 
-const App: React.FC = () => (
+const App: React.FC = () => {
+    const { isAuthenticated, validateSession } = useAuthStore();
+
+    // On every app boot, verify the persisted session against the server.
+    // If the cookie is gone or the DB was wiped the stale state is cleared.
+    useEffect(() => {
+        if (isAuthenticated) {
+            validateSession();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    return (
     <Router>
         <Routes>
             {/* ── Landlord dashboard — full-screen layout, no public Header ── */}
@@ -152,6 +165,7 @@ const App: React.FC = () => (
         </Routes>
         <Toaster richColors position="top-right" />
     </Router>
-);
+    );
+};
 
 export default App;
