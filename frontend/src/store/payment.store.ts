@@ -49,6 +49,7 @@ interface Payment {
     dueDate: string;
     paidAt?: string;
     confirmedAt?: string;
+    rejectionReason?: string;
     notes?: string;
     createdAt: string;
 }

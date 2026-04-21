@@ -3,6 +3,8 @@ import { useAuthStore } from '../store/auth.store';
 import { usePaymentStore, PaymentStatus, PaymentMethod, PaymentType } from '../store/payment.store';
 import Button from '../components/atoms/Button';
 import { Badge } from '../components/atoms/Badge';
+import PaymentProgressTracker from '../components/molecules/PaymentProgressTracker';
+import PaymentInstructionsCard from '../components/molecules/PaymentInstructionsCard';
 import { 
     CreditCard, 
     Wallet, 
@@ -225,7 +227,8 @@ const PaymentsPage: React.FC = () => {
                 ) : payments.length === 0 ? (
                     <div className="text-center py-12 bg-white rounded-2xl border border-neutral-100">
                         <CreditCard className="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-                        <p className="text-neutral-500">No payments found</p>
+                        <p className="text-neutral-600 font-medium">No payments yet</p>
+                        <p className="text-sm text-neutral-500 mt-1">Your booking payments will appear here</p>
                     </div>
                 ) : (
                     payments.map((payment) => (
@@ -233,6 +236,12 @@ const PaymentsPage: React.FC = () => {
                             key={payment._id}
                             className="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100"
                         >
+                            {!isLandlord && (
+                                <PaymentProgressTracker
+                                    bookingStatus={payment.booking?.status ?? 'approved'}
+                                    paymentStatus={payment.status}
+                                />
+                            )}
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-3 mb-2">
@@ -256,27 +265,14 @@ const PaymentsPage: React.FC = () => {
 
                                 <div className="flex flex-col gap-2">
                                     {/* Tenant actions */}
-                                    {!isLandlord && payment.status === PaymentStatus.PENDING && (
-                                        <>
-                                            {payment.paymentMethod === PaymentMethod.BANK_TRANSFER && (
-                                                <Button 
-                                                    size="sm"
-                                                    onClick={() => setShowPaymentModal({ ...payment, action: 'proof' })}
-                                                >
-                                                    <Upload className="w-4 h-4 mr-2" />
-                                                    Submit Proof
-                                                </Button>
-                                            )}
-                                            {payment.paymentMethod === PaymentMethod.CASH && (
-                                                <Button 
-                                                    size="sm"
-                                                    onClick={() => setShowPaymentModal({ ...payment, action: 'schedule' })}
-                                                >
-                                                    <Calendar className="w-4 h-4 mr-2" />
-                                                    Schedule Collection
-                                                </Button>
-                                            )}
-                                        </>
+                                    {!isLandlord && payment.status === PaymentStatus.PENDING && payment.paymentMethod === PaymentMethod.CASH && (
+                                        <Button 
+                                            size="sm"
+                                            onClick={() => setShowPaymentModal({ ...payment, action: 'schedule' })}
+                                        >
+                                            <Calendar className="w-4 h-4 mr-2" />
+                                            Schedule Collection
+                                        </Button>
                                     )}
 
                                     {/* Landlord actions */}
@@ -300,18 +296,7 @@ const PaymentsPage: React.FC = () => {
                                         </div>
                                     )}
 
-                                    {/* Show bank details for tenant (bank transfer) */}
-                                    {!isLandlord && payment.paymentMethod === PaymentMethod.BANK_TRANSFER && payment.bankDetails && (
-                                        <div className="text-sm bg-neutral-50 rounded-lg p-3 mt-2">
-                                            <p className="font-medium mb-1">Bank Details:</p>
-                                            <p>{payment.bankDetails.bankName}</p>
-                                            <p>{payment.bankDetails.accountTitle}</p>
-                                            <p className="font-mono">{payment.bankDetails.accountNumber}</p>
-                                            {payment.bankDetails.iban && (
-                                                <p className="text-xs text-neutral-500">IBAN: {payment.bankDetails.iban}</p>
-                                            )}
-                                        </div>
-                                    )}
+                                    {/* Bank transfer instructions rendered full-width below the flex row */}
 
                                     {/* Show proof of payment */}
                                     {payment.proofOfPayment && (
@@ -341,6 +326,38 @@ const PaymentsPage: React.FC = () => {
                                     )}
                                 </div>
                             </div>
+
+                            {/* Bank instructions card — full width, pending bank transfer */}
+                            {!isLandlord && payment.paymentMethod === PaymentMethod.BANK_TRANSFER && payment.bankDetails && payment.status === PaymentStatus.PENDING && (
+                                <PaymentInstructionsCard
+                                    bankDetails={payment.bankDetails}
+                                    amount={payment.amount}
+                                    currency={payment.currency}
+                                    onSubmitProof={() => setShowPaymentModal({ ...payment, action: 'proof' })}
+                                />
+                            )}
+
+                            {/* Rejection UI */}
+                            {!isLandlord && payment.status === PaymentStatus.REJECTED && (
+                                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-xl">
+                                    <div className="flex items-start gap-3 mb-3">
+                                        <XCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
+                                        <div>
+                                            <p className="text-sm font-semibold text-red-800">Payment Rejected</p>
+                                            <p className="text-sm text-red-600 mt-1">Reason: {payment.rejectionReason || 'No reason provided'}</p>
+                                            <p className="text-xs text-red-600 mt-2">Please correct the issue and resubmit your payment.</p>
+                                        </div>
+                                    </div>
+                                    <Button
+                                        size="sm"
+                                        className="w-full sm:w-auto"
+                                        onClick={() => setShowPaymentModal({ ...payment, action: 'proof' })}
+                                    >
+                                        <Upload className="w-4 h-4 mr-2" />
+                                        Resubmit Payment Proof
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     ))
                 )}
