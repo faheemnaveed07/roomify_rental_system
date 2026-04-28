@@ -1,6 +1,20 @@
-import { Badge, VerificationBadge } from '../atoms/Badge';
-import { colors, spacing, borderRadius } from '../../styles/theme';
+import React, { useState } from 'react';
+import { Heart, MapPin, Bed, Bath, Star, BadgeCheck } from 'lucide-react';
+import { Badge } from '../atoms/Badge';
 import { ASSETS_URL } from '../../services/api';
+
+/**
+ * PropertyCard (Tailwind refactor)
+ * --------------------------------
+ * Homearia-inspired listing card with:
+ *  - status pills (New / Popular / Best price / Featured)
+ *  - favorite (heart) toggle in top-right
+ *  - 3-icon details row (bed / bath / area)
+ *  - compatibility score chip + Best Match star ribbon
+ *  - hover-sync hooks for the map (onMouseEnter / onMouseLeave)
+ */
+
+export type PropertyStatus = 'new' | 'popular' | 'bestPrice';
 
 interface PropertyCardProps {
     id: string;
@@ -19,12 +33,43 @@ interface PropertyCardProps {
     amenities?: string[];
     isVerified?: boolean;
     isFeatured?: boolean;
+    statuses?: PropertyStatus[];
     compatibilityScore?: number;
     isBestMatch?: boolean;
+    isFavorite?: boolean;
+    isHighlighted?: boolean;
     onClick?: () => void;
+    onFavoriteToggle?: (id: string, next: boolean) => void;
+    onMouseEnter?: () => void;
+    onMouseLeave?: () => void;
 }
 
+const statusLabel: Record<PropertyStatus, string> = {
+    new: 'New',
+    popular: 'Popular',
+    bestPrice: 'Best price',
+};
+
+const statusClasses: Record<PropertyStatus, string> = {
+    new: 'bg-emerald-500 text-white',
+    popular: 'bg-orange-500 text-white',
+    bestPrice: 'bg-sky-500 text-white',
+};
+
+const formatPrice = (amount: number): string => {
+    if (amount >= 100000) return `${(amount / 100000).toFixed(1)}L`;
+    if (amount >= 1000) return `${Math.round(amount / 1000)}K`;
+    return amount.toString();
+};
+
+const scoreColor = (score: number) => {
+    if (score >= 80) return 'bg-emerald-100 text-emerald-700';
+    if (score >= 60) return 'bg-amber-100 text-amber-700';
+    return 'bg-red-100 text-red-700';
+};
+
 export const PropertyCard: React.FC<PropertyCardProps> = ({
+    id,
     title,
     city,
     area,
@@ -39,275 +84,196 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     amenities = [],
     isVerified = false,
     isFeatured = false,
+    statuses = [],
     compatibilityScore,
     isBestMatch = false,
+    isFavorite = false,
+    isHighlighted = false,
     onClick,
+    onFavoriteToggle,
+    onMouseEnter,
+    onMouseLeave,
 }) => {
-    const cardStyles: React.CSSProperties = {
-        display: 'flex',
-        flexDirection: 'column',
-        backgroundColor: colors.white,
-        borderRadius: borderRadius['xl'],
-        boxShadow: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
-        overflow: 'hidden',
-        transition: 'transform 200ms, box-shadow 200ms',
-        cursor: onClick ? 'pointer' : 'default',
+    const [favorite, setFavorite] = useState<boolean>(isFavorite);
+
+    const handleFavoriteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        const next = !favorite;
+        setFavorite(next);
+        onFavoriteToggle?.(id, next);
     };
 
-    const imageContainerStyles: React.CSSProperties = {
-        position: 'relative',
-        width: '100%',
-        paddingTop: '66.67%', // 3:2 aspect ratio
-        backgroundColor: colors.neutral[200],
-        overflow: 'hidden',
-    };
+    const resolvedImage = imageUrl
+        ? imageUrl.startsWith('/uploads/')
+            ? `${ASSETS_URL}${imageUrl}`
+            : imageUrl
+        : undefined;
 
-    const imageStyles: React.CSSProperties = {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        objectFit: 'cover',
-    };
+    const Wrapper: React.ElementType = onClick ? 'button' : 'div';
 
-    const badgeContainerStyles: React.CSSProperties = {
-        position: 'absolute',
-        top: spacing[3],
-        left: spacing[3],
-        display: 'flex',
-        flexDirection: 'column',
-        gap: spacing[1],
-    };
-
-    const contentStyles: React.CSSProperties = {
-        padding: spacing[4],
-        display: 'flex',
-        flexDirection: 'column',
-        gap: spacing[2],
-    };
-
-    const titleStyles: React.CSSProperties = {
-        fontSize: '1.125rem',
-        fontWeight: 600,
-        color: colors.neutral[900],
-        margin: 0,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-    };
-
-    const locationStyles: React.CSSProperties = {
-        fontSize: '0.875rem',
-        color: colors.neutral[500],
-        display: 'flex',
-        alignItems: 'center',
-        gap: spacing[1],
-    };
-
-    const detailsRowStyles: React.CSSProperties = {
-        display: 'flex',
-        alignItems: 'center',
-        gap: spacing[4],
-        fontSize: '0.875rem',
-        color: colors.neutral[600],
-    };
-
-    const priceStyles: React.CSSProperties = {
-        display: 'flex',
-        alignItems: 'baseline',
-        gap: spacing[1],
-        marginTop: spacing[2],
-    };
-
-    const priceAmountStyles: React.CSSProperties = {
-        fontSize: '1.5rem',
-        fontWeight: 700,
-        color: colors.primary[500],
-    };
-
-    const priceUnitStyles: React.CSSProperties = {
-        fontSize: '0.875rem',
-        color: colors.neutral[500],
-    };
-
-    const amenitiesStyles: React.CSSProperties = {
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: spacing[1],
-        marginTop: spacing[2],
-    };
-
-    const formatPrice = (amount: number): string => {
-        if (amount >= 100000) {
-            return `${(amount / 100000).toFixed(1)}L`;
-        }
-        if (amount >= 1000) {
-            return `${(amount / 1000).toFixed(0)}K`;
-        }
-        return amount.toString();
-    };
-
-    const getScoreColor = (score: number): string => {
-        if (score >= 80) return '#16a34a'; // green
-        if (score >= 60) return '#ca8a04'; // yellow/amber
-        return '#dc2626'; // red
-    };
-
-    const getScoreBgColor = (score: number): string => {
-        if (score >= 80) return '#dcfce7';
-        if (score >= 60) return '#fef9c3';
-        return '#fee2e2';
-    };
-
-    const LocationIcon = () => (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path
-                d="M7 7.5C7.82843 7.5 8.5 6.82843 8.5 6C8.5 5.17157 7.82843 4.5 7 4.5C6.17157 4.5 5.5 5.17157 5.5 6C5.5 6.82843 6.17157 7.5 7 7.5Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-            />
-            <path
-                d="M7 12.5C9 10.5 11.5 8.31371 11.5 6C11.5 3.51472 9.48528 1.5 7 1.5C4.51472 1.5 2.5 3.51472 2.5 6C2.5 8.31371 5 10.5 7 12.5Z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-            />
-        </svg>
-    );
-
-    const content = (
-        <>
-            <div style={imageContainerStyles}>
-                {imageUrl ? (
+    return (
+        <Wrapper
+            type={onClick ? 'button' : undefined}
+            onClick={onClick}
+            onMouseEnter={onMouseEnter}
+            onMouseLeave={onMouseLeave}
+            className={[
+                'group relative w-full text-left bg-white rounded-2xl overflow-hidden',
+                'border transition-all duration-200',
+                'shadow-[0_1px_3px_0_rgb(0_0_0_/_0.08),_0_1px_2px_-1px_rgb(0_0_0_/_0.06)]',
+                'hover:-translate-y-0.5 hover:shadow-lg',
+                isHighlighted
+                    ? 'border-primary-500 ring-2 ring-primary-200'
+                    : 'border-neutral-200 hover:border-neutral-300',
+                onClick ? 'cursor-pointer' : '',
+            ].join(' ')}
+        >
+            {/* ------------- Image area ------------- */}
+            <div className="relative w-full aspect-[3/2] bg-neutral-100 overflow-hidden">
+                {resolvedImage ? (
                     <img
-                        src={imageUrl.startsWith('/uploads/') ? `${ASSETS_URL}${imageUrl}` : imageUrl}
+                        src={resolvedImage}
                         alt={title}
-                        style={imageStyles}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
                     />
                 ) : (
-                    <div
-                        style={{
-                            ...imageStyles,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: colors.neutral[400],
-                        }}
-                    >
+                    <div className="absolute inset-0 flex items-center justify-center text-neutral-400 text-sm">
                         No Image
                     </div>
                 )}
-                <div style={badgeContainerStyles}>
-                    {isFeatured && <Badge variant="secondary">Featured</Badge>}
-                    <Badge variant={propertyType === 'shared_room' ? 'primary' : 'neutral'}>
+
+                {/* Status pills (top-left) */}
+                <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
+                    {isFeatured && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-500 text-white text-[11px] font-semibold shadow-sm">
+                            <Star size={11} fill="currentColor" /> Featured
+                        </span>
+                    )}
+                    {statuses.slice(0, 2).map((s) => (
+                        <span
+                            key={s}
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold shadow-sm ${statusClasses[s]}`}
+                        >
+                            {statusLabel[s]}
+                        </span>
+                    ))}
+                    <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold shadow-sm ${propertyType === 'shared_room'
+                                ? 'bg-primary-500 text-white'
+                                : 'bg-neutral-900 text-white'
+                            }`}
+                    >
                         {propertyType === 'shared_room' ? 'Shared Room' : 'Full House'}
-                    </Badge>
+                    </span>
                 </div>
+
+                {/* Favorite button (top-right) */}
+                {onFavoriteToggle !== undefined || true ? (
+                    <button
+                        type="button"
+                        onClick={handleFavoriteClick}
+                        aria-label={favorite ? 'Remove from favorites' : 'Add to favorites'}
+                        className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white backdrop-blur rounded-full shadow-sm transition-transform hover:scale-110"
+                    >
+                        <Heart
+                            size={16}
+                            className={
+                                favorite
+                                    ? 'text-red-500 fill-red-500'
+                                    : 'text-neutral-700'
+                            }
+                        />
+                    </button>
+                ) : null}
+
+                {/* Compatibility score + Best Match (bottom-right of image) */}
                 {compatibilityScore != null && (
-                    <div style={{
-                        position: 'absolute',
-                        top: spacing[3],
-                        right: spacing[3],
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'flex-end',
-                        gap: spacing[1],
-                    }}>
-                        <div style={{
-                            backgroundColor: getScoreBgColor(compatibilityScore),
-                            color: getScoreColor(compatibilityScore),
-                            fontWeight: 700,
-                            fontSize: '0.8rem',
-                            padding: '4px 8px',
-                            borderRadius: borderRadius.md,
-                            lineHeight: 1,
-                        }}>
+                    <div className="absolute bottom-3 right-3 flex flex-col items-end gap-1">
+                        <div
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-bold shadow-sm ${scoreColor(
+                                compatibilityScore
+                            )}`}
+                        >
                             {compatibilityScore}% Match
                         </div>
                         {isBestMatch && (
-                            <div style={{
-                                backgroundColor: '#7c3aed',
-                                color: '#fff',
-                                fontWeight: 600,
-                                fontSize: '0.7rem',
-                                padding: '3px 7px',
-                                borderRadius: borderRadius.md,
-                                lineHeight: 1,
-                            }}>
-                                ⭐ Best Match
+                            <div className="px-2 py-0.5 rounded-md bg-violet-600 text-white text-[10px] font-semibold flex items-center gap-1 shadow-sm">
+                                <Star size={10} fill="currentColor" /> Best Match
                             </div>
                         )}
                     </div>
                 )}
             </div>
 
-            <div style={contentStyles}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <h3 style={titleStyles}>{title}</h3>
-                    <VerificationBadge isVerified={isVerified} />
+            {/* ------------- Content area ------------- */}
+            <div className="p-4 flex flex-col gap-2">
+                <div className="flex items-start justify-between gap-2">
+                    <h3 className="text-base font-semibold text-neutral-900 truncate flex-1">
+                        {title}
+                    </h3>
+                    {isVerified && (
+                        <span
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700"
+                            title="Admin verified"
+                        >
+                            <BadgeCheck size={14} className="text-emerald-600" />
+                            Verified
+                        </span>
+                    )}
                 </div>
 
-                <div style={locationStyles}>
-                    <LocationIcon />
-                    <span>{area}, {city}</span>
+                <div className="flex items-center gap-1 text-sm text-neutral-500">
+                    <MapPin size={13} className="shrink-0" />
+                    <span className="truncate">
+                        {area}, {city}
+                    </span>
                 </div>
 
-                <div style={detailsRowStyles}>
+                <div className="flex items-center gap-4 text-sm text-neutral-600 mt-0.5">
                     {propertyType === 'full_house' ? (
                         <>
-                            <span>{bedrooms} Bed</span>
-                            <span>{bathrooms} Bath</span>
+                            {bedrooms != null && (
+                                <span className="inline-flex items-center gap-1">
+                                    <Bed size={14} /> {bedrooms} Bed
+                                </span>
+                            )}
+                            {bathrooms != null && (
+                                <span className="inline-flex items-center gap-1">
+                                    <Bath size={14} /> {bathrooms} Bath
+                                </span>
+                            )}
                         </>
                     ) : (
-                        <span>{availableBeds} of {totalBeds} beds available</span>
+                        <span className="inline-flex items-center gap-1">
+                            <Bed size={14} /> {availableBeds} of {totalBeds} beds
+                        </span>
                     )}
                 </div>
 
                 {amenities.length > 0 && (
-                    <div style={amenitiesStyles}>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
                         {amenities.slice(0, 3).map((amenity) => (
                             <Badge key={amenity} variant="neutral" size="sm">
                                 {amenity}
                             </Badge>
                         ))}
                         {amenities.length > 3 && (
-                            <Badge variant="neutral" size="sm">+{amenities.length - 3}</Badge>
+                            <Badge variant="neutral" size="sm">
+                                +{amenities.length - 3}
+                            </Badge>
                         )}
                     </div>
                 )}
 
-                <div style={priceStyles}>
-                    <span style={priceAmountStyles}>
+                <div className="flex items-baseline gap-1 mt-2 pt-2 border-t border-neutral-100">
+                    <span className="text-xl font-bold text-primary-500">
                         {currency} {formatPrice(price)}
                     </span>
-                    <span style={priceUnitStyles}>/month</span>
+                    <span className="text-xs text-neutral-500">/month</span>
                 </div>
             </div>
-        </>
-    );
-
-    if (onClick) {
-        return (
-            <button
-                type="button"
-                style={{
-                    ...cardStyles,
-                    border: 'none',
-                    padding: 0,
-                    textAlign: 'left',
-                    background: 'transparent',
-                }}
-                onClick={onClick}
-            >
-                {content}
-            </button>
-        );
-    }
-
-    return (
-        <div style={cardStyles}>
-            {content}
-        </div>
+        </Wrapper>
     );
 };
 

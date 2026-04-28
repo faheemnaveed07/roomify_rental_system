@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,700&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import 'leaflet/dist/leaflet.css';
 
 @tailwind base;
 @tailwind components;
@@ -685,4 +686,57 @@
       transform: translateY(0);
     }
   }
+}
+
+/* ============================================================
+ * Leaflet map — custom price-pin marker styles
+ * Used by PropertyMap molecule for sync with PropertyCard hover
+ * ============================================================ */
+.price-marker {
+  background: #2563EB;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  transition: background 200ms ease, transform 200ms ease;
+  white-space: nowrap;
+  border: 2px solid #ffffff;
+  display: inline-block;
+  line-height: 1;
+}
+
+.price-marker.hovered {
+  background: #1D4ED8;
+  transform: scale(1.12);
+  z-index: 1000;
+}
+
+.price-marker.selected {
+  background: #F59E0B;
+  transform: scale(1.18);
+  z-index: 1100;
+}
+
+/* Strip default leaflet div-icon background so our pill shows cleanly */
+.leaflet-div-icon.price-marker-wrapper {
+  background: transparent;
+  border: none;
+}
+
+/* Tighter popup styling to match Roomify card aesthetic */
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  width: 240px !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff;
 }

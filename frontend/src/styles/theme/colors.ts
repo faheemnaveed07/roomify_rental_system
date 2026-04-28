@@ -77,6 +77,27 @@ export const colors = {
         800: '#991B1B',
         900: '#7F1D1D',
     },
+    /**
+     * Status pills (Homearia-style card tags)
+     * Used on PropertyCard to differentiate listings at a glance.
+     */
+    status: {
+        new: '#10B981',         // green — fresh listing (< 7 days old)
+        popular: '#F97316',     // orange — high view/inquiry count
+        bestPrice: '#0EA5E9',   // sky-blue — among lowest priced in city
+        featured: '#A855F7',    // purple — admin-promoted listing
+        verified: '#2563EB',    // primary — admin-approved listing
+    },
+    /**
+     * Map marker palette
+     * Used by Leaflet price-pin markers on the Search page.
+     */
+    mapMarker: {
+        default: '#2563EB',     // primary blue
+        hovered: '#1D4ED8',     // primary darker (when card is hovered)
+        selected: '#F59E0B',    // amber accent (when marker clicked)
+        cluster: '#3B82F6',     // blue-500 (cluster bubbles)
+    },
     white: '#FFFFFF',
     black: '#000000',
     transparent: 'transparent',
@@ -85,5 +106,7 @@ export const colors = {
 export type ColorKey = keyof typeof colors;
 export type PrimaryShade = keyof typeof colors.primary;
 export type NeutralShade = keyof typeof colors.neutral;
+export type StatusKey = keyof typeof colors.status;
+export type MapMarkerKey = keyof typeof colors.mapMarker;
 
 export default colors;

@@ -126,9 +126,66 @@ export const authService = {
 };
 
 export const propertyService = {
-    getProperties: async (filters: IPropertyFilter = {}, pagination: PaginationQuery = {}): Promise<IPropertySearchResult> => {
+    /**
+     * Fetch properties with full filter + pagination support.
+     *
+     * Key behaviours:
+     * - Arrays (amenities) are serialized as repeated keys:
+     *   ?amenities=wifi&amenities=ac  (not amenities[]=wifi)
+     * - NaN / undefined values are omitted from the query string.
+     * - AbortSignal is forwarded so React Query's automatic cancellation works.
+     */
+    getProperties: async (
+        filters: IPropertyFilter = {},
+        pagination: PaginationQuery = {},
+        signal?: AbortSignal,
+    ): Promise<IPropertySearchResult> => {
+        // Build URLSearchParams manually to get correct array serialization.
+        const params = new URLSearchParams();
+
+        const appendIfDefined = (key: string, value: unknown) => {
+            if (value === undefined || value === null || value === '') return;
+            if (typeof value === 'number' && !Number.isFinite(value)) return;
+            if (Array.isArray(value)) {
+                value.forEach((item) => params.append(key, String(item)));
+                return;
+            }
+            if (value instanceof Date) {
+                params.set(key, value.toISOString());
+                return;
+            }
+            params.set(key, String(value));
+        };
+
+        // Filters
+        appendIfDefined('q',                filters.q);
+        appendIfDefined('city',             filters.city);
+        appendIfDefined('area',             filters.area);
+        appendIfDefined('propertyType',     filters.propertyType);
+        appendIfDefined('minRent',          filters.minRent);
+        appendIfDefined('maxRent',          filters.maxRent);
+        appendIfDefined('minBedrooms',      filters.minBedrooms);
+        appendIfDefined('maxBedrooms',      filters.maxBedrooms);
+        appendIfDefined('amenities',        filters.amenities);
+        appendIfDefined('genderPreference', filters.genderPreference);
+        appendIfDefined('furnished',        filters.furnished);
+        appendIfDefined('availableFrom',    filters.availableFrom);
+
+        if (filters.nearLocation) {
+            appendIfDefined('lat',    filters.nearLocation.latitude);
+            appendIfDefined('lng',    filters.nearLocation.longitude);
+            appendIfDefined('radius', filters.nearLocation.maxDistanceKm);
+        }
+
+        // Pagination
+        appendIfDefined('page',      pagination.page);
+        appendIfDefined('limit',     pagination.limit);
+        appendIfDefined('sortBy',    pagination.sortBy);
+        appendIfDefined('sortOrder', pagination.sortOrder);
+
         const response = await api.get<ApiResponse<IProperty[]>>('/properties/search', {
-            params: { ...filters, ...pagination },
+            params,
+            signal,
         });
 
         // Convert ApiResponse to IPropertySearchResult structure expected by the app

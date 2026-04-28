@@ -117,15 +117,12 @@ export class PropertyService {
             if (filters.maxRent) query['rent.amount'].$lte = filters.maxRent;
         }
 
-        if (filters.minBedrooms) {
-            query['fullHouseDetails.bedrooms'] = { $gte: filters.minBedrooms };
-        }
-
-        if (filters.maxBedrooms) {
-            query['fullHouseDetails.bedrooms'] = {
-                ...query['fullHouseDetails.bedrooms'],
-                $lte: filters.maxBedrooms,
-            };
+        // Build bedroom range filter in one shot to avoid duplicate-key spread.
+        if (filters.minBedrooms != null || filters.maxBedrooms != null) {
+            const bedroomFilter: Record<string, number> = {};
+            if (filters.minBedrooms != null) bedroomFilter.$gte = filters.minBedrooms;
+            if (filters.maxBedrooms != null) bedroomFilter.$lte = filters.maxBedrooms;
+            query['fullHouseDetails.bedrooms'] = bedroomFilter;
         }
 
         if (filters.amenities && filters.amenities.length > 0) {
@@ -147,7 +144,13 @@ export class PropertyService {
         }
 
         const skip = (page - 1) * limit;
-        const sort: Record<string, 1 | -1> = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
+        // Runtime guard: even though paginationSchema whitelists sortBy via z.enum,
+        // this service-layer check ensures no sort-injection if called programmatically.
+        const SAFE_SORT_FIELDS = new Set<string>([
+            'createdAt', 'rent.amount', 'views', 'inquiries', 'updatedAt',
+        ]);
+        const safeSortBy = SAFE_SORT_FIELDS.has(sortBy) ? sortBy : 'createdAt';
+        const sort: Record<string, 1 | -1> = { [safeSortBy]: sortOrder === 'asc' ? 1 : -1 };
 
         let queryBuilder;
 

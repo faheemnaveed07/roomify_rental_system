@@ -71,12 +71,104 @@ export const isValidObjectId = (id: string): boolean => {
 };
 
 // Validate pagination params
+/**
+ * Whitelist of sortable property fields. NEVER accept arbitrary strings here —
+ * an unknown sortBy hitting Mongo can cause table scans or, worse, leak operator
+ * names into the sort spec. Add fields explicitly as the product needs them.
+ */
+export const PROPERTY_SORT_FIELDS = [
+    'createdAt',
+    'rent.amount',
+    'views',
+    'inquiries',
+    'updatedAt',
+] as const;
+export type PropertySortField = (typeof PROPERTY_SORT_FIELDS)[number];
+
 export const paginationSchema = z.object({
-    page: z.string().optional().transform((val) => parseInt(val || '1', 10)),
-    limit: z.string().optional().transform((val) => Math.min(parseInt(val || '10', 10), 100)),
-    sortBy: z.string().optional().default('createdAt'),
+    page: z.string().optional().transform((val) => Math.max(1, parseInt(val || '1', 10) || 1)),
+    limit: z.string().optional().transform((val) => Math.min(Math.max(1, parseInt(val || '10', 10) || 10), 100)),
+    sortBy: z.enum(PROPERTY_SORT_FIELDS).optional().default('createdAt'),
     sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
 });
+
+/**
+ * Search query validator. All values arrive as strings (or string[]) from
+ * Express; coerce + bound here so the controller stays dumb.
+ *
+ * Notes:
+ *  - `amenities` may arrive as ?amenities=wifi&amenities=ac (string[]) or as a
+ *    single ?amenities=wifi — accept both.
+ *  - All numeric ranges are clamped; NaN turns into undefined (not 0/Infinity).
+ *  - `q` is sanitized to strip Mongo regex metacharacters (defense-in-depth on
+ *    top of the $regex usage in the service).
+ */
+const optNumber = z
+    .union([z.string(), z.number()])
+    .optional()
+    .transform((v) => {
+        if (v === undefined || v === '' || v === null) return undefined;
+        const n = typeof v === 'number' ? v : Number(v);
+        return Number.isFinite(n) ? n : undefined;
+    });
+
+const optStringList = z
+    .union([z.string(), z.array(z.string())])
+    .optional()
+    .transform((v) => {
+        if (!v) return undefined;
+        const arr = Array.isArray(v) ? v : [v];
+        const cleaned = arr.map((s) => s.trim()).filter(Boolean);
+        return cleaned.length > 0 ? cleaned : undefined;
+    });
+
+const optBool = z
+    .union([z.string(), z.boolean()])
+    .optional()
+    .transform((v) => {
+        if (v === undefined || v === '') return undefined;
+        if (typeof v === 'boolean') return v;
+        if (v === 'true' || v === '1') return true;
+        if (v === 'false' || v === '0') return false;
+        return undefined;
+    });
+
+const sanitizeRegexInput = (s: string) =>
+    s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').slice(0, 80);
+
+export const propertySearchQuerySchema = z.object({
+    q: z.string().optional().transform((v) => (v ? sanitizeRegexInput(v) : undefined)),
+    city: z.string().max(50).optional().transform((v) => (v && v.toLowerCase() !== 'all' ? v : undefined)),
+    area: z.string().max(50).optional(),
+    propertyType: z
+        .enum(['shared_room', 'full_house'])
+        .optional()
+        .or(z.literal('all').transform(() => undefined)),
+    minRent: optNumber.pipe(z.number().min(0).max(10_000_000).optional()),
+    maxRent: optNumber.pipe(z.number().min(0).max(10_000_000).optional()),
+    minBedrooms: optNumber.pipe(z.number().int().min(0).max(20).optional()),
+    maxBedrooms: optNumber.pipe(z.number().int().min(0).max(20).optional()),
+    amenities: optStringList,
+    genderPreference: z.enum(['male', 'female', 'any']).optional(),
+    furnished: optBool,
+    availableFrom: z
+        .string()
+        .optional()
+        .transform((v) => (v ? new Date(v) : undefined))
+        .pipe(z.date().optional()),
+    // Geo
+    lat: optNumber.pipe(z.number().min(-90).max(90).optional()),
+    lng: optNumber.pipe(z.number().min(-180).max(180).optional()),
+    radius: optNumber.pipe(z.number().min(0.1).max(500).optional()),
+}).refine(
+    (data) => !data.minRent || !data.maxRent || data.minRent <= data.maxRent,
+    { message: 'minRent must be ≤ maxRent', path: ['minRent'] },
+).refine(
+    (data) => (data.lat == null && data.lng == null) || (data.lat != null && data.lng != null),
+    { message: 'lat and lng must be provided together', path: ['lat'] },
+);
+
+export type PropertySearchQuery = z.infer<typeof propertySearchQuerySchema>;
 
 // User registration validation
 export const userRegistrationSchema = z.object({

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { propertyService } from '../services/PropertyService';
-import { propertyCreateSchema, paginationSchema } from '../utils/validators';
+import { propertyCreateSchema, paginationSchema, propertySearchQuerySchema } from '../utils/validators';
 import { IPropertyFilter, IPropertyCreate } from '@shared/types/property.types';
 import { ApiResponse } from '@shared/types/api.types';
 
@@ -121,26 +121,50 @@ export class PropertyController {
 
     async search(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
+            // Validate and sanitize all search params in one pass.
+            // propertySearchQuerySchema handles NaN coercion, regex sanitization,
+            // array normalization (amenities), and boolean coercion.
+            const filterParsed = propertySearchQuerySchema.safeParse(req.query);
+            if (!filterParsed.success) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Invalid search parameters',
+                    errors: filterParsed.error.flatten().fieldErrors,
+                });
+                return;
+            }
+
+            // Pagination (sortBy is whitelisted via z.enum — no sort-injection risk)
             const pagination = paginationSchema.parse(req.query);
 
+            const {
+                q, city, area, propertyType,
+                minRent, maxRent, minBedrooms, maxBedrooms,
+                amenities, genderPreference, furnished, availableFrom,
+                lat, lng, radius,
+            } = filterParsed.data;
+
             const filters: IPropertyFilter = {
-                q: req.query.q as string,
-                city: req.query.city as string,
-                area: req.query.area as string,
-                propertyType: req.query.propertyType as IPropertyFilter['propertyType'],
-                minRent: req.query.minRent ? Number(req.query.minRent) : undefined,
-                maxRent: req.query.maxRent ? Number(req.query.maxRent) : undefined,
-                minBedrooms: req.query.minBedrooms ? Number(req.query.minBedrooms) : undefined,
-                maxBedrooms: req.query.maxBedrooms ? Number(req.query.maxBedrooms) : undefined,
-                genderPreference: req.query.genderPreference as IPropertyFilter['genderPreference'],
+                q,
+                city,
+                area,
+                propertyType: propertyType as IPropertyFilter['propertyType'],
+                minRent,
+                maxRent,
+                minBedrooms,
+                maxBedrooms,
+                amenities: amenities as IPropertyFilter['amenities'],
+                genderPreference,
+                furnished,
+                availableFrom,
             };
 
-            // Handle geo-spatial search
-            if (req.query.lat && req.query.lng && req.query.radius) {
+            // Geo-spatial: lat+lng are validated together by the schema refine rule
+            if (lat != null && lng != null) {
                 filters.nearLocation = {
-                    latitude: Number(req.query.lat),
-                    longitude: Number(req.query.lng),
-                    maxDistanceKm: Number(req.query.radius),
+                    latitude: lat,
+                    longitude: lng,
+                    maxDistanceKm: radius ?? 10,
                 };
             }
 
