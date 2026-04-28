@@ -3,7 +3,7 @@ import { z } from 'zod';
 const envSchema = z.object({
     // Server
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-    PORT: z.string().transform(Number).default('5000'),
+    PORT: z.string().transform(Number).default('5001'),
 
     // Database (allow typical MongoDB connection string)
     MONGODB_URI: z.string().min(1).default('mongodb://127.0.0.1:27017/roomify'),

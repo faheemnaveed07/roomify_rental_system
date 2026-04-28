@@ -13,8 +13,16 @@ import {
 } from '@shared/types';
 import { IRoommateProfileForm, IRoommateProfileResponse } from '../types/roommate.types';
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-export const ASSETS_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+export const ASSETS_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+
+/** Resolve an image/asset path (string or {url} object) to a full URL. */
+export const resolveAssetUrl = (image: string | { url?: string } | undefined): string => {
+    if (!image) return '';
+    const raw = typeof image === 'string' ? image : image.url ?? '';
+    if (!raw) return '';
+    return raw.startsWith('/uploads/') ? `${ASSETS_URL}${raw}` : raw;
+};
 
 const api = axios.create({
     baseURL: API_BASE_URL,

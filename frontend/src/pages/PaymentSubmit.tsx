@@ -4,7 +4,7 @@ import {
     Building2, Upload, CheckCircle, AlertTriangle,
     FileText, CreditCard, Copy, Eye, X,
 } from 'lucide-react';
-import { paymentService, ASSETS_URL } from '../services/api';
+import { paymentService, ASSETS_URL, resolveAssetUrl } from '../services/api';
 import { usePaymentStore } from '../store/payment.store';
 import Button from '../components/atoms/Button';
 import { Badge } from '../components/atoms/Badge';
@@ -185,6 +185,7 @@ const PaymentSubmitPage: React.FC = () => {
     }
 
     const property = booking.property ?? {};
+    const propertyImageSrc = resolveAssetUrl(property.images?.[0]);
     const amountDue =
         booking.rentDetails?.monthlyRent ??
         booking.rentDetails?.agreedRent ??
@@ -268,11 +269,14 @@ const PaymentSubmitPage: React.FC = () => {
 
             {/* Property summary */}
             <div style={{ background: '#fff', borderRadius: 16, padding: '20px 24px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 16 }}>
-                {property.images?.[0] ? (
+                {propertyImageSrc ? (
                     <img
-                        src={`${ASSETS_URL}${property.images[0]}`}
+                        src={propertyImageSrc}
                         alt={property.title}
                         style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
+                        onError={(event) => {
+                            event.currentTarget.style.display = 'none';
+                        }}
                     />
                 ) : (
                     <div style={{ width: 64, height: 64, borderRadius: 10, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

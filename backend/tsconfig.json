@@ -16,21 +16,21 @@
         "declarationMap": true,
         "sourceMap": true,
         "noEmitOnError": false,
-        "baseUrl": ".",
+        "rootDir": "..",
         "paths": {
-            "@/*": ["src/*"],
-            "@config/*": ["src/config/*"],
-            "@models/*": ["src/models/*"],
-            "@services/*": ["src/services/*"],
-            "@controllers/*": ["src/controllers/*"],
-            "@routes/*": ["src/routes/*"],
-            "@middleware/*": ["src/middleware/*"],
-            "@utils/*": ["src/utils/*"],
-            "@types/*": ["src/types/*"],
+            "@/*": ["./src/*"],
+            "@config/*": ["./src/config/*"],
+            "@models/*": ["./src/models/*"],
+            "@services/*": ["./src/services/*"],
+            "@controllers/*": ["./src/controllers/*"],
+            "@routes/*": ["./src/routes/*"],
+            "@middleware/*": ["./src/middleware/*"],
+            "@utils/*": ["./src/utils/*"],
+            "@types/*": ["./src/types/*"],
             "@shared/*": ["../shared/*"]
         },
         "typeRoots": ["./node_modules/@types", "./src/types"]
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "../shared/types/**/*"],
     "exclude": ["node_modules", "dist"]
 }

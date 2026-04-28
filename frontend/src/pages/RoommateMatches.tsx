@@ -7,7 +7,7 @@ import {
     ArrowRight, ChevronLeft, ChevronRight, Loader2, UserCheck,
     SearchX, ChevronDown,
 } from 'lucide-react';
-import { matchingService, roommateProfileService, ASSETS_URL } from '../services/api';
+import { matchingService, roommateProfileService, resolveAssetUrl } from '../services/api';
 import { useAuthStore } from '../store/auth.store';
 import { IProperty } from '@shared/types';
 import { PropertyType } from '@shared/types';
@@ -291,10 +291,8 @@ const PropertyMatchCard: React.FC<PropertyMatchCardProps> = ({ property, score, 
     const overallScore = score ? Math.round(score.overallScore) : undefined;
     const isBestMatch = rank === 0 && overallScore !== undefined && overallScore >= 70;
 
-    const imageUrl = property.images?.[0]?.url
-        ? property.images[0].url.startsWith('/uploads/')
-            ? `${ASSETS_URL}${property.images[0].url}`
-            : property.images[0].url
+    const imageUrl = property.images?.[0]
+        ? resolveAssetUrl(property.images[0])
         : undefined;
 
     const scoreColor =

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { propertyService, bookingService, chatService, matchingService, ASSETS_URL } from '../services/api';
+import { propertyService, bookingService, chatService, matchingService, resolveAssetUrl } from '../services/api';
 import { useAuthStore } from '../store/auth.store';
 import { IProperty } from '@shared/types';
 import Button from '../components/atoms/Button';
@@ -100,7 +100,7 @@ const PropertyDetailPage: React.FC = () => {
                     <div className="rounded-3xl overflow-hidden bg-neutral-200 h-[500px] mb-8">
                         {property.images?.[0]?.url ? (
                             <img
-                                src={property.images[0].url.startsWith('/uploads/') ? `${ASSETS_URL}${property.images[0].url}` : property.images[0].url}
+                                src={resolveAssetUrl(property.images[0])}
                                 alt={property.title}
                                 className="w-full h-full object-cover"
                             />

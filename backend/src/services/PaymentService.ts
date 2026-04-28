@@ -4,6 +4,7 @@ import { Booking, BookingStatus } from '../models/Booking';
 import { User } from '../models/User';
 import mongoose from 'mongoose';
 import { logger } from '../utils/logger';
+import AgreementService from './AgreementService';
 
 const ALLOWED_PROOF_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.pdf']);
 
@@ -156,10 +157,19 @@ class PaymentService {
     }
 
     /**
-     * Create a new payment
+     * Create a new payment.
+     * For bank transfers with a receipt file, use submitPaymentWithReceipt instead.
      */
     async createPayment(data: CreatePaymentDTO): Promise<IPaymentDocument> {
         const { bookingId, tenantId, paymentType, paymentMethod, amount, dueDate, ...rest } = data;
+
+        // Issue 3: Prevent bank-transfer payments without proof being created via this
+        // two-step path — use submitPaymentWithReceipt for a clean single-step flow.
+        if (paymentMethod === PaymentMethod.BANK_TRANSFER && !data.proofOfPayment) {
+            throw new Error(
+                'For bank transfers, upload your receipt via the submit-with-receipt endpoint instead.'
+            );
+        }
 
         // Get booking details
         const booking = await Booking.findById(bookingId).populate('landlord property');
@@ -283,6 +293,21 @@ class PaymentService {
             if (!payment.paidAt) {
                 payment.paidAt = new Date();
             }
+
+            // Issue 2: Complete the booking lifecycle when landlord confirms payment
+            await Booking.findByIdAndUpdate(payment.booking, {
+                status: BookingStatus.COMPLETED,
+                'timeline.completedAt': new Date(),
+            });
+
+            // Issue 2: Auto-generate agreement — silently skip if already exists
+            try {
+                await AgreementService.generateAgreement(payment.booking.toString(), landlordId);
+            } catch (err: unknown) {
+                if (!(err instanceof Error) || !err.message.includes('already been generated')) {
+                    logger.warn(`Auto-agreement generation failed for booking ${payment.booking}: ${err}`);
+                }
+            }
         } else {
             payment.status = PaymentStatus.REJECTED;
             payment.rejectionReason = rejectionReason || 'Payment rejected by landlord';
@@ -328,7 +353,7 @@ class PaymentService {
      * Get payments for a landlord
      */
     async getLandlordPayments(landlordId: string, page = 1, limit = 20, status?: PaymentStatus) {
-        const query: any = { landlord: new mongoose.Types.ObjectId(landlordId) };
+        const query: Record<string, unknown> = { landlord: new mongoose.Types.ObjectId(landlordId) };
         if (status) {
             query.status = status;
         }
@@ -453,7 +478,7 @@ class PaymentService {
             throw new Error('A payment has already been submitted for this booking');
         }
 
-        const property = booking.property as any;
+        const property = booking.property as { rent?: { amount: number } };
         const amount = booking.rentDetails?.monthlyRent || property?.rent?.amount || 0;
 
         // Get landlord bank details if bank transfer
@@ -566,6 +591,15 @@ class PaymentService {
             status: BookingStatus.COMPLETED,
             'timeline.completedAt': new Date(),
         });
+
+        // Issue 2: Auto-generate agreement — silently skip if already exists
+        try {
+            await AgreementService.generateAgreement(payment.booking.toString(), adminId);
+        } catch (err: unknown) {
+            if (!(err instanceof Error) || !err.message.includes('already been generated')) {
+                logger.warn(`Auto-agreement generation failed for booking ${payment.booking}: ${err}`);
+            }
+        }
 
         logger.info(`Admin ${adminId} approved payment ${paymentId}; booking ${payment.booking} marked COMPLETED`);
         return payment;

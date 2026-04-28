@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { bookingService, paymentService } from '../services/api';
 import { Badge } from '../components/atoms/Badge';
 import Button from '../components/atoms/Button';
-import { ASSETS_URL } from '../services/api';
+import { resolveAssetUrl } from '../services/api';
 import { CreditCard, FileText } from 'lucide-react';
 
 const MyBookingsPage: React.FC = () => {
@@ -84,7 +84,7 @@ const MyBookingsPage: React.FC = () => {
                             <div className="w-full md:w-48 h-32 rounded-2xl overflow-hidden bg-neutral-100 flex-shrink-0">
                                 {booking.property?.images?.[0]?.url ? (
                                     <img
-                                        src={booking.property.images[0].url.startsWith('/uploads/') ? `${ASSETS_URL}${booking.property.images[0].url}` : booking.property.images[0].url}
+                                        src={resolveAssetUrl(booking.property.images[0])}
                                         alt={booking.property.title}
                                         className="w-full h-full object-cover"
                                     />

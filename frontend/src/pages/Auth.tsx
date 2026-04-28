@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, Building2, Users } from 'lucide-react';
+import { Eye, EyeOff, Mail, User, Phone, ArrowRight, Building2, Users } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import { UserRole } from '@shared/types';
 
@@ -55,6 +55,9 @@ function Field({
 
 const inputCls =
     'w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm';
+
+const passwordInputCls =
+    'w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm';
 
 // ─── Main page ───────────────────────────────────────────────────────
 const AuthPage: React.FC = () => {
@@ -236,12 +239,11 @@ const AuthPage: React.FC = () => {
 
                                         <Field label="Password" error={loginErrors.password?.message}>
                                             <div className="relative">
-                                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                 <input
                                                     type={showLoginPw ? 'text' : 'password'}
                                                     placeholder="••••••••"
                                                     autoComplete="current-password"
-                                                    className={`${inputCls} pr-10`}
+                                                    className={passwordInputCls}
                                                     {...regLogin('password')}
                                                 />
                                                 <button
@@ -350,12 +352,11 @@ const AuthPage: React.FC = () => {
 
                                         <Field label="Password" error={regErrors.password?.message}>
                                             <div className="relative">
-                                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                                                 <input
                                                     type={showRegPw ? 'text' : 'password'}
                                                     placeholder="Min. 8 chars, uppercase & number"
                                                     autoComplete="new-password"
-                                                    className={`${inputCls} pr-10`}
+                                                    className={passwordInputCls}
                                                     {...regRegister('password')}
                                                 />
                                                 <button
