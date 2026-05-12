@@ -10,7 +10,6 @@ import {
     ArrowRight,
     MapPin,
     Users,
-    Home,
     CheckCircle,
     TrendingUp,
 } from 'lucide-react';
@@ -242,10 +241,12 @@ const HomePage: React.FC = () => {
                         >
                             {/* Big hero image card */}
                             <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-primary-100 to-primary-50 aspect-[4/5]">
-                                <div className="absolute inset-0 flex items-center justify-center text-primary-300">
-                                    <Home className="w-32 h-32" strokeWidth={1.2} />
-                                </div>
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/40 via-transparent to-transparent" />
+                                <img
+                                    src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80"
+                                    alt="Modern apartment interior in Multan"
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/55 via-slate-900/10 to-transparent" />
                                 {/* Top-left tag */}
                                 <div className="absolute top-5 left-5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur text-xs font-bold text-slate-800 shadow">
                                     <span className="w-2 h-2 rounded-full bg-emerald-500" /> Live in Multan
@@ -395,10 +396,12 @@ const HomePage: React.FC = () => {
                             className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden"
                         >
                             <div className="p-2">
-                                <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 aspect-[4/3] flex items-center justify-center">
-                                    <div className="text-slate-300">
-                                        <Home className="w-20 h-20" />
-                                    </div>
+                                <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 aspect-[4/3]">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=900&q=80"
+                                        alt="Verified rental property"
+                                        className="absolute inset-0 w-full h-full object-cover"
+                                    />
                                     {/* overlay stats */}
                                     <div className="absolute bottom-4 left-4 right-4 glass rounded-xl p-4">
                                         <div className="flex items-center justify-between">
@@ -602,25 +605,6 @@ const HomePage: React.FC = () => {
                 </div>
             </section>
 
-            {/* ── FOOTER ──────────────────────────────────────── */}
-            <footer className="bg-slate-950 py-12">
-                <div className="container">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-3">
-                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white font-black text-sm">R</span>
-                            <span className="text-white font-bold tracking-tight">Roomify</span>
-                        </div>
-                        <p className="text-slate-500 text-xs">
-                            © {new Date().getFullYear()} Roomify. All rights reserved. Built for Multan.
-                        </p>
-                        <div className="flex gap-6 text-xs text-slate-500">
-                            <a href="#" className="hover:text-slate-300 transition-colors">Privacy</a>
-                            <a href="#" className="hover:text-slate-300 transition-colors">Terms</a>
-                            <a href="#" className="hover:text-slate-300 transition-colors">Contact</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 };
