@@ -1,0 +1,57 @@
+name: Deploy Backend to Hugging Face
+
+# Auto-deploys the backend/ subtree to a Hugging Face Docker Space.
+# Runs only when backend code changes (or when triggered manually), so
+# frontend-only commits don't kick off a backend rebuild.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch: {}
+
+# If you push twice quickly, cancel the in-flight deploy and run the latest.
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # fetch-depth: 0 -> full history is required for `git subtree split`.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Push backend/ to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}        # HF write token
+          HF_USERNAME: ${{ secrets.HF_USERNAME }}  # account that OWNS the Space (also used to auth)
+          HF_SPACE: ${{ secrets.HF_SPACE }}        # Space name, e.g. roomify-backend
+        run: |
+          set -euo pipefail
+
+          # Extract the history of just the backend/ folder into a synthetic
+          # commit whose tree IS the Space's repo root (Dockerfile, README.md,
+          # src/, shared/ all sit at the top level — exactly what HF expects).
+          SPLIT_SHA="$(git subtree split --prefix backend HEAD)"
+          echo "Backend subtree commit: ${SPLIT_SHA}"
+
+          # Force-push that commit as the Space's main branch. Force is correct
+          # here: the Space repo is a deploy target, not a source of truth, and
+          # its initial auto-generated commit is intentionally overwritten.
+          # NOTE: if the Space lives under an ORG, change the owner segment of
+          # the URL below from ${HF_USERNAME} to the org name.
+          git push --force \
+            "https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/${HF_SPACE}" \
+            "${SPLIT_SHA}:refs/heads/main"
+
+          echo "✅ Deployed. HF will now rebuild the Docker image."

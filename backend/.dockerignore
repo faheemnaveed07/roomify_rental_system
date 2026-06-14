@@ -1,0 +1,31 @@
+# Keep the Docker build context small and free of secrets / build artifacts.
+# Paths are relative to the backend/ build context.
+
+# Dependencies & build output (reinstalled / recompiled inside the image)
+node_modules
+dist
+
+# Secrets — provided at runtime via Hugging Face "Secrets", never baked in
+.env
+.env.*
+
+# Local runtime data (ephemeral; not needed in the image)
+logs
+uploads
+
+# Tests, coverage, lint/format config — not needed to run
+tests
+src/tests
+src/**/*.test.ts
+src/**/*.spec.ts
+coverage
+.eslintrc.json
+.prettierrc
+jest.config.js
+
+# Docs & misc
+*.md
+.git
+.gitignore
+.DS_Store
+npm-debug.log*

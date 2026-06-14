@@ -16,7 +16,7 @@
         "declarationMap": true,
         "sourceMap": true,
         "noEmitOnError": false,
-        "rootDir": "..",
+        "rootDir": ".",
         "paths": {
             "@/*": ["./src/*"],
             "@config/*": ["./src/config/*"],
@@ -27,10 +27,10 @@
             "@middleware/*": ["./src/middleware/*"],
             "@utils/*": ["./src/utils/*"],
             "@types/*": ["./src/types/*"],
-            "@shared/*": ["../shared/*"]
+            "@shared/*": ["./shared/*"]
         },
         "typeRoots": ["./node_modules/@types", "./src/types"]
     },
-    "include": ["src/**/*", "../shared/types/**/*"],
+    "include": ["src/**/*", "shared/types/**/*"],
     "exclude": ["node_modules", "dist"]
 }

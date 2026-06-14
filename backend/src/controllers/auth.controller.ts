@@ -10,29 +10,44 @@ import { env } from '../config/environment';
 const setAuthCookies = (res: Response, tokens: { accessToken: string; refreshToken: string }) => {
     const isProduction = env.NODE_ENV === 'production';
 
-    // Access token: 1 hour
-    res.cookie('accessToken', tokens.accessToken, {
+    // In production the frontend (Vercel) and API (Hugging Face) live on
+    // different domains, so the auth cookies MUST be SameSite=None to be sent
+    // on cross-site requests — and SameSite=None requires Secure (HTTPS).
+    // Locally we keep SameSite=Lax so cookies still work over http://localhost.
+    // CSRF is still defended by the Origin-validation middleware.
+    const crossSite = {
         httpOnly: true,
         secure: isProduction,
-        sameSite: 'strict',
-        maxAge: 60 * 60 * 1000, // 1 hour
+        sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
         path: '/',
+    };
+
+    // Access token: 1 hour
+    res.cookie('accessToken', tokens.accessToken, {
+        ...crossSite,
+        maxAge: 60 * 60 * 1000, // 1 hour
     });
 
     // Refresh token: 30 days
     res.cookie('refreshToken', tokens.refreshToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: 'strict',
+        ...crossSite,
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-        path: '/',
     });
 };
 
 // ─── Helper: Clear Auth Cookies ──────────────────────────────────────
 const clearAuthCookies = (res: Response) => {
-    res.clearCookie('accessToken', { path: '/' });
-    res.clearCookie('refreshToken', { path: '/' });
+    const isProduction = env.NODE_ENV === 'production';
+    // clearCookie must use the SAME attributes the cookie was set with,
+    // otherwise the browser will not match and clear it cross-site.
+    const opts = {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: (isProduction ? 'none' : 'lax') as 'none' | 'lax',
+        path: '/',
+    };
+    res.clearCookie('accessToken', opts);
+    res.clearCookie('refreshToken', opts);
 };
 
 export class AuthController {

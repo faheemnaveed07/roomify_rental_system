@@ -45,6 +45,11 @@ export const useSocket = (options: UseSocketOptions = {}) => {
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 1000,
+            // Cross-domain (Vercel frontend -> Hugging Face backend): send the
+            // auth cookie on the handshake and allow polling fallback if the
+            // WebSocket upgrade is blocked by an intermediate proxy.
+            withCredentials: true,
+            transports: ['websocket', 'polling'],
         });
 
         socketRef.current = socket;
