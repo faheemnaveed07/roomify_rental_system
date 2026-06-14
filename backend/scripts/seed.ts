@@ -268,6 +268,14 @@ const TENANTS = [
     { firstName: 'Saima', lastName: 'Noor', email: 'tenant2@demo.com', phone: '03111234567' },
 ];
 
+// Admin demo account
+const ADMIN = {
+    firstName: 'Roomify',
+    lastName: 'Admin',
+    email: 'admin@demo.com',
+    phone: '03001112233',
+};
+
 // ─── main ────────────────────────────────────────────────────────────────────
 
 async function seed() {
@@ -285,6 +293,27 @@ async function seed() {
     }
 
     const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 12);
+
+    // ── Create admin ────────────────────────────────────────────────────────
+    const existingAdmin = await User.findOne({ email: ADMIN.email });
+    if (existingAdmin) {
+        // Ensure role/status are correct even if account already existed
+        existingAdmin.role = 'admin' as any;
+        existingAdmin.status = 'active' as any;
+        existingAdmin.emailVerified = true;
+        await existingAdmin.save();
+        console.log(`  ⏩ Admin already exists (role re-asserted): ${ADMIN.email}`);
+    } else {
+        await User.create({
+            ...ADMIN,
+            password: passwordHash,
+            role: 'admin',
+            status: 'active',
+            emailVerified: true,
+            cnicNumber: `${randInt(10000, 99999)}-${randInt(1000000, 9999999)}-${randInt(1, 9)}`,
+        });
+        console.log(`  🛡  Admin created: ${ADMIN.email}`);
+    }
 
     // ── Create tenants ──────────────────────────────────────────────────────
     const tenantDocs = [];
@@ -426,6 +455,7 @@ async function seed() {
     console.log(`   Tenants   : ${TENANTS.length}`);
     console.log(`   Properties: ${propertiesCreated}`);
     console.log('\n Demo login credentials (password for all: Demo@1234)');
+    console.log('   admin@demo.com');
     console.log('   tenant1@demo.com — tenant2@demo.com');
     console.log('   landlord1@demo.com … landlord12@demo.com');
     console.log('─────────────────────────────────────────────\n');
