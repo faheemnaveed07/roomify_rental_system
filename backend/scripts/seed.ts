@@ -12,7 +12,6 @@
  */
 
 import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import path from 'path';
 import User from '../src/models/User';
@@ -292,21 +291,25 @@ async function seed() {
         console.log('🗑  Cleared existing seed data');
     }
 
-    const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 12);
+    // NOTE: always pass the PLAINTEXT password — the User model's pre('save')
+    // hook hashes it exactly once. Pre-hashing here caused a double-hash bug
+    // (hash(hash(pw))) that made every demo login fail.
 
     // ── Create admin ────────────────────────────────────────────────────────
     const existingAdmin = await User.findOne({ email: ADMIN.email });
     if (existingAdmin) {
-        // Ensure role/status are correct even if account already existed
+        // Re-assert role/status AND reset the password so the seed self-heals
+        // accounts created before the double-hash fix.
         existingAdmin.role = 'admin' as any;
         existingAdmin.status = 'active' as any;
         existingAdmin.emailVerified = true;
+        existingAdmin.password = DEMO_PASSWORD;
         await existingAdmin.save();
-        console.log(`  ⏩ Admin already exists (role re-asserted): ${ADMIN.email}`);
+        console.log(`  ⏩ Admin already exists (role + password re-asserted): ${ADMIN.email}`);
     } else {
         await User.create({
             ...ADMIN,
-            password: passwordHash,
+            password: DEMO_PASSWORD,
             role: 'admin',
             status: 'active',
             emailVerified: true,
@@ -320,13 +323,17 @@ async function seed() {
     for (const t of TENANTS) {
         const existing = await User.findOne({ email: t.email });
         if (existing) {
-            console.log(`  ⏩ Tenant already exists: ${t.email}`);
+            existing.password = DEMO_PASSWORD;
+            existing.status = 'active' as any;
+            existing.emailVerified = true;
+            await existing.save();
+            console.log(`  ⏩ Tenant already exists (password re-asserted): ${t.email}`);
             tenantDocs.push(existing);
             continue;
         }
         const tenant = await User.create({
             ...t,
-            password: passwordHash,
+            password: DEMO_PASSWORD,
             role: 'tenant',
             status: 'active',
             emailVerified: true,
@@ -350,7 +357,7 @@ async function seed() {
             const phonePrefixes = ['0300', '0311', '0321', '0331', '0341', '0351'];
             landlord = await User.create({
                 email,
-                password: passwordHash,
+                password: DEMO_PASSWORD,
                 firstName,
                 lastName,
                 phone: `${pick(phonePrefixes)}${randInt(1000000, 9999999)}`,
@@ -361,7 +368,11 @@ async function seed() {
             });
             console.log(`  🏠 Landlord created: ${email} (${firstName} ${lastName})`);
         } else {
-            console.log(`  ⏩ Landlord already exists: ${email}`);
+            landlord.password = DEMO_PASSWORD;
+            landlord.status = 'active' as any;
+            landlord.emailVerified = true;
+            await landlord.save();
+            console.log(`  ⏩ Landlord already exists (password re-asserted): ${email}`);
         }
 
         // ── Create 2-3 properties for this landlord ─────────────────────
