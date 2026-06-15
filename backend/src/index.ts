@@ -15,6 +15,7 @@ import { logger, httpLogStream } from './utils/logger';
 import errorMiddleware from './middleware/error.middleware';
 import { csrfMiddleware } from './middleware/csrf.middleware';
 import { initializeSocket } from './config/socket';
+import { isAllowedOrigin } from './utils/origins';
 
 const app = express();
 const httpServer = createServer(app);
@@ -22,24 +23,20 @@ const httpServer = createServer(app);
 // Initialize Socket.IO
 const io = initializeSocket(httpServer);
 
-// ✅ CORS Configuration with credentials enabled for httpOnly cookies
-const allowedOrigins: string[] = [
-    'http://localhost:3000',  // Local frontend (old port)
-    'http://localhost:5173',  // Local frontend (Vite)
-];
-if (process.env.FRONTEND_URL) {
-    allowedOrigins.push(process.env.FRONTEND_URL);
-}
+// ✅ CORS Configuration with credentials enabled for httpOnly cookies.
+// Origin is validated via the shared allow-list (normalizes trailing slashes
+// and accepts every Vercel preview/production URL of this project).
+const corsOptions = {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        callback(null, isAllowedOrigin(origin));
+    },
+    credentials: true, // ✅ Required for httpOnly cookie transmission
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+};
 
-app.use(
-    cors({
-        origin: allowedOrigins,
-        credentials: true, // ✅ Required for httpOnly cookie transmission
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-    })
-);
-app.options('*', cors());
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // ✅ Helmet security headers
 app.use(

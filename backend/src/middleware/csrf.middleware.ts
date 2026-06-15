@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger';
+import { isAllowedOrigin } from '../utils/origins';
 
 /**
  * Origin Validation Middleware
@@ -16,14 +17,6 @@ import { logger } from '../utils/logger';
  * 
  * This provides lightweight CSRF protection without requiring explicit tokens.
  */
-
-// Whitelist of allowed origins
-const ALLOWED_ORIGINS = [
-    'http://localhost:3000',  // Local frontend (old port)
-    'http://localhost:5173',  // Local frontend (Vite)
-    'http://localhost:5001',  // Local API (self-reference for development)
-    process.env.FRONTEND_URL, // Production frontend URL (if provided)
-].filter(Boolean); // Remove undefined values
 
 /**
  * Validates that request origin matches allowed origins
@@ -43,8 +36,8 @@ export const validateOrigin = (
         return next();
     }
 
-    // Check if origin is in whitelist
-    if (!ALLOWED_ORIGINS.includes(origin)) {
+    // Check if origin is allowed (normalized + Vercel preview/production aware)
+    if (!isAllowedOrigin(origin)) {
         logger.warn(`⚠️ CSRF: Blocked request from unauthorized origin: ${origin}`, {
             method: req.method,
             path: req.path,
