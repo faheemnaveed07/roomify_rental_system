@@ -33,9 +33,10 @@ ENV NODE_ENV=production
 ENV PORT=7860
 WORKDIR /app
 
-# Run as a non-root user (uid 1000 = the user Hugging Face runs containers as).
-RUN addgroup -g 1000 appuser \
- && adduser -u 1000 -G appuser -s /bin/sh -D appuser
+# Run as a non-root user. node:20-alpine already ships a `node` user at
+# uid/gid 1000, so we use 1001 to avoid the "addgroup: gid '1000' in use" error.
+RUN addgroup -g 1001 appuser \
+ && adduser -u 1001 -G appuser -s /bin/sh -D appuser
 
 # Bring over only what the runtime needs: pruned node_modules + compiled output.
 COPY --from=builder --chown=appuser:appuser /app/node_modules ./node_modules
