@@ -1,8 +1,11 @@
 name: Deploy Backend to Hugging Face
 
-# Auto-deploys the backend/ subtree to a Hugging Face Docker Space.
-# Runs only when backend code changes (or when triggered manually), so
-# frontend-only commits don't kick off a backend rebuild.
+# Deploys backend/ to a Hugging Face Docker Space on every backend change.
+#
+# Strategy: push a CLEAN, single-commit snapshot of the *current* backend/ tree
+# (no node_modules, no uploads, no git history). A history-free orphan commit
+# guarantees old binary blobs from the monorepo's past can never end up in the
+# push pack — which is exactly what Hugging Face's pre-receive hook rejects.
 on:
   push:
     branches: [main]
@@ -11,7 +14,7 @@ on:
       - '.github/workflows/deploy-backend.yml'
   workflow_dispatch: {}
 
-# If you push twice quickly, cancel the in-flight deploy and run the latest.
+# Cancel an in-flight deploy if a newer one starts.
 concurrency:
   group: deploy-backend
   cancel-in-progress: true
@@ -20,38 +23,53 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # fetch-depth: 0 -> full history is required for `git subtree split`.
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Configure git identity
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Push backend/ to Hugging Face Space
+      - name: Validate required secrets
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}        # HF write token
-          HF_USERNAME: ${{ secrets.HF_USERNAME }}  # account that OWNS the Space (also used to auth)
-          HF_SPACE: ${{ secrets.HF_SPACE }}        # Space name, e.g. roomify-backend
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: ${{ secrets.HF_USERNAME }}
+          HF_SPACE: ${{ secrets.HF_SPACE }}
         run: |
-          set -euo pipefail
+          set -eu
+          missing=""
+          [ -z "${HF_TOKEN:-}" ]    && missing="$missing HF_TOKEN"
+          [ -z "${HF_USERNAME:-}" ] && missing="$missing HF_USERNAME"
+          [ -z "${HF_SPACE:-}" ]    && missing="$missing HF_SPACE"
+          if [ -n "$missing" ]; then
+            echo "::error::Missing repo secret(s):$missing — add them under Settings > Secrets and variables > Actions."
+            exit 1
+          fi
 
-          # Extract the history of just the backend/ folder into a synthetic
-          # commit whose tree IS the Space's repo root (Dockerfile, README.md,
-          # src/, shared/ all sit at the top level — exactly what HF expects).
-          SPLIT_SHA="$(git subtree split --prefix backend HEAD)"
-          echo "Backend subtree commit: ${SPLIT_SHA}"
+      - name: Guard against binary files (HF rejects them)
+        run: |
+          set -eu
+          bins="$(git ls-tree -r HEAD --name-only | grep '^backend/' \
+            | grep -iE '\.(png|jpe?g|jfif|gif|webp|ico|gz|node|pdf|woff2?|ttf|mp4)$' || true)"
+          if [ -n "$bins" ]; then
+            echo "::error::Binary files are tracked under backend/ — Hugging Face will reject the push:"
+            echo "$bins"
+            exit 1
+          fi
+          echo "No tracked binary files under backend/ — safe to deploy."
 
-          # Force-push that commit as the Space's main branch. Force is correct
-          # here: the Space repo is a deploy target, not a source of truth, and
-          # its initial auto-generated commit is intentionally overwritten.
-          # NOTE: if the Space lives under an ORG, change the owner segment of
-          # the URL below from ${HF_USERNAME} to the org name.
-          git push --force \
+      - name: Push clean snapshot to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_USERNAME: ${{ secrets.HF_USERNAME }}
+          HF_SPACE: ${{ secrets.HF_SPACE }}
+        run: |
+          set -eu
+          cd backend
+          rm -rf .git
+          git init -q
+          git checkout -q -b main
+          git config user.email "actions@github.com"
+          git config user.name  "GitHub Actions"
+          git add -A                                   # respects backend/.gitignore
+          git commit -q -m "Deploy ${GITHUB_SHA} from monorepo"
+          git push --force -q \
             "https://${HF_USERNAME}:${HF_TOKEN}@huggingface.co/spaces/${HF_USERNAME}/${HF_SPACE}" \
-            "${SPLIT_SHA}:refs/heads/main"
-
-          echo "✅ Deployed. HF will now rebuild the Docker image."
+            main
+          echo "✅ Deployed monorepo ${GITHUB_SHA} -> https://huggingface.co/spaces/${HF_USERNAME}/${HF_SPACE}"
