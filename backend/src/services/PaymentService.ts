@@ -65,6 +65,33 @@ export interface AddBankAccountDTO {
 }
 
 class PaymentService {
+    private async resolveLandlordBankDetailsOrThrow(
+        landlord: mongoose.Types.ObjectId | string | unknown
+    ): Promise<{
+        bankName: string;
+        accountTitle: string;
+        accountNumber: string;
+        iban?: string;
+        branchCode?: string;
+    }> {
+        const bankAccount = await LandlordBankAccount.findOne({
+            landlord,
+            isDefault: true,
+        }) || await LandlordBankAccount.findOne({ landlord });
+
+        if (!bankAccount) {
+            throw new Error('Landlord has not set up bank account for payments');
+        }
+
+        return {
+            bankName: bankAccount.bankName,
+            accountTitle: bankAccount.accountTitle,
+            accountNumber: bankAccount.accountNumber,
+            iban: bankAccount.iban,
+            branchCode: bankAccount.branchCode,
+        };
+    }
+
     /**
      * Get landlord's bank accounts
      */
@@ -185,35 +212,7 @@ class PaymentService {
         // If bank transfer, get landlord's bank details
         let bankDetails;
         if (paymentMethod === PaymentMethod.BANK_TRANSFER) {
-            const bankAccount = await LandlordBankAccount.findOne({
-                landlord: booking.landlord,
-                isDefault: true,
-            });
-            
-            if (!bankAccount) {
-                // Get any bank account
-                const anyAccount = await LandlordBankAccount.findOne({
-                    landlord: booking.landlord,
-                });
-                if (!anyAccount) {
-                    throw new Error('Landlord has not set up bank account for payments');
-                }
-                bankDetails = {
-                    bankName: anyAccount.bankName,
-                    accountTitle: anyAccount.accountTitle,
-                    accountNumber: anyAccount.accountNumber,
-                    iban: anyAccount.iban,
-                    branchCode: anyAccount.branchCode,
-                };
-            } else {
-                bankDetails = {
-                    bankName: bankAccount.bankName,
-                    accountTitle: bankAccount.accountTitle,
-                    accountNumber: bankAccount.accountNumber,
-                    iban: bankAccount.iban,
-                    branchCode: bankAccount.branchCode,
-                };
-            }
+            bankDetails = await this.resolveLandlordBankDetailsOrThrow(booking.landlord);
         }
 
         const payment = await Payment.create({
@@ -484,20 +483,7 @@ class PaymentService {
         // Get landlord bank details if bank transfer
         let bankDetails;
         if (paymentMethod === PaymentMethod.BANK_TRANSFER) {
-            const bankAccount = await LandlordBankAccount.findOne({
-                landlord: booking.landlord,
-                isDefault: true,
-            }) || await LandlordBankAccount.findOne({ landlord: booking.landlord });
-
-            if (bankAccount) {
-                bankDetails = {
-                    bankName: bankAccount.bankName,
-                    accountTitle: bankAccount.accountTitle,
-                    accountNumber: bankAccount.accountNumber,
-                    iban: bankAccount.iban,
-                    branchCode: bankAccount.branchCode,
-                };
-            }
+            bankDetails = await this.resolveLandlordBankDetailsOrThrow(booking.landlord);
         }
 
         const payment = await Payment.create({

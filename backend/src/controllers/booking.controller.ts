@@ -3,6 +3,45 @@ import { Types } from 'mongoose';
 import { bookingService } from '../services/BookingService';
 import { logger } from '../utils/logger';
 
+const normalizeOwnerId = (owner: unknown): string | undefined => {
+    if (!owner) {
+        return undefined;
+    }
+
+    if (typeof owner === 'string') {
+        return owner;
+    }
+
+    if (owner instanceof Types.ObjectId) {
+        return owner.toString();
+    }
+
+    if (typeof owner === 'object') {
+        const ownerRecord = owner as {
+            _id?: unknown;
+            id?: unknown;
+            toString?: () => string;
+        };
+
+        if (ownerRecord._id) {
+            return normalizeOwnerId(ownerRecord._id);
+        }
+
+        if (typeof ownerRecord.id === 'string' && ownerRecord.id) {
+            return ownerRecord.id;
+        }
+
+        if (typeof ownerRecord.toString === 'function') {
+            const value = ownerRecord.toString();
+            if (value && value !== '[object Object]') {
+                return value;
+            }
+        }
+    }
+
+    return undefined;
+};
+
 export class BookingController {
     /**
      * Create a new booking request
@@ -107,7 +146,10 @@ export class BookingController {
 
             // Check if user is either the tenant or landlord
             const userId = req.user?.userId;
-            if (booking.tenant.toString() !== userId && booking.landlord.toString() !== userId) {
+            const tenantId = normalizeOwnerId(booking.tenant);
+            const landlordId = normalizeOwnerId(booking.landlord);
+
+            if (!userId || (tenantId !== userId && landlordId !== userId)) {
                 return res.status(403).json({
                     success: false,
                     message: 'Access denied'

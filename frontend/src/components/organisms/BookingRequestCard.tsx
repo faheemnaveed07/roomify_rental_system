@@ -3,6 +3,7 @@ import { IBooking } from '@shared/types';
 import { User, MessageSquare, Bed, Calendar, CheckCircle, XCircle } from 'lucide-react';
 import { Badge } from '../atoms/Badge';
 import Button from '../atoms/Button';
+import { formatBookingCalendarDate } from '../../lib/date';
 
 interface BookingRequestCardProps {
     booking: IBooking;
@@ -49,7 +50,7 @@ const BookingRequestCard: React.FC<BookingRequestCardProps> = ({ booking, onAppr
                         <div className="flex flex-wrap gap-4 mt-2">
                             <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-500 bg-neutral-50 px-2 py-1 rounded-lg">
                                 <Calendar size={14} />
-                                {new Date(booking.proposedMoveInDate).toLocaleDateString()}
+                                {formatBookingCalendarDate(booking.proposedMoveInDate)}
                             </div>
                             {booking.bedNumber && (
                                 <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2563EB] bg-blue-50 px-2 py-1 rounded-lg">

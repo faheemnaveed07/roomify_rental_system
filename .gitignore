@@ -55,3 +55,12 @@ Thumbs.db
 *.pem
 .cache/
 backend/uploads/
+
+# Generated QA / implementation docs (do not trigger CI on these artifacts)
+*_REPORT.md
+*IMPLEMENTATION_REPORT*.md
+*_ANALYSIS*.md
+*_IMPLEMENTATION_PLAN.md
+SOLUTION_*_PLAN.md
+Roomify_QA_Testing_Guide.html
+Roomify_QA_Testing_Guide.pdf

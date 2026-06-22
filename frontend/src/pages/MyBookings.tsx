@@ -5,6 +5,10 @@ import { Badge } from '../components/atoms/Badge';
 import Button from '../components/atoms/Button';
 import { resolveAssetUrl } from '../services/api';
 import { CreditCard, FileText } from 'lucide-react';
+import { useToast } from '../hooks/useToast';
+import ToastContainer from '../components/atoms/ToastContainer';
+import BookingTimeline from '../components/molecules/BookingTimeline';
+import { formatBookingCalendarDate } from '../lib/date';
 
 const MyBookingsPage: React.FC = () => {
     const navigate = useNavigate();
@@ -12,6 +16,7 @@ const MyBookingsPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [paymentLoading, setPaymentLoading] = useState<string | null>(null);
+    const { toasts, success, dismiss } = useToast();
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -27,6 +32,24 @@ const MyBookingsPage: React.FC = () => {
 
         fetchBookings();
     }, []);
+
+    useEffect(() => {
+        bookings.forEach((booking) => {
+            if (booking.status !== 'approved' || !booking.timeline?.approvedAt) return;
+
+            const toastKey = `booking-approved-toast-${booking._id}`;
+            if (sessionStorage.getItem(toastKey)) return;
+
+            const approvedAt = new Date(booking.timeline.approvedAt).getTime();
+            const now = Date.now();
+            const fifteenMinutes = 15 * 60 * 1000;
+
+            if (now - approvedAt <= fifteenMinutes) {
+                success(`Your booking for "${booking.property?.title || 'this property'}" was approved. You can pay now.`);
+                sessionStorage.setItem(toastKey, 'shown');
+            }
+        });
+    }, [bookings, success]);
 
     const getStatusColor = (status: string) => {
         switch (status) {
@@ -68,6 +91,7 @@ const MyBookingsPage: React.FC = () => {
 
     return (
         <div className="container py-12">
+            <ToastContainer toasts={toasts} dismiss={dismiss} />
             <h1 className="text-3xl font-bold text-neutral-900 mb-8">My Booking Requests</h1>
 
             {bookings.length === 0 ? (
@@ -113,13 +137,28 @@ const MyBookingsPage: React.FC = () => {
                                     </div>
                                     <div>
                                         <p className="text-neutral-500">Move-in Date</p>
-                                        <p className="font-semibold">{new Date(booking.proposedMoveInDate).toLocaleDateString()}</p>
+                                        <p className="font-semibold">{formatBookingCalendarDate(booking.proposedMoveInDate)}</p>
                                     </div>
                                     <div>
                                         <p className="text-neutral-500">Duration</p>
                                         <p className="font-semibold">{booking.proposedDuration?.value} {booking.proposedDuration?.unit}</p>
                                     </div>
                                 </div>
+
+                                <BookingTimeline booking={booking} />
+
+                                {booking.status === 'pending' && (
+                                    <div className="mt-4">
+                                        <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+                                            <p className="text-sm font-semibold text-blue-900">
+                                                Waiting for landlord approval
+                                            </p>
+                                            <p className="text-xs text-blue-700 mt-1">
+                                                Your request has been sent. The landlord will review it soon. You will be able to pay once the request is approved.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {booking.status === 'completed' && (
                                     <div className="mt-4 pt-4 border-t border-neutral-100">

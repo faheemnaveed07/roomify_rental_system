@@ -1,9 +1,11 @@
 import { Types } from 'mongoose';
 import { Booking, IBooking, BookingStatus, BookingType } from '../models/Booking';
 import { Property } from '../models/Property';
+import User from '../models/User';
 import { PropertyStatus, PropertyType } from '@shared/types/property.types';
 import { PaginationQuery } from '@shared/types/api.types';
 import { logger } from '../utils/logger';
+import { sendBookingNotificationEmail } from '../utils/email';
 
 interface BookingRequest {
     propertyId: string;
@@ -108,6 +110,35 @@ export class BookingService {
             $inc: { inquiries: 1 },
         });
 
+        // Best-effort email notifications (never block booking creation)
+        try {
+            const [tenant, landlord] = await Promise.all([
+                User.findById(request.tenantId),
+                User.findById(property.owner),
+            ]);
+
+            if (tenant?.email) {
+                await sendBookingNotificationEmail(
+                    tenant.email,
+                    tenant.firstName,
+                    property.title,
+                    'requested'
+                );
+            }
+
+            if (landlord?.email) {
+                await sendBookingNotificationEmail(
+                    landlord.email,
+                    landlord.firstName,
+                    property.title,
+                    'requested',
+                    request.requestMessage
+                );
+            }
+        } catch (error) {
+            logger.error('Failed to send booking request notification email(s):', error as Error);
+        }
+
         logger.info(`Booking request created: ${booking._id}`);
         return booking;
     }
@@ -143,6 +174,26 @@ export class BookingService {
         booking.timeline.respondedAt = new Date();
         booking.timeline.approvedAt = new Date();
         await booking.save();
+
+        // Best-effort tenant approval email (never block approval)
+        try {
+            const [tenant, property] = await Promise.all([
+                User.findById(booking.tenant),
+                Property.findById(booking.property).select('title'),
+            ]);
+
+            if (tenant?.email) {
+                await sendBookingNotificationEmail(
+                    tenant.email,
+                    tenant.firstName,
+                    property?.title || 'your selected property',
+                    'approved',
+                    responseMessage
+                );
+            }
+        } catch (error) {
+            logger.error('Failed to send booking approval notification email:', error as Error);
+        }
 
         // Update property availability for full house
         if (booking.bookingType === BookingType.FULL_PROPERTY) {

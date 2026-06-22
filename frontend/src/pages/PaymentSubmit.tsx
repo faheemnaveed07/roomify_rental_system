@@ -42,6 +42,7 @@ const PaymentSubmitPage: React.FC = () => {
     const [bankAccounts, setBankAccounts] = useState<any[]>([]);
     const [existingPayment, setExistingPayment] = useState<any>(null);
     const [dataLoading, setDataLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
 
     // Form state
     const [txnRef, setTxnRef] = useState('');
@@ -58,6 +59,7 @@ const PaymentSubmitPage: React.FC = () => {
         if (!bookingId) return;
         (async () => {
             setDataLoading(true);
+            setLoadError(null);
             try {
                 const bookingData = await paymentService.getBookingById(bookingId);
                 setBooking(bookingData);
@@ -81,7 +83,9 @@ const PaymentSubmitPage: React.FC = () => {
                 );
                 if (active) setExistingPayment(active);
             } catch (err: any) {
-                toastError(err?.response?.data?.message || 'Failed to load booking details.');
+                const backendMessage = err?.response?.data?.message;
+                setLoadError(backendMessage || 'Failed to load booking details.');
+                toastError(backendMessage || 'Failed to load booking details.');
             } finally {
                 setDataLoading(false);
             }
@@ -168,12 +172,38 @@ const PaymentSubmitPage: React.FC = () => {
     }
 
     if (!booking) {
+        const notReadyMessage =
+            loadError === 'Access denied'
+                ? 'This booking is not available for payment yet. If your request is still pending, wait for landlord approval and try again from My Bookings.'
+                : 'This booking doesn\'t exist, you don\'t have access, or it isn\'t ready for payment yet.';
+
         return (
             <div style={{ textAlign: 'center', padding: '80px 24px' }}>
                 <AlertTriangle size={48} color="#f59e0b" style={{ margin: '0 auto 16px' }} />
-                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b' }}>Booking not found</h2>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b' }}>Booking Not Ready for Payment</h2>
                 <p style={{ color: '#64748b', marginTop: 8 }}>
-                    This booking doesn't exist or you don't have access.
+                    {notReadyMessage}
+                </p>
+                <div style={{ marginTop: 20 }}>
+                    <Button variant="outline" onClick={() => navigate('/my-bookings')}>
+                        Back to My Bookings
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
+    if (!['approved', 'completed'].includes(booking.status) && !existingPayment) {
+        return (
+            <div style={{ textAlign: 'center', padding: '80px 24px' }}>
+                <AlertTriangle size={48} color="#f59e0b" style={{ margin: '0 auto 16px' }} />
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b' }}>
+                    Booking Not Ready for Payment
+                </h2>
+                <p style={{ color: '#64748b', marginTop: 8, maxWidth: 560, marginInline: 'auto' }}>
+                    {booking.status === 'pending'
+                        ? 'Your booking is pending landlord approval. You can submit payment as soon as it is approved.'
+                        : `Your booking is currently ${booking.status}. Payment submission is only available for approved bookings.`}
                 </p>
                 <div style={{ marginTop: 20 }}>
                     <Button variant="outline" onClick={() => navigate('/my-bookings')}>
@@ -251,6 +281,68 @@ const PaymentSubmitPage: React.FC = () => {
         );
     }
 
+    if (!primaryAccount) {
+        return (
+            <div style={{ maxWidth: 680, margin: '40px auto', padding: '0 16px 60px' }}>
+                <ToastContainer toasts={toasts} dismiss={dismiss} />
+
+                <div style={{ marginBottom: 28 }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6366f1', marginBottom: 4 }}>
+                        Payment
+                    </p>
+                    <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e293b' }}>Payment Unavailable</h1>
+                    <p style={{ color: '#64748b', marginTop: 4 }}>
+                        This payment cannot proceed yet because the landlord has not configured a payout bank account.
+                    </p>
+                </div>
+
+                <div style={{ background: '#fff', borderRadius: 16, padding: '20px 24px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 16 }}>
+                    {propertyImageSrc ? (
+                        <img
+                            src={propertyImageSrc}
+                            alt={property.title}
+                            style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }}
+                            onError={(event) => {
+                                event.currentTarget.style.display = 'none';
+                            }}
+                        />
+                    ) : (
+                        <div style={{ width: 64, height: 64, borderRadius: 10, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Building2 size={28} color="#94a3b8" />
+                        </div>
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontWeight: 700, color: '#1e293b', fontSize: 16, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {property.title ?? 'Property'}
+                        </p>
+                        <p style={{ fontSize: 13, color: '#64748b' }}>
+                            {property.location?.city ?? ''}{property.location?.area ? `, ${property.location.area}` : ''}
+                        </p>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <p style={{ fontSize: 22, fontWeight: 800, color: '#6366f1' }}>
+                            PKR {amountDue.toLocaleString()}
+                        </p>
+                        <p style={{ fontSize: 12, color: '#94a3b8' }}>due amount</p>
+                    </div>
+                </div>
+
+                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 16, padding: '16px 20px', marginBottom: 20 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#92400e' }}>
+                        <AlertTriangle size={18} />
+                        <span style={{ fontSize: 14 }}>
+                            The landlord hasn&apos;t set up bank accounts yet, so receipt submission is temporarily disabled for this booking.
+                        </span>
+                    </div>
+                </div>
+
+                <Button variant="outline" onClick={() => navigate('/my-bookings')}>
+                    Back to My Bookings
+                </Button>
+            </div>
+        );
+    }
+
     // ── Main form ────────────────────────────────────────────────────────────
     return (
         <div style={{ maxWidth: 680, margin: '40px auto', padding: '0 16px 60px' }}>
@@ -300,43 +392,34 @@ const PaymentSubmitPage: React.FC = () => {
             </div>
 
             {/* Bank details */}
-            {primaryAccount ? (
-                <div style={{ background: '#f8f9ff', border: '1px solid #e0e7ff', borderRadius: 16, padding: '20px 24px', marginBottom: 20 }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6366f1', marginBottom: 12 }}>
-                        Transfer to this account
-                    </p>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
-                        {[
-                            { label: 'Bank', value: primaryAccount.bankName },
-                            { label: 'Account Title', value: primaryAccount.accountTitle },
-                            { label: 'Account Number', value: primaryAccount.accountNumber },
-                            ...(primaryAccount.iban ? [{ label: 'IBAN', value: primaryAccount.iban }] : []),
-                        ].map(({ label, value }) => (
-                            <div key={label}>
-                                <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>{label}</p>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    <p style={{ fontWeight: 600, color: '#1e293b', fontSize: 14 }}>{value}</p>
-                                    <button
-                                        type="button"
-                                        title="Copy"
-                                        onClick={() => copyToClipboard(value)}
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#94a3b8' }}
-                                    >
-                                        <Copy size={12} />
-                                    </button>
-                                </div>
+            <div style={{ background: '#f8f9ff', border: '1px solid #e0e7ff', borderRadius: 16, padding: '20px 24px', marginBottom: 20 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6366f1', marginBottom: 12 }}>
+                    Transfer to this account
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
+                    {[
+                        { label: 'Bank', value: primaryAccount.bankName },
+                        { label: 'Account Title', value: primaryAccount.accountTitle },
+                        { label: 'Account Number', value: primaryAccount.accountNumber },
+                        ...(primaryAccount.iban ? [{ label: 'IBAN', value: primaryAccount.iban }] : []),
+                    ].map(({ label, value }) => (
+                        <div key={label}>
+                            <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>{label}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <p style={{ fontWeight: 600, color: '#1e293b', fontSize: 14 }}>{value}</p>
+                                <button
+                                    type="button"
+                                    title="Copy"
+                                    onClick={() => copyToClipboard(value)}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#94a3b8' }}
+                                >
+                                    <Copy size={12} />
+                                </button>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
-            ) : (
-                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 16, padding: '16px 20px', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#92400e' }}>
-                        <AlertTriangle size={18} />
-                        <span style={{ fontSize: 14 }}>The landlord hasn't set up bank accounts yet. Please contact them directly.</span>
-                    </div>
-                </div>
-            )}
+            </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit}>

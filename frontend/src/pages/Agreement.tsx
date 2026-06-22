@@ -5,7 +5,7 @@ import { useAgreementStore } from '../store/agreement.store';
 import { useAuthStore } from '../store/auth.store';
 import Button from '../components/atoms/Button';
 import { Badge } from '../components/atoms/Badge';
-import { ASSETS_URL } from '../services/api';
+import { ASSETS_URL, paymentService } from '../services/api';
 
 const AgreementPage: React.FC = () => {
     const { bookingId } = useParams<{ bookingId: string }>();
@@ -17,6 +17,8 @@ const AgreementPage: React.FC = () => {
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
     const [signConfirm, setSignConfirm] = useState(false);
     const [downloadLoading, setDownloadLoading] = useState(false);
+    const [bookingStatus, setBookingStatus] = useState<string | null>(null);
+    const [bookingStatusLoading, setBookingStatusLoading] = useState(false);
 
     const showToast = (type: 'success' | 'error', message: string) => {
         setToast({ type, message });
@@ -24,13 +26,42 @@ const AgreementPage: React.FC = () => {
     };
 
     useEffect(() => {
+        let isMounted = true;
+
+        const fetchBookingStatus = async (id: string) => {
+            setBookingStatusLoading(true);
+            try {
+                // Reuse existing booking-by-id API helper to avoid introducing new endpoints.
+                const booking = await paymentService.getBookingById(id);
+                if (isMounted) {
+                    setBookingStatus(booking?.status ?? null);
+                }
+            } catch {
+                if (isMounted) {
+                    setBookingStatus(null);
+                }
+            } finally {
+                if (isMounted) {
+                    setBookingStatusLoading(false);
+                }
+            }
+        };
+
         if (bookingId) {
             fetchByBooking(bookingId);
+            fetchBookingStatus(bookingId);
+        } else {
+            setBookingStatus(null);
         }
+
         return () => {
+            isMounted = false;
             clearError();
         };
     }, [bookingId]);
+
+    const canGenerateAgreement = bookingStatus === 'completed';
+    const shouldDisableGenerate = generating || bookingStatusLoading || !canGenerateAgreement;
 
     const handleGenerate = async () => {
         if (!bookingId) return;
@@ -141,7 +172,7 @@ const AgreementPage: React.FC = () => {
                         <p className="text-neutral-500 mb-8 max-w-sm mx-auto text-sm">
                             A lease agreement can be generated once the booking is marked as completed and payment has been verified.
                         </p>
-                        <Button variant="primary" onClick={handleGenerate} disabled={generating}>
+                        <Button variant="primary" onClick={handleGenerate} disabled={shouldDisableGenerate}>
                             {generating ? (
                                 <span className="flex items-center gap-2">
                                     <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -154,6 +185,11 @@ const AgreementPage: React.FC = () => {
                                 </span>
                             )}
                         </Button>
+                        {!bookingStatusLoading && !canGenerateAgreement && (
+                            <p className="mt-4 text-sm text-amber-700 bg-amber-50 px-4 py-2 rounded-xl inline-block">
+                                Agreement becomes available after booking completion.
+                            </p>
+                        )}
                         {error && (
                             <p className="mt-4 text-sm text-red-600 bg-red-50 px-4 py-2 rounded-xl inline-block">
                                 {error}
