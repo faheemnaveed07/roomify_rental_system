@@ -216,6 +216,23 @@ export const useSocket = (options: UseSocketOptions = {}) => {
         };
     }, []);
 
+    // Agreement notifications (delivered to the user:<id> room the socket joins
+    // on connect). Fires for both "tenant signed, awaiting your signature" and
+    // "fully executed" — the caller distinguishes via the `event` argument.
+    const onAgreementNotification = useCallback(
+        (callback: (event: 'agreement:awaiting-signature' | 'agreement:executed', data: any) => void) => {
+            const awaiting = (data: any) => callback('agreement:awaiting-signature', data);
+            const executed = (data: any) => callback('agreement:executed', data);
+            socketRef.current?.on('agreement:awaiting-signature', awaiting);
+            socketRef.current?.on('agreement:executed', executed);
+            return () => {
+                socketRef.current?.off('agreement:awaiting-signature', awaiting);
+                socketRef.current?.off('agreement:executed', executed);
+            };
+        },
+        []
+    );
+
     // Check if user is online
     const isUserOnline = useCallback((userId: string) => onlineUsers.has(userId), [onlineUsers]);
 
@@ -234,6 +251,7 @@ export const useSocket = (options: UseSocketOptions = {}) => {
         onReadReceipt,
         subscribeToPayments,
         onPaymentNotification,
+        onAgreementNotification,
         isUserOnline,
     };
 };

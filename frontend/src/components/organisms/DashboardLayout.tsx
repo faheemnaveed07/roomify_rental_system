@@ -1,10 +1,39 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { toast } from 'sonner';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import { useAgreementStore } from '../../store/agreement.store';
+import { useAuthStore } from '../../store/auth.store';
+import { useSocket } from '../../hooks/useSocket';
 
 const DashboardLayout: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const fetchLandlordAgreements = useAgreementStore((s) => s.fetchLandlordAgreements);
+    const user = useAuthStore((s) => s.user);
+    const { onAgreementNotification, isConnected } = useSocket({ userId: user?.id });
+
+    // Load the landlord's agreements once so the sidebar "Agreements" badge is
+    // accurate on every dashboard page (socket events refresh it thereafter).
+    useEffect(() => {
+        fetchLandlordAgreements();
+    }, [fetchLandlordAgreements]);
+
+    // Real-time: a tenant signing (or the lease becoming fully executed) toasts
+    // the landlord and refreshes the badge/list without a manual reload.
+    useEffect(() => {
+        if (!isConnected) return;
+        return onAgreementNotification((event, data) => {
+            if (event === 'agreement:awaiting-signature') {
+                toast.info(
+                    `${data?.tenantName ?? 'A tenant'} signed the lease for ${data?.propertyTitle ?? 'a property'} — review & sign.`
+                );
+            } else {
+                toast.success(`Lease for ${data?.propertyTitle ?? 'your property'} is now fully signed.`);
+            }
+            fetchLandlordAgreements();
+        });
+    }, [isConnected, onAgreementNotification, fetchLandlordAgreements]);
 
     return (
         <div className="flex h-screen bg-[#F8FAFC]">

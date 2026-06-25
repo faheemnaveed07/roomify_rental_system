@@ -4,6 +4,10 @@ import path from 'path';
 import mongoose from 'mongoose';
 import { Agreement, IAgreementDocument } from '../models/Agreement';
 import { Booking, BookingStatus } from '../models/Booking';
+import { User } from '../models/User';
+import { Property } from '../models/Property';
+import { sendEmail } from '../utils/email';
+import { emitAgreementNotification } from '../config/socket';
 import { logger } from '../utils/logger';
 
 interface IUserPopulated {
@@ -313,6 +317,23 @@ class AgreementService {
     }
 
     /**
+     * List all agreements where the given user is the landlord, most recent
+     * first, with property + tenant populated so the dashboard can render a
+     * "review & sign" card without extra round-trips.
+     *
+     * Powers the landlord "Awaiting your signature" section: the frontend
+     * treats an agreement as awaiting the landlord when `tenantSignedAt` is set
+     * but `landlordSignedAt` is not. `booking` stays as the raw id, which the
+     * UI uses to navigate to /agreement/:bookingId.
+     */
+    async getLandlordAgreements(landlordId: string): Promise<IAgreementDocument[]> {
+        return Agreement.find({ landlord: new mongoose.Types.ObjectId(landlordId) })
+            .populate('property', 'title location')
+            .populate('tenant', 'firstName lastName email')
+            .sort({ createdAt: -1 });
+    }
+
+    /**
      * Mark agreement as signed by the requesting user (tenant or landlord).
      */
     async markAsSigned(agreementId: string, userId: string): Promise<IAgreementDocument> {
@@ -328,20 +349,98 @@ class AgreementService {
             throw new Error('Unauthorized');
         }
 
-        if (isTenant && !agreement.tenantSignedAt) {
+        const tenantJustSigned = isTenant && !agreement.tenantSignedAt;
+        const landlordJustSigned = isLandlord && !agreement.landlordSignedAt;
+
+        if (tenantJustSigned) {
             agreement.tenantSignedAt = new Date();
         }
-        if (isLandlord && !agreement.landlordSignedAt) {
+        if (landlordJustSigned) {
             agreement.landlordSignedAt = new Date();
         }
 
-        if (agreement.tenantSignedAt && agreement.landlordSignedAt) {
+        const fullyExecuted = Boolean(agreement.tenantSignedAt && agreement.landlordSignedAt);
+        if (fullyExecuted) {
             agreement.status = 'signed';
         }
 
         await agreement.save();
         logger.info(`Agreement ${agreementId} signed by user ${userId}`);
+
+        // Fire-and-forget: a socket/email hiccup must never fail the signature.
+        if (tenantJustSigned || landlordJustSigned) {
+            this.notifyAfterSign(agreement, { tenantJustSigned, fullyExecuted }).catch((err) =>
+                logger.error('Agreement sign notification failed', err as Error)
+            );
+        }
+
         return agreement;
+    }
+
+    /**
+     * Notify the relevant parties after a signature.
+     * - Tenant just signed (not yet executed) -> tell the landlord to countersign.
+     * - Fully executed -> tell both parties the lease is complete.
+     * Socket events drive the in-app toast/badge; email is the durable fallback.
+     */
+    private async notifyAfterSign(
+        agreement: IAgreementDocument,
+        state: { tenantJustSigned: boolean; fullyExecuted: boolean }
+    ): Promise<void> {
+        const [tenant, landlord, property] = await Promise.all([
+            User.findById(agreement.tenant).select('firstName lastName email'),
+            User.findById(agreement.landlord).select('firstName lastName email'),
+            Property.findById(agreement.property).select('title'),
+        ]);
+
+        const propertyTitle = property?.title ?? 'your property';
+        const bookingId = agreement.booking.toString();
+        const agreementId = String(agreement._id);
+        const tenantName = tenant ? `${tenant.firstName} ${tenant.lastName}`.trim() : 'The tenant';
+
+        const emailTasks: Promise<unknown>[] = [];
+
+        if (state.fullyExecuted) {
+            const payload = { agreementId, bookingId, propertyTitle, status: 'signed' as const };
+            emitAgreementNotification(agreement.tenant.toString(), 'agreement:executed', payload);
+            emitAgreementNotification(agreement.landlord.toString(), 'agreement:executed', payload);
+
+            if (tenant?.email) {
+                emailTasks.push(sendEmail({
+                    to: tenant.email,
+                    subject: 'Your Roomify lease is fully signed',
+                    html: `<p>Hi ${tenant.firstName || 'there'},</p><p>Your lease agreement for <strong>${propertyTitle}</strong> has been signed by both parties and is now fully executed. You can download the signed copy from your bookings.</p>`,
+                    text: `Your lease agreement for ${propertyTitle} is now fully executed.`,
+                }));
+            }
+            if (landlord?.email) {
+                emailTasks.push(sendEmail({
+                    to: landlord.email,
+                    subject: 'Lease fully signed on Roomify',
+                    html: `<p>Hi ${landlord.firstName || 'there'},</p><p>The lease agreement for <strong>${propertyTitle}</strong> has been signed by both parties and is now fully executed.</p>`,
+                    text: `The lease agreement for ${propertyTitle} is now fully executed.`,
+                }));
+            }
+        } else if (state.tenantJustSigned) {
+            // Tenant signed; landlord needs to countersign.
+            emitAgreementNotification(agreement.landlord.toString(), 'agreement:awaiting-signature', {
+                agreementId,
+                bookingId,
+                propertyTitle,
+                tenantName,
+            });
+
+            if (landlord?.email) {
+                emailTasks.push(sendEmail({
+                    to: landlord.email,
+                    subject: 'Action needed: countersign your Roomify lease',
+                    html: `<p>Hi ${landlord.firstName || 'there'},</p><p>${tenantName} has signed the lease agreement for <strong>${propertyTitle}</strong>. Please review and countersign it to finalize the lease.</p><p>Open your dashboard and go to <strong>Awaiting your signature</strong>.</p>`,
+                    text: `${tenantName} signed the lease for ${propertyTitle}. Please countersign to finalize.`,
+                }));
+            }
+        }
+
+        await Promise.all(emailTasks);
     }
 }
 
