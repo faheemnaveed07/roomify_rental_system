@@ -50,6 +50,36 @@ export const connectDatabase = async (): Promise<typeof mongoose> => {
   }
 };
 
+/**
+ * Connect to MongoDB, retrying in the background forever instead of crashing.
+ *
+ * Why: a single transient Atlas hiccup at boot (free M0 clusters auto-pause,
+ * brief network blips, IP-allowlist propagation delay) used to throw out of
+ * `connectDatabase()` and trigger `process.exit(1)` in the server bootstrap.
+ * On Hugging Face Spaces a RUNTIME_ERROR container is NOT auto-restarted, so a
+ * 30-second blip turned into a multi-day outage that surfaced to the browser as
+ * a misleading CORS error (HF's error proxy omits Access-Control-Allow-Credentials).
+ *
+ * Mongoose auto-reconnects once the initial handshake succeeds, so we only need
+ * to keep retrying the FIRST connection here. The HTTP server stays up the whole
+ * time, so /api/health and CORS keep responding and DB-dependent routes return a
+ * proper 5xx (with correct CORS headers) until the database is ready.
+ */
+export const connectDatabaseWithRetry = async (retryDelayMs = 5000): Promise<void> => {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      await connectDatabase();
+      return;
+    } catch (error) {
+      logger.error(
+        `MongoDB connection attempt ${attempt} failed; retrying in ${retryDelayMs}ms`,
+        error as Error
+      );
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+    }
+  }
+};
+
 export const disconnectDatabase = async (): Promise<void> => {
   try {
     await mongoose.disconnect();
@@ -60,4 +90,4 @@ export const disconnectDatabase = async (): Promise<void> => {
   }
 };
 
-export default { connectDatabase, disconnectDatabase };
+export default { connectDatabase, connectDatabaseWithRetry, disconnectDatabase };

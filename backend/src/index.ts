@@ -10,7 +10,7 @@ import { createServer } from 'http';
 
 import path from 'path';
 import routes from './routes/index';
-import { connectDatabase } from './config/database';
+import { connectDatabaseWithRetry } from './config/database';
 import { logger, httpLogStream } from './utils/logger';
 import errorMiddleware from './middleware/error.middleware';
 import { csrfMiddleware } from './middleware/csrf.middleware';
@@ -80,27 +80,32 @@ app.use(errorMiddleware.errorHandler);
 const PORT = process.env.PORT ? Number(process.env.PORT) : 5001;
 
 const start = async () => {
-  try {
-    await connectDatabase();
+  // Start the HTTP server FIRST, independent of the database. This keeps
+  // /api/health and CORS responding even while MongoDB is still connecting, so
+  // a transient Atlas blip can never leave the container dead (a RUNTIME_ERROR
+  // Space on Hugging Face is not auto-restarted, which previously turned a brief
+  // DB hiccup into a multi-day outage that surfaced as a misleading CORS error).
+  httpServer.listen(PORT, () => {
+    logger.info(`Server running on port ${PORT}`);
+    logger.info(`Socket.IO initialized`);
+  });
 
-    httpServer.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
-      logger.info(`Socket.IO initialized`);
+  const shutdown = async () => {
+    logger.info('Shutting down server');
+    httpServer.close(() => {
+      process.exit(0);
     });
+  };
 
-    const shutdown = async () => {
-      logger.info('Shutting down server');
-      httpServer.close(() => {
-        process.exit(0);
-      });
-    };
+  process.on('SIGINT', shutdown);
+  process.on('SIGTERM', shutdown);
 
-    process.on('SIGINT', shutdown);
-    process.on('SIGTERM', shutdown);
-  } catch (error) {
-    logger.error('Failed to start server', error as Error);
-    process.exit(1);
-  }
+  // Connect to MongoDB in the background with retry. DB-dependent routes return
+  // a proper 5xx (with correct CORS headers) until the connection is ready;
+  // mongoose auto-reconnects thereafter. We never process.exit on DB failure.
+  connectDatabaseWithRetry().catch((error) => {
+    logger.error('Unexpected error in database connection bootstrap', error as Error);
+  });
 };
 
 start();
