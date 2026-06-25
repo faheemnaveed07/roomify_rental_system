@@ -84,6 +84,7 @@ const App: React.FC = () => {
                     <Route index element={<LandlordDashboard />} />
                     <Route path="requests" element={<LandlordDashboard />} />
                     <Route path="properties" element={<LandlordDashboard />} />
+                    <Route path="agreements" element={<LandlordDashboard />} />
                 </Route>
                 <Route path="/add-property" element={<DashboardLayout />}>
                     <Route index element={<AddPropertyPage />} />

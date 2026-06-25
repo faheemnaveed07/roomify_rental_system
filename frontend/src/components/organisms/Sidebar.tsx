@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Building2, CalendarCheck, PlusCircle, LogOut, X, MessageCircle, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Building2, CalendarCheck, PlusCircle, LogOut, X, MessageCircle, CreditCard, FileSignature } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
+import { useAgreementStore, isAwaitingLandlord } from '../../store/agreement.store';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ const navGroups = [
         items: [
             { icon: Building2, label: 'My Properties', path: '/dashboard/properties', end: false },
             { icon: CalendarCheck, label: 'Booking Requests', path: '/dashboard/requests', end: false },
+            { icon: FileSignature, label: 'Agreements', path: '/dashboard/agreements', end: false },
             { icon: MessageCircle, label: 'Messages', path: '/messages', end: false },
             { icon: CreditCard, label: 'Payments', path: '/payments', end: false },
         ],
@@ -30,6 +32,8 @@ const navGroups = [
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
     const { logout } = useAuthStore();
     const navigate = useNavigate();
+    const landlordAgreements = useAgreementStore((s) => s.landlordAgreements);
+    const awaitingCount = landlordAgreements.filter(isAwaitingLandlord).length;
 
     return (
         <aside
@@ -76,7 +80,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
                                     {({ isActive }) => (
                                         <>
                                             <item.icon size={17} className={isActive ? 'text-primary-600' : ''} />
-                                            {item.label}
+                                            <span className="flex-1">{item.label}</span>
+                                            {item.path === '/dashboard/agreements' && awaitingCount > 0 && (
+                                                <span className="ml-auto min-w-[20px] h-5 px-1.5 inline-flex items-center justify-center rounded-full bg-amber-500 text-white text-[11px] font-bold">
+                                                    {awaitingCount > 9 ? '9+' : awaitingCount}
+                                                </span>
+                                            )}
                                         </>
                                     )}
                                 </NavLink>

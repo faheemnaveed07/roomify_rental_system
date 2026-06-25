@@ -78,6 +78,26 @@ export const getAgreementByBooking = async (req: Request, res: Response, next: N
 };
 
 /**
+ * GET /agreements/landlord/mine
+ * List agreements where the requester is the landlord, used by the dashboard
+ * "Awaiting your signature" section. Role is enforced by route middleware.
+ */
+export const getLandlordAgreements = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const userId = req.user?.userId;
+        if (!userId) {
+            res.status(401).json({ success: false, message: 'Unauthorized' });
+            return;
+        }
+
+        const agreements = await AgreementService.getLandlordAgreements(userId);
+        res.status(200).json({ success: true, data: agreements });
+    } catch (error) {
+        next(error);
+    }
+};
+
+/**
  * GET /agreements/download/:id
  * Stream the PDF file for download.
  */

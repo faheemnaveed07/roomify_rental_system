@@ -18,6 +18,22 @@ export interface Agreement {
     updatedAt: string;
 }
 
+/** Agreement as returned by GET /agreements/landlord/mine (property + tenant populated). */
+export interface LandlordAgreement {
+    _id: string;
+    booking: string;
+    status: AgreementStatus;
+    tenantSignedAt?: string;
+    landlordSignedAt?: string;
+    createdAt: string;
+    property?: { _id: string; title?: string; location?: { city?: string; area?: string } } | string;
+    tenant?: { _id: string; firstName?: string; lastName?: string; email?: string } | string;
+}
+
+/** An agreement is awaiting the landlord when the tenant has signed but the landlord hasn't. */
+export const isAwaitingLandlord = (a: Pick<LandlordAgreement, 'tenantSignedAt' | 'landlordSignedAt'>): boolean =>
+    Boolean(a.tenantSignedAt && !a.landlordSignedAt);
+
 interface AgreementStore {
     agreement: Agreement | null;
     loading: boolean;
@@ -25,8 +41,13 @@ interface AgreementStore {
     signing: boolean;
     error: string | null;
 
+    // Landlord dashboard: the landlord's own agreements + loading flag.
+    landlordAgreements: LandlordAgreement[];
+    landlordAgreementsLoading: boolean;
+
     generate: (bookingId: string) => Promise<Agreement>;
     fetchByBooking: (bookingId: string) => Promise<void>;
+    fetchLandlordAgreements: () => Promise<void>;
     sign: (agreementId: string) => Promise<void>;
     download: (agreementId: string, bookingId: string) => Promise<void>;
     clearError: () => void;
@@ -39,6 +60,8 @@ export const useAgreementStore = create<AgreementStore>((set) => ({
     generating: false,
     signing: false,
     error: null,
+    landlordAgreements: [],
+    landlordAgreementsLoading: false,
 
     generate: async (bookingId: string): Promise<Agreement> => {
         set({ generating: true, error: null });
@@ -66,6 +89,17 @@ export const useAgreementStore = create<AgreementStore>((set) => ({
                 const message = err.response?.data?.message || err.message || 'Failed to fetch agreement';
                 set({ loading: false, error: message });
             }
+        }
+    },
+
+    fetchLandlordAgreements: async (): Promise<void> => {
+        set({ landlordAgreementsLoading: true });
+        try {
+            const list = await agreementService.listMine();
+            set({ landlordAgreements: list as LandlordAgreement[], landlordAgreementsLoading: false });
+        } catch {
+            // Non-fatal: leave the previous list and just drop the loading flag.
+            set({ landlordAgreementsLoading: false });
         }
     },
 

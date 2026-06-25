@@ -450,6 +450,12 @@ export const agreementService = {
         const response = await api.put<ApiResponse<any>>(`/agreements/${agreementId}/sign`);
         return response.data.data!;
     },
+    // Landlord's own agreements (property + tenant populated) — powers the
+    // "Awaiting your signature" dashboard section and the nav badge.
+    listMine: async (): Promise<any[]> => {
+        const response = await api.get<ApiResponse<any[]>>(`/agreements/landlord/mine`);
+        return response.data.data ?? [];
+    },
 };
 
 // Matching / Recommendation Service

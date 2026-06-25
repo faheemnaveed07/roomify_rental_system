@@ -195,6 +195,12 @@ export const emitPaymentNotification = (userId: string, event: string, data: unk
     }
 };
 
+export const emitAgreementNotification = (userId: string, event: string, data: unknown): void => {
+    if (ioInstance) {
+        ioInstance.to(`user:${userId}`).emit(event, data);
+    }
+};
+
 export const getConnectedUsers = (): Map<string, SocketUser> => connectedUsers;
 
 export const isUserOnline = (userId: string): boolean => connectedUsers.has(userId);
@@ -207,6 +213,7 @@ export default {
     emitToProperty, 
     emitToConversation,
     emitPaymentNotification,
+    emitAgreementNotification,
     getConnectedUsers,
     isUserOnline,
     getIO,
