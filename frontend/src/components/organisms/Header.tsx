@@ -16,6 +16,9 @@ import {
     Building2,
     BarChart3,
     Search,
+    Menu,
+    X,
+    MapPin,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/auth.store';
 import { useChatStore } from '../../store/chat.store';
@@ -28,10 +31,21 @@ const Header: React.FC = () => {
     const { unreadCount, fetchUnreadCount } = useChatStore();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false);
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         if (isAuthenticated) fetchUnreadCount();
+    }, [isAuthenticated]);
+
+    // Public (logged-out) dark header: switch to solid blur after scrolling past the hero edge.
+    useEffect(() => {
+        if (isAuthenticated) return;
+        const onScroll = () => setScrolled(window.scrollY > 40);
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
     }, [isAuthenticated]);
 
     const displayName = useMemo(
@@ -117,6 +131,128 @@ const Header: React.FC = () => {
     };
 
     const menuItem = 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors';
+
+    // ── Public (logged-out) header — DOMAVI dark marketing nav ──────────
+    if (!isAuthenticated) {
+        const publicLinks = [
+            { label: 'Verification', href: '/#verification' },
+            { label: 'Browse', to: '/browse' },
+            { label: 'Matching', href: '/#matching' },
+            { label: 'Safety', href: '/#trust' },
+            { label: 'Stories', href: '/#stories' },
+        ];
+        const closeMobile = () => setMobileOpen(false);
+
+        return (
+            <header
+                className={`domavi-dark fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-all duration-300 ${
+                    scrolled ? 'nav-scrolled' : 'border-white/5 bg-black/50'
+                }`}
+            >
+                <div className="max-w-[1600px] mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
+                    {/* Logo */}
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <span className="w-9 h-9 bg-[var(--accent)] flex items-center justify-center relative shrink-0">
+                            <Home className="text-black w-4 h-4" />
+                            <span className="absolute -inset-1 border border-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </span>
+                        <span>
+                            <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">DOMAVI</span>
+                            <span className="block font-mono text-[10px] text-[var(--muted)] tracking-[0.3em] mt-0.5">
+                                TRUST · HOME · <span className="font-urdu">گھر</span>
+                            </span>
+                        </span>
+                    </Link>
+
+                    {/* Desktop nav */}
+                    <nav className="hidden lg:flex items-center gap-10">
+                        {publicLinks.map((l) =>
+                            l.to ? (
+                                <Link key={l.label} to={l.to} className="nav-link">
+                                    {l.label}
+                                </Link>
+                            ) : (
+                                <a key={l.label} href={l.href} className="nav-link">
+                                    {l.label}
+                                </a>
+                            )
+                        )}
+                    </nav>
+
+                    {/* Right side */}
+                    <div className="flex items-center gap-5">
+                        <div className="hidden md:flex items-center gap-2 font-mono text-[11px] text-[var(--muted)]">
+                            <MapPin className="w-3 h-3 text-[var(--accent)]" />
+                            <span>MULTAN · BZU · PAKISTAN</span>
+                        </div>
+                        <Link
+                            to="/auth"
+                            className="hidden sm:inline-flex items-center font-heading text-xs tracking-[0.2em] uppercase text-[var(--fg-dim)] hover:text-[var(--fg)] transition-colors"
+                        >
+                            Sign In
+                        </Link>
+                        <Link
+                            to="/auth"
+                            className="hidden sm:inline-block font-heading text-xs tracking-[0.2em] uppercase text-black bg-[var(--accent)] px-5 py-2.5 hover:bg-[var(--accent-bright)] transition-colors"
+                        >
+                            Get Verified
+                        </Link>
+                        <button
+                            type="button"
+                            className="lg:hidden p-2"
+                            onClick={() => setMobileOpen(true)}
+                            aria-label="Open menu"
+                        >
+                            <Menu className="text-[var(--fg-dim)]" size={20} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* Mobile backdrop + drawer */}
+                <div
+                    className={`mobile-backdrop fixed inset-0 bg-black/60 z-40 ${mobileOpen ? 'show' : ''}`}
+                    onClick={closeMobile}
+                    aria-hidden
+                />
+                <div
+                    className={`mobile-drawer fixed top-0 right-0 bottom-0 w-72 bg-[var(--bg-card)] z-50 p-6 flex flex-col border-l border-[var(--border)] ${
+                        mobileOpen ? 'open' : ''
+                    }`}
+                >
+                    <button
+                        type="button"
+                        className="self-end mb-8 p-2 hover:bg-[var(--bg-card-hover)] transition-colors"
+                        onClick={closeMobile}
+                        aria-label="Close menu"
+                    >
+                        <X className="text-[var(--fg-dim)]" size={18} />
+                    </button>
+                    <nav className="flex flex-col gap-1">
+                        {publicLinks.map((l) =>
+                            l.to ? (
+                                <Link key={l.label} to={l.to} onClick={closeMobile} className="nav-link py-3 px-2">
+                                    {l.label}
+                                </Link>
+                            ) : (
+                                <a key={l.label} href={l.href} onClick={closeMobile} className="nav-link py-3 px-2">
+                                    {l.label}
+                                </a>
+                            )
+                        )}
+                    </nav>
+                    <div className="mt-auto">
+                        <Link
+                            to="/auth"
+                            onClick={closeMobile}
+                            className="block text-center font-heading text-xs tracking-[0.2em] uppercase text-black bg-[var(--accent)] px-5 py-3 hover:bg-[var(--accent-bright)] transition-colors"
+                        >
+                            Get Verified
+                        </Link>
+                    </div>
+                </div>
+            </header>
+        );
+    }
 
     return (
         <nav className="sticky top-0 z-50 border-b border-slate-200/60 bg-white/90 backdrop-blur-md">

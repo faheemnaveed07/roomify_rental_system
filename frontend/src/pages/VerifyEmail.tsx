@@ -37,15 +37,9 @@ const VerifyEmailPage: React.FC = () => {
 
     const content: Record<State, React.ReactNode> = {
         loading: (
-            <motion.div
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex flex-col items-center gap-4"
-            >
-                <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
-                <p className="text-slate-600 text-sm font-medium">Verifying your email address…</p>
+            <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-4">
+                <Loader2 className="h-12 w-12 text-[var(--accent)] animate-spin" />
+                <p className="text-[var(--fg-dim)] text-sm font-medium">Verifying your email address…</p>
             </motion.div>
         ),
         success: (
@@ -56,18 +50,16 @@ const VerifyEmailPage: React.FC = () => {
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
                 className="flex flex-col items-center gap-5"
             >
-                <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
-                    <CheckCircle2 className="h-10 w-10 text-emerald-600" />
+                <div className="w-20 h-20 rounded-full bg-[#1d5a3b]/30 border border-[var(--verify-dim)] flex items-center justify-center">
+                    <CheckCircle2 className="h-10 w-10 text-[var(--verify-bright)]" />
                 </div>
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Email verified!</h1>
-                    <p className="text-sm text-slate-500">
-                        Your account is now active. You can sign in and start exploring.
-                    </p>
+                    <h1 className="font-display text-4xl text-[var(--fg)] mb-2">Email verified!</h1>
+                    <p className="text-sm text-[var(--muted)]">Your account is now active. You can sign in and start exploring.</p>
                 </div>
                 <Link
                     to="/auth"
-                    className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition-colors"
+                    className="inline-flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-bright)] text-black font-heading text-xs tracking-[0.2em] uppercase py-3 px-6 transition-colors"
                 >
                     Sign In to Domavi
                 </Link>
@@ -81,22 +73,18 @@ const VerifyEmailPage: React.FC = () => {
                 transition={{ type: 'spring', stiffness: 260, damping: 20 }}
                 className="flex flex-col items-center gap-5"
             >
-                <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
-                    <AlertCircle className="h-10 w-10 text-red-500" />
+                <div className="w-20 h-20 rounded-full bg-[#e05a4a]/15 border border-[#e05a4a]/40 flex items-center justify-center">
+                    <AlertCircle className="h-10 w-10 text-[#e05a4a]" />
                 </div>
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">Verification failed</h1>
-                    <p className="text-sm text-slate-500 mb-1">
-                        This verification link is invalid or has expired.
-                    </p>
-                    <p className="text-xs text-slate-400">
-                        Links expire after 24 hours. Please register again to receive a new link.
-                    </p>
+                    <h1 className="font-display text-4xl text-[var(--fg)] mb-2">Verification failed</h1>
+                    <p className="text-sm text-[var(--muted)] mb-1">This verification link is invalid or has expired.</p>
+                    <p className="text-xs text-[var(--muted)]">Links expire after 24 hours. Please register again to receive a new link.</p>
                 </div>
                 <div className="flex gap-3">
                     <Link
                         to="/auth"
-                        className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-xl text-sm transition-colors"
+                        className="inline-flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-bright)] text-black font-heading text-xs tracking-[0.2em] uppercase py-3 px-5 transition-colors"
                     >
                         Back to Sign In
                     </Link>
@@ -106,10 +94,11 @@ const VerifyEmailPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-blue-50 px-4">
+        <div className="domavi-dark dv-page min-h-screen flex items-center justify-center px-4 pt-28 pb-12 relative overflow-hidden">
+            <div className="grain" aria-hidden />
             <div className="pointer-events-none fixed inset-0 overflow-hidden">
-                <div className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-blue-100/60 blur-3xl" />
-                <div className="absolute -right-32 -bottom-32 h-[32rem] w-[32rem] rounded-full bg-amber-100/60 blur-3xl" />
+                <div className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-[#d4845a]/10 blur-3xl" />
+                <div className="absolute -right-32 -bottom-32 h-[32rem] w-[32rem] rounded-full bg-[#2d8f5e]/10 blur-3xl" />
             </div>
 
             <motion.div
@@ -118,8 +107,8 @@ const VerifyEmailPage: React.FC = () => {
                 transition={{ duration: 0.3 }}
                 className="relative z-10 w-full max-w-md"
             >
-                <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-200/60 p-10 text-center">
-                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-600 mb-8">Domavi</p>
+                <div className="bg-[var(--bg-card)] border border-[var(--border-light)] notch-corner p-10 text-center">
+                    <p className="font-mono text-[11px] tracking-[0.3em] uppercase text-[var(--accent)] mb-8">DOMAVI</p>
                     <AnimatePresence mode="wait">{content[state]}</AnimatePresence>
                 </div>
             </motion.div>

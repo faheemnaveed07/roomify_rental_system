@@ -36,28 +36,36 @@ const PublicLayout: React.FC = () => (
         <main className="flex-grow">
             <Outlet />
         </main>
-        <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20">
+        <footer className="domavi-dark bg-[var(--bg-darker)] border-t border-[var(--border)] text-[var(--fg-dim)] py-16 mt-20">
             <div className="container grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div>
-                    <h3 className="text-white font-bold text-xl mb-4">Domavi</h3>
-                    <p className="max-w-xs">Simplifying rental search and verification for Pakistan's growing urban population.</p>
+                    <div className="flex items-center gap-3 mb-4">
+                        <span className="w-8 h-8 bg-[var(--accent)] flex items-center justify-center shrink-0">
+                            <span className="text-black font-display text-lg leading-none">D</span>
+                        </span>
+                        <span>
+                            <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">DOMAVI</span>
+                            <span className="block font-mono text-[9px] text-[var(--muted)] tracking-[0.3em] mt-0.5">TRUST · HOME · <span className="font-urdu">گھر</span></span>
+                        </span>
+                    </div>
+                    <p className="max-w-xs text-sm leading-relaxed">A home you can trust. People you'll click with — CNIC-verified rentals &amp; roommate matching for Pakistan.</p>
                 </div>
                 <div>
-                    <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-                    <ul className="space-y-2">
-                        <li><Link to="/browse" className="hover:text-white">Find Properties</Link></li>
-                        <li><Link to="/auth" className="hover:text-white">Sign In / Register</Link></li>
-                        <li><Link to="/roommate-matches" className="hover:text-white">Roommate Matching</Link></li>
+                    <h4 className="font-heading text-sm tracking-[0.2em] uppercase text-[var(--fg)] mb-4">Quick Links</h4>
+                    <ul className="space-y-2.5 text-sm">
+                        <li><Link to="/browse" className="hover:text-[var(--accent)] transition-colors">Find Properties</Link></li>
+                        <li><Link to="/auth" className="hover:text-[var(--accent)] transition-colors">Sign In / Register</Link></li>
+                        <li><Link to="/roommate-matches" className="hover:text-[var(--accent)] transition-colors">Roommate Matching</Link></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 className="text-white font-semibold mb-4">Contact</h4>
-                    <p>support@domavi.pk</p>
-                    <p>Multan, Pakistan</p>
+                    <h4 className="font-heading text-sm tracking-[0.2em] uppercase text-[var(--fg)] mb-4">Contact</h4>
+                    <p className="font-mono text-xs tracking-wide">support@domavi.pk</p>
+                    <p className="font-mono text-xs tracking-wide mt-1.5">MULTAN · PAKISTAN</p>
                 </div>
             </div>
-            <div className="container border-t border-neutral-800 mt-12 pt-8 text-center text-sm">
-                © 2026 Domavi Rental System. Built with ❤️ for Multan.
+            <div className="container border-t border-[var(--border)] mt-12 pt-8 text-center font-mono text-xs tracking-[0.15em] text-[var(--muted)]">
+                © 2026 DOMAVI RENTAL SYSTEM · BUILT FOR MULTAN
             </div>
         </footer>
     </div>

@@ -100,6 +100,12 @@ export default {
             fontFamily: {
                 sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
                 serif: ['Playfair Display', 'Georgia', 'serif'],
+                /* DOMAVI dark public-face stack */
+                display: ['"Bebas Neue"', 'sans-serif'],
+                heading: ['Oswald', 'sans-serif'],
+                body: ['Archivo', 'sans-serif'],
+                mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+                urdu: ['"Noto Sans Urdu"', 'sans-serif'],
             },
             spacing: {
                 '0.5': '0.125rem',
