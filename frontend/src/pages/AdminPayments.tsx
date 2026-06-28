@@ -43,9 +43,9 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
         onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
     >
-        <div style={{ background: '#fff', borderRadius: 20, padding: 32, maxWidth: 440, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#1e293b', marginBottom: 10 }}>{title}</h3>
-            <p style={{ fontSize: 14, color: '#64748b', marginBottom: 20 }}>{description}</p>
+        <div style={{ background: '#141414', borderRadius: 20, padding: 32, maxWidth: 440, width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#f5f5f5', marginBottom: 10 }}>{title}</h3>
+            <p style={{ fontSize: 14, color: '#8f8f8f', marginBottom: 20 }}>{description}</p>
             {children}
             <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end', marginTop: 24 }}>
                 <Button variant="outline" onClick={onCancel} disabled={loading}>Cancel</Button>
@@ -184,11 +184,11 @@ const AdminPaymentsPage: React.FC = () => {
 
     // ── Stat cards ────────────────────────────────────────────────────────────
     const STAT_CARDS = [
-        { label: 'Total',       value: stats.total,     color: '#6366f1', bg: '#f5f3ff' },
+        { label: 'Total',       value: stats.total,     color: '#d4845a', bg: '#f5f3ff' },
         { label: 'Pending',     value: stats.pending,   color: '#d97706', bg: '#fffbeb' },
         { label: 'Under Review',value: stats.awaiting,  color: '#2563eb', bg: '#eff6ff' },
-        { label: 'Approved',    value: stats.confirmed, color: '#16a34a', bg: '#f0fdf4' },
-        { label: 'Rejected',    value: stats.rejected,  color: '#dc2626', bg: '#fef2f2' },
+        { label: 'Approved',    value: stats.confirmed, color: '#16a34a', bg: 'rgba(45,143,94,0.15)' },
+        { label: 'Rejected',    value: stats.rejected,  color: '#dc2626', bg: 'rgba(224,90,74,0.15)' },
     ];
 
     return (
@@ -197,7 +197,7 @@ const AdminPaymentsPage: React.FC = () => {
 
             {/* Page header */}
             <div>
-                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6366f1' }}>Admin</p>
+                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#d4845a' }}>Admin</p>
                 <h1 className="text-3xl font-extrabold text-slate-900">Payment Verifications</h1>
                 <p className="text-slate-500 mt-1 max-w-2xl">
                     Review tenant receipts, approve confirmed transfers, or reject invalid submissions.
@@ -209,7 +209,7 @@ const AdminPaymentsPage: React.FC = () => {
                 {STAT_CARDS.map(({ label, value, color, bg }) => (
                     <div key={label} style={{ background: bg, borderRadius: 14, padding: '16px 20px', border: `1px solid ${color}22` }}>
                         <p style={{ fontSize: 28, fontWeight: 800, color }}>{value}</p>
-                        <p style={{ fontSize: 12, color: '#64748b', fontWeight: 500, marginTop: 2 }}>{label}</p>
+                        <p style={{ fontSize: 12, color: '#8f8f8f', fontWeight: 500, marginTop: 2 }}>{label}</p>
                     </div>
                 ))}
             </div>
@@ -223,9 +223,9 @@ const AdminPaymentsPage: React.FC = () => {
                         style={{
                             padding: '7px 16px',
                             borderRadius: 999,
-                            border: `1.5px solid ${activeTab === tab.key ? '#6366f1' : '#e2e8f0'}`,
-                            background: activeTab === tab.key ? '#6366f1' : '#fff',
-                            color: activeTab === tab.key ? '#fff' : '#64748b',
+                            border: `1.5px solid ${activeTab === tab.key ? '#d4845a' : '#e2e8f0'}`,
+                            background: activeTab === tab.key ? '#d4845a' : '#141414',
+                            color: activeTab === tab.key ? '#141414' : '#8f8f8f',
                             fontWeight: 600,
                             fontSize: 13,
                             cursor: 'pointer',
@@ -238,8 +238,8 @@ const AdminPaymentsPage: React.FC = () => {
                         {tab.count !== undefined && (
                             <span style={{
                                 fontSize: 11,
-                                background: activeTab === tab.key ? 'rgba(255,255,255,0.25)' : '#f1f5f9',
-                                color: activeTab === tab.key ? '#fff' : '#475569',
+                                background: activeTab === tab.key ? 'rgba(255,255,255,0.25)' : '#1f1f1f',
+                                color: activeTab === tab.key ? '#141414' : '#c0c0c0',
                                 borderRadius: 999, padding: '1px 7px', fontWeight: 700,
                             }}>
                                 {tab.count}
@@ -250,7 +250,7 @@ const AdminPaymentsPage: React.FC = () => {
                 <button
                     onClick={() => { fetchPayments(activeTab, page); fetchStats(); }}
                     title="Refresh"
-                    style={{ marginLeft: 'auto', background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 999, padding: '7px 12px', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}
+                    style={{ marginLeft: 'auto', background: 'none', border: '1.5px solid #e2e8f0', borderRadius: 999, padding: '7px 12px', cursor: 'pointer', color: '#8f8f8f', display: 'flex', alignItems: 'center', gap: 4 }}
                 >
                     <RefreshCw size={14} />
                     <span style={{ fontSize: 13, fontWeight: 500 }}>Refresh</span>
@@ -261,16 +261,16 @@ const AdminPaymentsPage: React.FC = () => {
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 {loading ? (
                     <div style={{ padding: 60, textAlign: 'center' }}>
-                        <div style={{ width: 36, height: 36, border: '4px solid #e2e8f0', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
+                        <div style={{ width: 36, height: 36, border: '4px solid #e2e8f0', borderTopColor: '#d4845a', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 12px' }} />
                         <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
-                        <p style={{ color: '#94a3b8', fontSize: 14 }}>Loading payments…</p>
+                        <p style={{ color: '#8f8f8f', fontSize: 14 }}>Loading payments…</p>
                     </div>
                 ) : fetchError ? (
                     <div style={{ padding: 60, textAlign: 'center' }}>
                         <p style={{ color: '#ef4444', fontSize: 15, fontWeight: 500, marginBottom: 12 }}>Failed to load payments</p>
                         <button
                             onClick={() => fetchPayments(activeTab, page)}
-                            style={{ padding: '8px 20px', background: '#6366f1', color: '#fff', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 14 }}
+                            style={{ padding: '8px 20px', background: '#d4845a', color: '#141414', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 14 }}
                         >
                             Try Again
                         </button>
@@ -278,7 +278,7 @@ const AdminPaymentsPage: React.FC = () => {
                 ) : payments.length === 0 ? (
                     <div style={{ padding: 60, textAlign: 'center' }}>
                         <FileText size={40} color="#cbd5e1" style={{ margin: '0 auto 12px' }} />
-                        <p style={{ color: '#94a3b8', fontSize: 15, fontWeight: 500 }}>No payments found</p>
+                        <p style={{ color: '#8f8f8f', fontSize: 15, fontWeight: 500 }}>No payments found</p>
                     </div>
                 ) : (
                     <div style={{ overflowX: 'auto' }}>
@@ -308,43 +308,43 @@ const AdminPaymentsPage: React.FC = () => {
                                                     {tenant?.avatar ? (
                                                         <img src={`${ASSETS_URL}${tenant.avatar}`} alt="" style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }} />
                                                     ) : (
-                                                        <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                             <User size={16} color="#94a3b8" />
                                                         </div>
                                                     )}
                                                     <div>
-                                                        <p style={{ fontWeight: 600, fontSize: 13, color: '#1e293b' }}>
+                                                        <p style={{ fontWeight: 600, fontSize: 13, color: '#f5f5f5' }}>
                                                             {tenant ? `${tenant.firstName} ${tenant.lastName}` : 'Unknown'}
                                                         </p>
-                                                        <p style={{ fontSize: 11, color: '#94a3b8' }}>{tenant?.email ?? ''}</p>
+                                                        <p style={{ fontSize: 11, color: '#8f8f8f' }}>{tenant?.email ?? ''}</p>
                                                     </div>
                                                 </div>
                                             </td>
 
                                             {/* Property */}
                                             <td className="px-5 py-4">
-                                                <p style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                <p style={{ fontSize: 13, fontWeight: 600, color: '#f5f5f5', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                                     {property?.title ?? '—'}
                                                 </p>
                                             </td>
 
                                             {/* Amount */}
                                             <td className="px-5 py-4">
-                                                <span style={{ fontWeight: 700, fontSize: 14, color: '#1e293b' }}>
+                                                <span style={{ fontWeight: 700, fontSize: 14, color: '#f5f5f5' }}>
                                                     PKR {(payment.amount ?? 0).toLocaleString()}
                                                 </span>
                                             </td>
 
                                             {/* Type */}
                                             <td className="px-5 py-4">
-                                                <span style={{ fontSize: 12, color: '#64748b', fontWeight: 500 }}>
+                                                <span style={{ fontSize: 12, color: '#8f8f8f', fontWeight: 500 }}>
                                                     {(payment.paymentType ?? '').replace(/_/g, ' ')}
                                                 </span>
                                             </td>
 
                                             {/* Transaction ID */}
                                             <td className="px-5 py-4">
-                                                <span style={{ fontSize: 12, color: '#334155', fontFamily: 'monospace', background: '#f1f5f9', padding: '3px 8px', borderRadius: 6 }}>
+                                                <span style={{ fontSize: 12, color: '#c0c0c0', fontFamily: 'monospace', background: '#1f1f1f', padding: '3px 8px', borderRadius: 6 }}>
                                                     {payment.transactionReference ?? '—'}
                                                 </span>
                                             </td>
@@ -356,13 +356,13 @@ const AdminPaymentsPage: React.FC = () => {
                                                         href={`${ASSETS_URL}${payment.proofOfPayment}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#6366f1', fontWeight: 600, fontSize: 12 }}
+                                                        style={{ display: 'inline-flex', alignItems: 'center', gap: 5, color: '#d4845a', fontWeight: 600, fontSize: 12 }}
                                                     >
                                                         <Eye size={14} />
                                                         View
                                                     </a>
                                                 ) : (
-                                                    <span style={{ color: '#cbd5e1', fontSize: 12 }}>—</span>
+                                                    <span style={{ color: '#6a6a6a', fontSize: 12 }}>—</span>
                                                 )}
                                             </td>
 
@@ -382,19 +382,19 @@ const AdminPaymentsPage: React.FC = () => {
                                                     <div style={{ display: 'flex', gap: 8 }}>
                                                         <button
                                                             onClick={() => { setApproveModal({ paymentId: payment._id, amount: payment.amount }); setAdminNotes(''); }}
-                                                            style={{ padding: '5px 14px', borderRadius: 8, background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#16a34a', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                                                            style={{ padding: '5px 14px', borderRadius: 8, background: 'rgba(45,143,94,0.15)', border: '1.5px solid #bbf7d0', color: '#16a34a', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
                                                         >
                                                             Approve
                                                         </button>
                                                         <button
                                                             onClick={() => { setRejectModal({ paymentId: payment._id, amount: payment.amount }); setRejectReason(''); setRejectReasonError(''); }}
-                                                            style={{ padding: '5px 14px', borderRadius: 8, background: '#fef2f2', border: '1.5px solid #fecaca', color: '#dc2626', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                                                            style={{ padding: '5px 14px', borderRadius: 8, background: 'rgba(224,90,74,0.15)', border: '1.5px solid #fecaca', color: '#dc2626', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
                                                         >
                                                             Reject
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <span style={{ fontSize: 12, color: '#cbd5e1' }}>—</span>
+                                                    <span style={{ fontSize: 12, color: '#6a6a6a' }}>—</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -409,21 +409,21 @@ const AdminPaymentsPage: React.FC = () => {
             {/* Pagination */}
             {totalPages > 1 && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
-                    <p style={{ fontSize: 13, color: '#64748b' }}>
+                    <p style={{ fontSize: 13, color: '#8f8f8f' }}>
                         Showing page <strong>{page}</strong> of <strong>{totalPages}</strong> ({totalCount} total)
                     </p>
                     <div style={{ display: 'flex', gap: 8 }}>
                         <button
                             disabled={page <= 1}
                             onClick={() => setPage((p) => p - 1)}
-                            style={{ padding: '7px 14px', borderRadius: 8, border: '1.5px solid #e2e8f0', background: '#fff', cursor: page <= 1 ? 'not-allowed' : 'pointer', opacity: page <= 1 ? 0.4 : 1, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, color: '#475569' }}
+                            style={{ padding: '7px 14px', borderRadius: 8, border: '1.5px solid #e2e8f0', background: '#141414', cursor: page <= 1 ? 'not-allowed' : 'pointer', opacity: page <= 1 ? 0.4 : 1, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, color: '#c0c0c0' }}
                         >
                             <ChevronLeft size={15} /> Prev
                         </button>
                         <button
                             disabled={page >= totalPages}
                             onClick={() => setPage((p) => p + 1)}
-                            style={{ padding: '7px 14px', borderRadius: 8, border: '1.5px solid #e2e8f0', background: '#fff', cursor: page >= totalPages ? 'not-allowed' : 'pointer', opacity: page >= totalPages ? 0.4 : 1, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, color: '#475569' }}
+                            style={{ padding: '7px 14px', borderRadius: 8, border: '1.5px solid #e2e8f0', background: '#141414', cursor: page >= totalPages ? 'not-allowed' : 'pointer', opacity: page >= totalPages ? 0.4 : 1, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontWeight: 600, color: '#c0c0c0' }}
                         >
                             Next <ChevronRight size={15} />
                         </button>
@@ -443,7 +443,7 @@ const AdminPaymentsPage: React.FC = () => {
                     onCancel={() => setApproveModal(null)}
                 >
                     <div style={{ marginBottom: 4 }}>
-                        <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+                        <label style={{ fontSize: 13, fontWeight: 600, color: '#c0c0c0', display: 'block', marginBottom: 6 }}>
                             Admin notes (optional)
                         </label>
                         <textarea
@@ -452,7 +452,7 @@ const AdminPaymentsPage: React.FC = () => {
                             placeholder="e.g. Receipt verified via bank portal on April 3, 2026"
                             rows={3}
                             maxLength={500}
-                            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 13, resize: 'none', outline: 'none', color: '#1e293b', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 13, resize: 'none', outline: 'none', color: '#f5f5f5', boxSizing: 'border-box' }}
                         />
                     </div>
                 </ConfirmModal>
@@ -470,7 +470,7 @@ const AdminPaymentsPage: React.FC = () => {
                     onCancel={() => setRejectModal(null)}
                 >
                     <div style={{ marginBottom: 4 }}>
-                        <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+                        <label style={{ fontSize: 13, fontWeight: 600, color: '#c0c0c0', display: 'block', marginBottom: 6 }}>
                             Rejection reason <span style={{ color: '#dc2626' }}>*</span>
                         </label>
                         <textarea
@@ -479,7 +479,7 @@ const AdminPaymentsPage: React.FC = () => {
                             placeholder="e.g. Transaction ID not found in bank records, please resubmit."
                             rows={3}
                             maxLength={500}
-                            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${rejectReasonError ? '#fca5a5' : '#e2e8f0'}`, fontSize: 13, resize: 'none', outline: 'none', color: '#1e293b', boxSizing: 'border-box' }}
+                            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: `1.5px solid ${rejectReasonError ? '#fca5a5' : '#e2e8f0'}`, fontSize: 13, resize: 'none', outline: 'none', color: '#f5f5f5', boxSizing: 'border-box' }}
                         />
                         {rejectReasonError && (
                             <p style={{ color: '#dc2626', fontSize: 12, marginTop: 4 }}>{rejectReasonError}</p>

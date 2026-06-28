@@ -8,7 +8,7 @@
 \section{Introduction to Requirement Analysis}
 %===========================================================
 
-This chapter presents a structured and formal specification of the system requirements for the Domavi platform. The purpose of this chapter is to clearly define what the system shall accomplish before proceeding to the system design phase. The requirements documented here serve as a contractual foundation for implementation, validation, and system testing.
+This chapter presents a structured and formal specification of the system requirements for the Property Rental System platform. The purpose of this chapter is to clearly define what the system shall accomplish before proceeding to the system design phase. The requirements documented here serve as a contractual foundation for implementation, validation, and system testing.
 
 The requirement analysis includes requirement elicitation techniques, identification of user classes, use case modelling, functional requirements, non-functional requirements, and external interface requirements. All requirements are written in measurable and testable form using standard requirement engineering principles.
 
@@ -16,7 +16,7 @@ The requirement analysis includes requirement elicitation techniques, identifica
 \section{Requirement Elicitation Techniques}
 %===========================================================
 
-This section describes the techniques used to gather and refine the requirements of the Domavi platform. Requirement elicitation ensured that the platform's capabilities are aligned with the real needs of students, young professionals, and landlords.
+This section describes the techniques used to gather and refine the requirements of the Property Rental System platform. Requirement elicitation ensured that the platform's capabilities are aligned with the real needs of students, young professionals, and landlords.
 
 Requirements for this project were identified using the following techniques:
 
@@ -32,7 +32,7 @@ Requirements for this project were identified using the following techniques:
 \section{User Classes and Characteristics}
 %===========================================================
 
-This section identifies the different categories of users who interact with the Domavi platform. Each user class is defined along with its responsibilities, access privileges, and technical proficiency. This classification supports the role-based access control enforced by the system.
+This section identifies the different categories of users who interact with the Property Rental System platform. Each user class is defined along with its responsibilities, access privileges, and technical proficiency. This classification supports the role-based access control enforced by the system.
 
 \begin{table}[h]
 \centering
@@ -58,13 +58,13 @@ External Service & Third-party systems integrated with the platform, including t
 \section{System Overview}
 %===========================================================
 
-Domavi operates within a layered, client-server architecture designed to support secure, role-based interaction between user interfaces, business logic, and data storage. The React-based presentation layer communicates with a Node.js and Express.js application layer through a RESTful API, and the application layer persists data in a MongoDB database via Mongoose models. The system boundary encompasses all internal modules, namely user and profile management, property listing and search, roommate matching, booking, payment, agreement generation, messaging, and administration, together with the integrated external services for mapping, media storage, and email. Role-based access control governs every protected interaction, ensuring that tenants, landlords, and administrators can only perform actions appropriate to their role.
+Property Rental System operates within a layered, client-server architecture designed to support secure, role-based interaction between user interfaces, business logic, and data storage. The React-based presentation layer communicates with a Node.js and Express.js application layer through a RESTful API, and the application layer persists data in a MongoDB database via Mongoose models. The system boundary encompasses all internal modules, namely user and profile management, property listing and search, roommate matching, booking, payment, agreement generation, messaging, and administration, together with the integrated external services for mapping, media storage, and email. Role-based access control governs every protected interaction, ensuring that tenants, landlords, and administrators can only perform actions appropriate to their role.
 
 %===========================================================
 \section{Use Case Model}
 %===========================================================
 
-The use case model represents the high-level interactions between the actors and the functionalities of the Domavi platform. It defines the system boundary and captures functional behaviour from the perspective of each user.
+The use case model represents the high-level interactions between the actors and the functionalities of the Property Rental System platform. It defines the system boundary and captures functional behaviour from the perspective of each user.
 
 %===========================================================
 \subsection{Use Case Diagram}
@@ -73,11 +73,11 @@ The use case model represents the high-level interactions between the actors and
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.6\textwidth]{Figures/usecase_diagram.png}
-\caption{Use Case Diagram of the Domavi Platform}
+\caption{Use Case Diagram of the Property Rental System Platform}
 \label{fig:usecase}
 \end{figure}
 
-The diagram above illustrates the interaction between the three primary actors, Tenant, Landlord, and Administrator, and the major system functionalities. Common functionality such as registration, login, and verification is shared through \textit{include} relationships, while optional behaviour such as roommate matching extends the core search experience. \textit{(This is a sample diagram from the template; replace it with the finalised Domavi use case diagram before submission.)}
+The diagram above illustrates the interaction between the three primary actors, Tenant, Landlord, and Administrator, and the major system functionalities. Common functionality such as registration, login, and verification is shared through \textit{include} relationships, while optional behaviour such as roommate matching extends the core search experience. \textit{(This is a sample diagram from the template; replace it with the finalised Property Rental System use case diagram before submission.)}
 
 %===========================================================
 \subsection{Use Case Descriptions}
@@ -655,7 +655,7 @@ Non-functional requirements define the quality attributes that describe how the 
 \section{External Interface Requirements}
 %===========================================================
 
-This section defines how the Domavi platform interacts with external entities including users, hardware devices, software systems, and communication networks.
+This section defines how the Property Rental System platform interacts with external entities including users, hardware devices, software systems, and communication networks.
 
 %===========================================================
 \subsection{User Interface Requirements}
@@ -740,7 +740,7 @@ BO-6 & UC-1.2 & FR-5.2 \\ \hline
 \section*{Chapter Summary}
 %===========================================================
 
-This chapter presented a structured requirement analysis of the Domavi platform.
+This chapter presented a structured requirement analysis of the Property Rental System platform.
 It defined the requirement elicitation techniques, the user classes (tenant,
 landlord, administrator, and external services), and a use case model with
 detailed use case specifications for registration, verification, listing,

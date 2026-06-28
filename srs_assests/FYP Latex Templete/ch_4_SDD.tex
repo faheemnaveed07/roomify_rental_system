@@ -2,7 +2,7 @@
 
 \section{Introduction to Software Design}
 
-This chapter presents the detailed software design of the Domavi platform. It translates the requirements identified in Chapter~3 into structured architectural, behavioural, and data models. The purpose of this chapter is to provide a clear blueprint for system implementation, ensuring maintainability, scalability, and modular development.
+This chapter presents the detailed software design of the Property Rental System platform. It translates the requirements identified in Chapter~3 into structured architectural, behavioural, and data models. The purpose of this chapter is to provide a clear blueprint for system implementation, ensuring maintainability, scalability, and modular development.
 
 The chapter covers the design methodology and software process model, a high-level system overview and architecture, UML behavioural and structural models, data flow diagrams, and the database design including the entity relationship model, schema, and data dictionary for the platform's MongoDB collections.
 
@@ -11,7 +11,7 @@ The chapter covers the design methodology and software process model, a high-lev
 
 \subsection{Design Methodology}
 
-Domavi follows an object-oriented, layered design methodology combined with the Model-View-Controller pattern on the backend. The system is divided into a presentation layer (React client), an application layer (Express controllers and services), and a data layer (MongoDB through Mongoose models). Within the application layer, controllers handle request and response concerns while services encapsulate business logic, giving a clear separation of concerns.
+Property Rental System follows an object-oriented, layered design methodology combined with the Model-View-Controller pattern on the backend. The system is divided into a presentation layer (React client), an application layer (Express controllers and services), and a data layer (MongoDB through Mongoose models). Within the application layer, controllers handle request and response concerns while services encapsulate business logic, giving a clear separation of concerns.
 
 This methodology was selected because it suits a web application with multiple user roles and evolving features. It enforces loose coupling between layers, promotes reuse of services across controllers, and allows each module to be developed and tested independently. The design adheres to established principles including Separation of Concerns, the DRY (Don't Repeat Yourself) principle, and SOLID object-oriented design guidelines, particularly single-responsibility services and dependency inversion through well-defined interfaces.
 
@@ -22,30 +22,30 @@ The project follows the \textbf{Agile (iterative and incremental)} process model
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{System Overview}
 
-This section provides a high-level overview of the system components and their interactions with external entities. At the boundary, three human actors, the tenant, the landlord, and the administrator, interact with the Domavi platform, while three external services, the Google Maps API, cloud media storage, and the email service, support the platform's operation. The context diagram below depicts the system as a single process exchanging data with these external entities.
+This section provides a high-level overview of the system components and their interactions with external entities. At the boundary, three human actors, the tenant, the landlord, and the administrator, interact with the Property Rental System platform, while three external services, the Google Maps API, cloud media storage, and the email service, support the platform's operation. The context diagram below depicts the system as a single process exchanging data with these external entities.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.9\textwidth]{Figures/Context Diagram.png}
-\caption{Context Diagram of the Domavi Platform}
+\caption{Context Diagram of the Property Rental System Platform}
 \label{fig:context}
 \end{figure}
 
-\noindent\textit{(The figure above is a sample from the template; replace it with the finalised Domavi context diagram before submission.)} The diagram shows the system boundary, the human actors who submit requests and receive responses, and the third-party services that the platform calls for mapping, storage, and email.
+\noindent\textit{(The figure above is a sample from the template; replace it with the finalised Property Rental System context diagram before submission.)} The diagram shows the system boundary, the human actors who submit requests and receive responses, and the third-party services that the platform calls for mapping, storage, and email.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Architectural Design}
 
-Domavi adopts a three-layer client-server architecture. The presentation layer is a React single-page application built with Vite and styled with Tailwind CSS, using Zustand for client-side state. It communicates with the backend solely through a RESTful API over HTTPS. The application layer is a Node.js and Express.js server organised into routes, controllers, and services; it enforces authentication and role-based access control through middleware and implements all business logic in dedicated service classes such as the authentication, property, booking, payment, chat, agreement, and roommate-matching services. The data layer is a MongoDB database accessed through Mongoose models, complemented by external integrations for geospatial search, media storage, and email.
+Property Rental System adopts a three-layer client-server architecture. The presentation layer is a React single-page application built with Vite and styled with Tailwind CSS, using Zustand for client-side state. It communicates with the backend solely through a RESTful API over HTTPS. The application layer is a Node.js and Express.js server organised into routes, controllers, and services; it enforces authentication and role-based access control through middleware and implements all business logic in dedicated service classes such as the authentication, property, booking, payment, chat, agreement, and roommate-matching services. The data layer is a MongoDB database accessed through Mongoose models, complemented by external integrations for geospatial search, media storage, and email.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.9\textwidth]{Figures/Architecture Diagram.png}
-\caption{System Architecture of the Domavi Platform}
+\caption{System Architecture of the Property Rental System Platform}
 \label{fig:arch}
 \end{figure}
 
-\noindent\textit{(Sample template figure; replace with the finalised Domavi architecture diagram.)} The presentation layer issues API requests; the API layer authenticates and authorises each request, delegates to the appropriate service, and the service interacts with the data layer and external services. Responses flow back through the same layers, keeping the frontend decoupled from data and integration concerns.
+\noindent\textit{(Sample template figure; replace with the finalised Property Rental System architecture diagram.)} The presentation layer issues API requests; the API layer authenticates and authorises each request, delegates to the appropriate service, and the service interacts with the data layer and external services. Responses flow back through the same layers, keeping the frontend decoupled from data and integration concerns.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Design Models}
@@ -88,7 +88,7 @@ The class diagram shows the static structure of the system, including the princi
 \label{fig:class}
 \end{figure}
 
-The key classes of Domavi are \texttt{User} (with subtypes distinguished by role), \texttt{Property}, \texttt{RoommateProfile}, \texttt{Booking}, \texttt{Agreement}, \texttt{Payment}, \texttt{Conversation}, \texttt{Message}, \texttt{Document}, and \texttt{LandlordBankAccount}. A \texttt{User} acting as a landlord owns many \texttt{Property} listings; a \texttt{User} acting as a tenant creates many \texttt{Booking} records; each \texttt{Booking} relates one tenant, one landlord, and one property and may generate one \texttt{Agreement} and one or more \texttt{Payment} records. \texttt{Conversation} aggregates many \texttt{Message} objects between two users. Each \texttt{User} may have one \texttt{RoommateProfile}, which the matching service uses to compute compatibility. These relationships include association, aggregation, and role-based specialisation.
+The key classes of Property Rental System are \texttt{User} (with subtypes distinguished by role), \texttt{Property}, \texttt{RoommateProfile}, \texttt{Booking}, \texttt{Agreement}, \texttt{Payment}, \texttt{Conversation}, \texttt{Message}, \texttt{Document}, and \texttt{LandlordBankAccount}. A \texttt{User} acting as a landlord owns many \texttt{Property} listings; a \texttt{User} acting as a tenant creates many \texttt{Booking} records; each \texttt{Booking} relates one tenant, one landlord, and one property and may generate one \texttt{Agreement} and one or more \texttt{Payment} records. \texttt{Conversation} aggregates many \texttt{Message} objects between two users. Each \texttt{User} may have one \texttt{RoommateProfile}, which the matching service uses to compute compatibility. These relationships include association, aggregation, and role-based specialisation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Sequence Diagrams}
@@ -127,7 +127,7 @@ In the booking sequence, the tenant submits a booking request; the booking servi
 \label{fig:state}
 \end{figure}
 
-State transition diagrams show how key entities change state over their lifecycle. Two important examples in Domavi are the user account and the booking. A \textbf{User account} transitions through the states \textit{Pending} (just registered), \textit{Active} (verified), and \textit{Suspended} (administratively blocked). A \textbf{Booking} transitions through \textit{Pending} (requested), \textit{Accepted} or \textit{Rejected} (landlord decision), \textit{Confirmed} (payment recorded), and \textit{Completed} or \textit{Cancelled}. A \textbf{Property} listing transitions through \textit{Pending Verification}, \textit{Active}, and \textit{Inactive}. Each transition is triggered by a specific event, such as approval, payment, or administrative action.
+State transition diagrams show how key entities change state over their lifecycle. Two important examples in Property Rental System are the user account and the booking. A \textbf{User account} transitions through the states \textit{Pending} (just registered), \textit{Active} (verified), and \textit{Suspended} (administratively blocked). A \textbf{Booking} transitions through \textit{Pending} (requested), \textit{Accepted} or \textit{Rejected} (landlord decision), \textit{Confirmed} (payment recorded), and \textit{Completed} or \textit{Cancelled}. A \textbf{Property} listing transitions through \textit{Pending Verification}, \textit{Active}, and \textit{Inactive}. Each transition is triggered by a specific event, such as approval, payment, or administrative action.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Data Flow Diagrams}
@@ -159,7 +159,7 @@ The Level 2 DFD further decomposes the Booking and Payment process. It details t
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Data Design}
 
-This section describes how data is structured, stored, and managed. Domavi uses MongoDB, a document-oriented NoSQL database, accessed through the Mongoose object data modelling library. The schema is organised into discrete collections that mirror the domain entities. Documents reference one another by ObjectId to model relationships, and indexes are defined on frequently queried fields, including a 2dsphere geospatial index on property location and compound indexes on status fields, to ensure efficient queries. Security mechanisms include password hashing, role-based access control, and restricted access to verification documents.
+This section describes how data is structured, stored, and managed. Property Rental System uses MongoDB, a document-oriented NoSQL database, accessed through the Mongoose object data modelling library. The schema is organised into discrete collections that mirror the domain entities. Documents reference one another by ObjectId to model relationships, and indexes are defined on frequently queried fields, including a 2dsphere geospatial index on property location and compound indexes on status fields, to ensure efficient queries. Security mechanisms include password hashing, role-based access control, and restricted access to verification documents.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Entity Relationship Diagram (ERD)}
@@ -171,12 +171,12 @@ This section describes how data is structured, stored, and managed. Domavi uses 
 \label{fig:erd}
 \end{figure}
 
-The ERD represents the logical structure of the Domavi database. The principal entities are User, Property, RoommateProfile, Booking, Agreement, Payment, Conversation, Message, Document, and LandlordBankAccount. A User (landlord) owns many Properties (1:N); a User (tenant) makes many Bookings (1:N); a Property has many Bookings (1:N); a Booking produces one Agreement (1:1) and one or more Payments (1:N); a Conversation contains many Messages (1:N) and links two Users; and a User has one RoommateProfile (1:1). \textit{(Replace the sample figure with the finalised Domavi ERD before submission.)}
+The ERD represents the logical structure of the Property Rental System database. The principal entities are User, Property, RoommateProfile, Booking, Agreement, Payment, Conversation, Message, Document, and LandlordBankAccount. A User (landlord) owns many Properties (1:N); a User (tenant) makes many Bookings (1:N); a Property has many Bookings (1:N); a Booking produces one Agreement (1:1) and one or more Payments (1:N); a Conversation contains many Messages (1:N) and links two Users; and a User has one RoommateProfile (1:1). \textit{(Replace the sample figure with the finalised Property Rental System ERD before submission.)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Database Architecture}
 
-Domavi uses a client-server database architecture in which the Express application server is the sole client of the MongoDB database. Property images and verification documents are stored in cloud media storage, with the database retaining only their secure references. This separation keeps the database lean and allows media to be served efficiently. The design supports cloud deployment and can be scaled through MongoDB replication and sharding if required.
+Property Rental System uses a client-server database architecture in which the Express application server is the sole client of the MongoDB database. Property images and verification documents are stored in cloud media storage, with the database retaining only their secure references. This separation keeps the database lean and allows media to be served efficiently. The design supports cloud deployment and can be scaled through MongoDB replication and sharding if required.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Database Schema Diagram}
@@ -188,7 +188,7 @@ Domavi uses a client-server database architecture in which the Express applicati
 \label{fig:dbschema}
 \end{figure}
 
-The schema diagram represents the physical structure of the collections, including field names, types, and the reference relationships between collections. The design supports data integrity through schema validation in Mongoose, efficient querying through indexing, scalability through a document model that avoids costly joins, and security through controlled access to sensitive fields. \textit{(Replace the sample figure with the finalised Domavi schema diagram.)}
+The schema diagram represents the physical structure of the collections, including field names, types, and the reference relationships between collections. The design supports data integrity through schema validation in Mongoose, efficient querying through indexing, scalability through a document model that avoids costly joins, and security through controlled access to sensitive fields. \textit{(Replace the sample figure with the finalised Property Rental System schema diagram.)}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Data Dictionary}
@@ -226,7 +226,7 @@ createdAt & Date & Account creation timestamp \\
 \section{Database Collections}
 %===========================================================
 
-This section describes the logical database design of Domavi. As a NoSQL system, the database is organised into collections, each modelling a domain entity with primary identifiers, references, and major attributes. The design ensures data consistency, integrity, security, and scalability.
+This section describes the logical database design of Property Rental System. As a NoSQL system, the database is organised into collections, each modelling a domain entity with primary identifiers, references, and major attributes. The design ensures data consistency, integrity, security, and scalability.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{User Collection}
@@ -335,7 +335,7 @@ The \textbf{Booking} collection records each rental request, referencing the ten
 \section{Chapter Summary}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This chapter presented the comprehensive software design of the Domavi platform.
+This chapter presented the comprehensive software design of the Property Rental System platform.
 It justified an object-oriented, layered MVC design methodology and an Agile
 process model, and described the system through a context diagram and a
 three-layer client-server architecture. Detailed UML models, including activity,

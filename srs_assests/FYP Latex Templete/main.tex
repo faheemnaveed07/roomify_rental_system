@@ -25,6 +25,7 @@
 % Format chapter heading
 \usepackage{titlesec}
 \usepackage{amsmath}
+\usepackage{helvet} % Arial-like sans-serif for title/approval headings (\sffamily)
 
 
 % Chapter Formatting
@@ -60,18 +61,22 @@
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}
 \begin{document}
-\input{title.tex}
+% ---------- Front pages (template style, unnumbered) ----------
+\thispagestyle{empty}
+\input{title.tex}        % Page 1 - Title Page
+\newpage
+\thispagestyle{empty}
+\input{report_page.tex}  % Page 2 - Report Submission Page
+\newpage
+\thispagestyle{empty}
+\input{certificate}      % Page 3 - Final Approval
 \newpage
 % ---------- Roman numbering ----------
 \pagenumbering{roman}
 \setcounter{page}{1}
 \pagestyle{plain}
-% Reset counter after PDF
-\setcounter{page}{1}
-\input{dedication}  
-\input{acknowledgement} 
-\input{certificate}
-\input{plagiarism}
+\input{dedication}
+\input{acknowledgement}
 \input{executive_summary}
 \input{abbreviations}
 \newpage
@@ -118,21 +123,9 @@
 % Remove extra vertical space
 \vspace{-0.1em}
 
-% Appendix A (no page break before)
-\section*{Appendix A - Turnitin Similarity Report}
-\addcontentsline{toc}{section}{Appendix A – Turnitin Similarity Report}
-\input{ch_8_plagiarismreport}
-
-% Appendix B
-\clearpage
-\section*{Appendix B - AI Writing Detection Report}
-\addcontentsline{toc}{section}{Appendix B – AI Writing Detection Report}
-\input{ch_8.1_AI_report}
-
 % Source Code
-\clearpage
-\section*{Appendix C – Source Code}
-\addcontentsline{toc}{section}{Appendix C – Source Code}
+\section*{Appendix A – Source Code}
+\addcontentsline{toc}{section}{Appendix A – Source Code}
 \input{ch_9_appendix_source_code}
 
 \end{document}

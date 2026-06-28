@@ -23,9 +23,9 @@ function getScoreColor(score: number): string {
 }
 
 function getScoreBg(score: number): string {
-    if (score >= 80) return '#dcfce7';  // green-100
-    if (score >= 60) return '#fef9c3';  // yellow-100
-    return '#fee2e2';                    // red-100
+    if (score >= 80) return 'rgba(45,143,94,0.18)';   // green tint
+    if (score >= 60) return 'rgba(217,119,6,0.18)';   // amber tint
+    return 'rgba(220,38,38,0.18)';                     // red tint
 }
 
 function getScoreLabel(score: number): string {
@@ -76,7 +76,7 @@ export const MatchScoreRing: React.FC<MatchScoreRingProps> = ({
                         cy={cfg.cy}
                         r={cfg.r}
                         fill="none"
-                        stroke="rgba(0,0,0,0.06)"
+                        stroke="rgba(255,255,255,0.1)"
                         strokeWidth={cfg.stroke}
                     />
                     {/* Progress */}

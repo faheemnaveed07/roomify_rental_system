@@ -496,6 +496,228 @@
 .domavi-dark ::-webkit-scrollbar-thumb { background: var(--accent-dim); }
 .domavi-dark ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
+/* ============================================================================
+ * DOMAVI — Logged-in app dark layer (.dv-app)
+ * ----------------------------------------------------------------------------
+ * Applied to the logged-in shells/pages (dashboards, admin, chat, tenant pages).
+ * Separate from .domavi-dark (marketing) so we can correctly set the shadcn/ui
+ * HSL design tokens to dark values AND remap the pervasive hardcoded light
+ * utilities (bg-white, text-slate-900, bg-primary-600, borders, hovers) to dark
+ * in one central place — instead of hand-editing hundreds of class strings.
+ * Accent = terracotta. Status colors (amber/green/red chips) are left as-is and
+ * read fine as bright chips on dark.
+ * ========================================================================== */
+
+.dv-app {
+    /* shadcn/ui semantic tokens → dark (HSL channels, consumed via hsl(var(--x))) */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 21 59% 59%;           /* terracotta #d4845a */
+    --primary-foreground: 24 45% 7%; /* dark text on terracotta (brand-consistent) */
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 11%;
+    --muted-foreground: 0 0% 63%;
+    --accent: 0 0% 13%;              /* shadcn "accent" = hover surface, NOT brand */
+    --accent-foreground: 0 0% 96%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 21 59% 59%;
+
+    /* DOMAVI palette (local, hex) */
+    --dv-bg: #0a0a0a;
+    --dv-bg-card: #141414;
+    --dv-bg-elev: #1a1a1a;
+    --dv-fg: #f5f5f5;
+    --dv-fg-dim: #c0c0c0;
+    --dv-muted: #8f8f8f;
+    --dv-accent: #d4845a;
+    --dv-accent-bright: #e89a6c;
+    --dv-verify: #2d8f5e;
+    --dv-border: #1f1f1f;
+    --dv-border-light: #2a2a2a;
+
+    background-color: var(--dv-bg);
+    color: var(--dv-fg);
+    font-family: 'Archivo', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Restrained typography: branded headings, readable body/data.
+ * :where() keeps specificity at (0,0,1) so any explicit font-* utility (e.g. the
+ * landing's font-display) still wins — this rule only styles unclassed headings. */
+:where(.dv-app) h1,
+:where(.dv-app) h2,
+:where(.dv-app) h3 { font-family: 'Oswald', sans-serif; letter-spacing: 0.01em; }
+
+/* ---- Surface remaps (hardcoded light utilities → dark) ---- */
+.dv-app .bg-white { background-color: var(--dv-bg-card) !important; }
+.dv-app .bg-slate-50,
+.dv-app .bg-neutral-50,
+.dv-app .bg-gray-50,
+.dv-app .bg-\[\#F8FAFC\],
+.dv-app .bg-\[\#f8fafc\] { background-color: var(--dv-bg) !important; }
+.dv-app .bg-slate-100,
+.dv-app .bg-neutral-100,
+.dv-app .bg-gray-100 { background-color: var(--dv-border) !important; }
+.dv-app .bg-slate-200,
+.dv-app .bg-neutral-200 { background-color: var(--dv-border-light) !important; }
+
+/* Translucent white surfaces (e.g. bg-white/90 headers) */
+.dv-app .bg-white\/90,
+.dv-app .bg-white\/95,
+.dv-app .bg-white\/80 { background-color: rgba(20, 20, 20, 0.85) !important; }
+
+/* ---- Border remaps ---- */
+.dv-app .border-slate-100,
+.dv-app .border-slate-200,
+.dv-app .border-slate-300,
+.dv-app .border-neutral-100,
+.dv-app .border-neutral-200,
+.dv-app .border-neutral-300,
+.dv-app .border-gray-100,
+.dv-app .border-gray-200,
+.dv-app .border-slate-200\/60 { border-color: var(--dv-border-light) !important; }
+
+/* ---- Text remaps ---- */
+.dv-app .text-slate-900,
+.dv-app .text-neutral-900,
+.dv-app .text-gray-900,
+.dv-app .text-\[\#1E293B\],
+.dv-app .text-\[\#1e293b\] { color: var(--dv-fg) !important; }
+.dv-app .text-slate-700,
+.dv-app .text-slate-600,
+.dv-app .text-neutral-700,
+.dv-app .text-neutral-600,
+.dv-app .text-gray-700,
+.dv-app .text-gray-600 { color: var(--dv-fg-dim) !important; }
+.dv-app .text-slate-500,
+.dv-app .text-slate-400,
+.dv-app .text-neutral-500,
+.dv-app .text-neutral-400,
+.dv-app .text-neutral-300,
+.dv-app .text-slate-300,
+.dv-app .text-gray-500,
+.dv-app .text-gray-400 { color: var(--dv-muted) !important; }
+
+/* ---- Primary (blue) → terracotta accent ---- */
+.dv-app .bg-primary-600,
+.dv-app .bg-primary-500,
+.dv-app .bg-primary { background-color: var(--dv-accent) !important; }
+/* Dark text on terracotta fills (incl. chat sent-bubbles & primary buttons) for contrast */
+.dv-app .bg-primary-600.text-white,
+.dv-app .bg-primary-500.text-white,
+.dv-app .bg-primary.text-white,
+.dv-app .bg-\[\#2563EB\].text-white { color: #1a0e07 !important; }
+.dv-app .text-primary-600,
+.dv-app .text-primary-700,
+.dv-app .text-primary,
+.dv-app .text-\[\#2563EB\] { color: var(--dv-accent) !important; }
+.dv-app .border-primary-500,
+.dv-app .border-primary-600 { border-color: var(--dv-accent) !important; }
+.dv-app .bg-primary-50,
+.dv-app .bg-primary-100,
+.dv-app .bg-primary\/10,
+.dv-app .bg-primary\/5 { background-color: rgba(212, 132, 90, 0.14) !important; }
+.dv-app .border-primary-100,
+.dv-app .border-primary\/20 { border-color: rgba(212, 132, 90, 0.3) !important; }
+/* Hardcoded brand-hex utility classes used across the app */
+.dv-app .bg-\[\#2563EB\] { background-color: var(--dv-accent) !important; }
+.dv-app .bg-\[\#2563EB\]\/10 { background-color: rgba(212, 132, 90, 0.12) !important; }
+.dv-app .border-\[\#2563EB\] { border-color: var(--dv-accent) !important; }
+.dv-app .hover\:bg-\[\#1d4ed8\]:hover,
+.dv-app .hover\:bg-\[\#1D4ED8\]:hover { background-color: var(--dv-accent-bright) !important; }
+.dv-app .bg-\[\#1E293B\] { background-color: var(--dv-bg-elev) !important; }
+.dv-app .from-primary-500 { --tw-gradient-from: #d4845a var(--tw-gradient-from-position) !important; }
+.dv-app .to-primary-700 { --tw-gradient-to: #a06030 var(--tw-gradient-to-position) !important; }
+.dv-app .shadow-primary-200,
+.dv-app .shadow-primary-200\/60 { --tw-shadow-color: transparent !important; }
+
+/* ---- Hover states ---- */
+.dv-app .hover\:bg-slate-50:hover,
+.dv-app .hover\:bg-neutral-50:hover,
+.dv-app .hover\:bg-slate-100:hover,
+.dv-app .hover\:bg-neutral-100:hover,
+.dv-app .hover\:bg-slate-50\/60:hover,
+.dv-app .hover\:bg-slate-50\/50:hover,
+.dv-app .hover\:bg-neutral-50\/50:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
+.dv-app .hover\:bg-primary-700:hover,
+.dv-app .hover\:bg-blue-700:hover { background-color: var(--dv-accent-bright) !important; }
+.dv-app .hover\:text-slate-900:hover,
+.dv-app .hover\:text-slate-800:hover,
+.dv-app .hover\:text-slate-700:hover,
+.dv-app .hover\:text-neutral-900:hover,
+.dv-app .hover\:text-neutral-700:hover { color: var(--dv-fg) !important; }
+.dv-app .hover\:text-primary-700:hover,
+.dv-app .hover\:text-primary-600:hover { color: var(--dv-accent-bright) !important; }
+.dv-app .hover\:border-slate-300:hover,
+.dv-app .hover\:border-neutral-300:hover { border-color: #3a3a3a !important; }
+.dv-app .hover\:border-primary-300:hover { border-color: var(--dv-accent) !important; }
+
+/* ---- Divider remaps ---- */
+.dv-app .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.dv-app .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+.dv-app .divide-neutral-100 > :not([hidden]) ~ :not([hidden]),
+.dv-app .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--dv-border) !important; }
+
+/* ---- Inputs / placeholders ---- */
+.dv-app input,
+.dv-app textarea,
+.dv-app select {
+    color: var(--dv-fg);
+    background-color: transparent;
+}
+.dv-app input::placeholder,
+.dv-app textarea::placeholder { color: var(--dv-muted); }
+.dv-app .placeholder-slate-400::placeholder,
+.dv-app .placeholder-neutral-400::placeholder { color: var(--dv-muted) !important; }
+
+/* ---- Reusable dark "box"/card helper (dark fill + subtle light border) ---- */
+.dv-app .dv-card,
+.dv-app .dv-box {
+    background-color: var(--dv-bg-card);
+    border: 1px solid var(--dv-border-light);
+    transition: border-color 0.3s ease, background 0.3s ease;
+}
+.dv-app .dv-card:hover { border-color: rgba(212, 132, 90, 0.5); }
+
+/* ---- Brand accent helpers reusable inside the app ---- */
+.dv-app .dv-accent-text { color: var(--dv-accent); }
+.dv-app .dv-accent-bg { background-color: var(--dv-accent); color: #000; }
+
+/* ---- Chat bubbles ---- */
+.dv-app .dv-bubble-sent { background-color: var(--dv-accent); color: #1a0e07; }
+.dv-app .dv-bubble-recv { background-color: var(--dv-bg-elev); color: var(--dv-fg); border: 1px solid var(--dv-border-light); }
+
+/* ---- Global component-class remaps (globals.css .card/.input/.btn/.glass) ---- */
+.dv-app .card { background-color: var(--dv-bg-card); border-color: var(--dv-border-light); }
+.dv-app .input { background-color: var(--dv-bg-card) !important; border-color: var(--dv-border-light) !important; color: var(--dv-fg) !important; }
+.dv-app .input:focus { border-color: var(--dv-accent) !important; box-shadow: 0 0 0 3px rgba(212, 132, 90, 0.15) !important; }
+.dv-app .label { color: var(--dv-fg-dim); }
+.dv-app .btn-primary { background-color: var(--dv-accent) !important; color: #1a0e07 !important; box-shadow: none !important; }
+.dv-app .btn-primary:hover { background-color: var(--dv-accent-bright) !important; }
+.dv-app .btn-outline { border-color: var(--dv-border-light) !important; color: var(--dv-fg) !important; }
+.dv-app .btn-outline:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
+.dv-app .text-gradient { background-image: linear-gradient(135deg, #e89a6c 0%, #d4845a 100%); }
+.dv-app .glass { background: rgba(20, 20, 20, 0.6) !important; border-color: var(--dv-border-light) !important; }
+.dv-app .bg-mesh { background-color: var(--dv-bg); background-image: none; }
+
+/* ---- Scrollbar ---- */
+.dv-app ::-webkit-scrollbar { width: 8px; height: 8px; }
+.dv-app ::-webkit-scrollbar-track { background: var(--dv-bg); }
+.dv-app ::-webkit-scrollbar-thumb { background: #333; border-radius: 99px; }
+.dv-app ::-webkit-scrollbar-thumb:hover { background: var(--dv-accent); }
+
+/* Leaflet popups inside the dark app */
+.dv-app .leaflet-popup-content-wrapper,
+.dv-app .leaflet-popup-tip { background: var(--dv-bg-card); color: var(--dv-fg); }
+
 @media (max-width: 768px) {
     .domavi-dark .flip-card { height: 480px; }
     .domavi-dark .story-card { width: 300px; }

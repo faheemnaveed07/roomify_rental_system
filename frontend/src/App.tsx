@@ -31,7 +31,7 @@ import AgreementPage from './pages/Agreement';
 
 // ── Public layout: Header + main content + footer ──────────────────
 const PublicLayout: React.FC = () => (
-    <div className="min-h-screen bg-neutral-50 flex flex-col">
+    <div className="dv-app min-h-screen bg-neutral-50 flex flex-col">
         <Header />
         <main className="flex-grow">
             <Outlet />

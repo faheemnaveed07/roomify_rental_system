@@ -13,25 +13,27 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     fullWidth?: boolean;
 }
 
+// DOMAVI dark app: terracotta primary, dark-aware outline/ghost.
+const DV_ACCENT = '#d4845a';
 const variantStyles: Record<ButtonVariant, React.CSSProperties> = {
     primary: {
-        backgroundColor: colors.primary[500],
-        color: colors.white,
+        backgroundColor: DV_ACCENT,
+        color: '#1a0e07',
         border: 'none',
     },
     secondary: {
         backgroundColor: colors.secondary[500],
-        color: colors.white,
+        color: '#1a0e07',
         border: 'none',
     },
     outline: {
         backgroundColor: 'transparent',
-        color: colors.primary[500],
-        border: `2px solid ${colors.primary[500]}`,
+        color: '#f5f5f5',
+        border: '1px solid #2a2a2a',
     },
     ghost: {
         backgroundColor: 'transparent',
-        color: colors.neutral[700],
+        color: '#c0c0c0',
         border: 'none',
     },
     danger: {

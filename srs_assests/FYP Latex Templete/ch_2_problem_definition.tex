@@ -17,7 +17,7 @@ Students and young professionals seeking affordable shared accommodation in Paki
 
 \section{Proposed Solution Overview}
 
-Domavi is a web-based micro-rental and roommate matching platform that directly addresses the weaknesses of the current system. It provides a dedicated marketplace for single rooms, bed spaces, and hostels, replacing scattered and irrelevant listings with a focused, well-structured catalogue. To establish trust, the platform enforces a multi-layer verification system covering email and phone confirmation, administrator-reviewed CNIC verification, and property ownership validation, thereby reducing fraud. An intelligent roommate matching engine scores potential roommates on lifestyle, preferences, budget, location, and schedule, transforming roommate selection from guesswork into a data-driven decision. Commute-based search powered by the Google Maps API allows users to find accommodation within walking distance of their destination. Finally, secure in-app messaging, structured booking requests, payment recording, and auto-generated digital rental agreements automate the rental lifecycle. The result is a safer, cheaper, faster, and more transparent rental experience.
+Property Rental System is a web-based micro-rental and roommate matching platform that directly addresses the weaknesses of the current system. It provides a dedicated marketplace for single rooms, bed spaces, and hostels, replacing scattered and irrelevant listings with a focused, well-structured catalogue. To establish trust, the platform enforces a multi-layer verification system covering email and phone confirmation, administrator-reviewed CNIC verification, and property ownership validation, thereby reducing fraud. An intelligent roommate matching engine scores potential roommates on lifestyle, preferences, budget, location, and schedule, transforming roommate selection from guesswork into a data-driven decision. Commute-based search powered by the Google Maps API allows users to find accommodation within walking distance of their destination. Finally, secure in-app messaging, structured booking requests, payment recording, and auto-generated digital rental agreements automate the rental lifecycle. The result is a safer, cheaper, faster, and more transparent rental experience.
 
 % --------------------------------
 % 2.3 Objectives of the Proposed System
@@ -25,7 +25,7 @@ Domavi is a web-based micro-rental and roommate matching platform that directly 
 
 \section{Objectives of the Proposed System}
 
-The objectives of Domavi are defined to be specific, measurable, and directly aligned with the problems identified above. Each objective begins with an action verb and is achievable within the project constraints.
+The objectives of Property Rental System are defined to be specific, measurable, and directly aligned with the problems identified above. Each objective begins with an action verb and is achievable within the project constraints.
 
 \vspace{0.3cm}
 
@@ -46,7 +46,7 @@ The objectives of Domavi are defined to be specific, measurable, and directly al
 
 \section{Scope of the System}
 
-Domavi is a responsive web application targeting students and young professionals seeking shared accommodation, the landlords who offer such accommodation, and the administrators who govern the platform. The system includes user registration and role-based access for tenants, landlords, and administrators; creation and management of room, bed-space, and hostel listings with images, pricing, amenities, and location; verification of users and properties; commute-based and filter-based search; roommate profile creation and compatibility-based matching; in-app messaging; booking requests and status management; payment recording and confirmation; auto-generated digital rental agreements; and an administrative dashboard with analytics.
+Property Rental System is a responsive web application targeting students and young professionals seeking shared accommodation, the landlords who offer such accommodation, and the administrators who govern the platform. The system includes user registration and role-based access for tenants, landlords, and administrators; creation and management of room, bed-space, and hostel listings with images, pricing, amenities, and location; verification of users and properties; commute-based and filter-based search; roommate profile creation and compatibility-based matching; in-app messaging; booking requests and status management; payment recording and confirmation; auto-generated digital rental agreements; and an administrative dashboard with analytics.
 
 The system explicitly excludes full-house sales and commercial property transactions, live integration with a third-party payment gateway in the initial release, native mobile applications, and nationwide coverage beyond the initially targeted cities. These exclusions delineate the platform's coverage and are distinct from the operational limitations described in Chapter~1.
 
@@ -56,7 +56,7 @@ The system explicitly excludes full-house sales and commercial property transact
 
 \section{System Architecture and Modules}
 
-Domavi follows a layered, client-server architecture organised into a presentation layer, an application (business logic) layer, and a data layer. The presentation layer is a React single-page application that communicates with the backend exclusively through a RESTful API. The application layer, built on Node.js and Express.js, hosts modular controllers and services that implement business rules and enforce role-based access control. The data layer is a MongoDB database accessed through Mongoose models. External services, including the Google Maps API, cloud media storage, and an email service, are integrated through the application layer. This modular design promotes loose coupling, reusability, and independent development and testing of each module, and a high-level architecture diagram is presented in Chapter~4.
+Property Rental System follows a layered, client-server architecture organised into a presentation layer, an application (business logic) layer, and a data layer. The presentation layer is a React single-page application that communicates with the backend exclusively through a RESTful API. The application layer, built on Node.js and Express.js, hosts modular controllers and services that implement business rules and enforce role-based access control. The data layer is a MongoDB database accessed through Mongoose models. External services, including the Google Maps API, cloud media storage, and an email service, are integrated through the application layer. This modular design promotes loose coupling, reusability, and independent development and testing of each module, and a high-level architecture diagram is presented in Chapter~4.
 
 % --------------------------------
 % 2.5.1 Module Descriptions
@@ -143,7 +143,7 @@ This module gives administrators control over the platform. It supports reviewin
 
 \section{Assumptions and Dependencies}
 
-The design of Domavi rests on a number of assumptions and external dependencies that define its operating conditions.
+The design of Property Rental System rests on a number of assumptions and external dependencies that define its operating conditions.
 
 \begin{itemize}
     \item The system assumes that users have access to a stable internet connection and a modern web browser.
@@ -157,7 +157,7 @@ The design of Domavi rests on a number of assumptions and external dependencies 
 \section{Chapter Summary}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This chapter defined the core problem addressed by Domavi and outlined the
+This chapter defined the core problem addressed by Property Rental System and outlined the
 conceptual solution approach. Clear, measurable objectives were established to
 ensure alignment with the identified challenges of cost, fraud, discovery, and
 roommate incompatibility. The system scope and architectural overview were

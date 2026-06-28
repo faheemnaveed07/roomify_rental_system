@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '../atoms/Button';
-import { colors, spacing, borderRadius } from '../../styles/theme';
+import { spacing, borderRadius } from '../../styles/theme';
 
 interface QuizOption {
     value: string;
@@ -36,9 +36,10 @@ export const RoommateQuizCard: React.FC<RoommateQuizCardProps> = ({
     isLast = false,
 }) => {
     const cardStyles: React.CSSProperties = {
-        backgroundColor: colors.white,
+        backgroundColor: '#141414',
         borderRadius: borderRadius['2xl'],
-        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+        border: '1px solid #2a2a2a',
+        boxShadow: 'none',
         padding: spacing[8],
         maxWidth: '600px',
         width: '100%',
@@ -54,7 +55,7 @@ export const RoommateQuizCard: React.FC<RoommateQuizCardProps> = ({
     const progressBarStyles: React.CSSProperties = {
         flex: 1,
         height: '8px',
-        backgroundColor: colors.neutral[200],
+        backgroundColor: '#2a2a2a',
         borderRadius: borderRadius.full,
         overflow: 'hidden',
     };
@@ -62,7 +63,7 @@ export const RoommateQuizCard: React.FC<RoommateQuizCardProps> = ({
     const progressFillStyles: React.CSSProperties = {
         height: '100%',
         width: `${(questionNumber / totalQuestions) * 100}%`,
-        backgroundColor: colors.primary[500],
+        backgroundColor: '#d4845a',
         borderRadius: borderRadius.full,
         transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1)',
     };
@@ -70,21 +71,21 @@ export const RoommateQuizCard: React.FC<RoommateQuizCardProps> = ({
     const progressTextStyles: React.CSSProperties = {
         fontSize: '0.875rem',
         fontWeight: 500,
-        color: colors.neutral[500],
+        color: '#8f8f8f',
         whiteSpace: 'nowrap',
     };
 
     const questionStyles: React.CSSProperties = {
         fontSize: '1.5rem',
         fontWeight: 600,
-        color: colors.neutral[900],
+        color: '#f5f5f5',
         marginBottom: spacing[2],
         lineHeight: 1.3,
     };
 
     const descriptionStyles: React.CSSProperties = {
         fontSize: '1rem',
-        color: colors.neutral[500],
+        color: '#8f8f8f',
         marginBottom: spacing[6],
     };
 
@@ -99,8 +100,8 @@ export const RoommateQuizCard: React.FC<RoommateQuizCardProps> = ({
         alignItems: 'center',
         gap: spacing[3],
         padding: spacing[4],
-        backgroundColor: isSelected ? colors.primary[50] : colors.white,
-        border: `2px solid ${isSelected ? colors.primary[500] : colors.neutral[200]}`,
+        backgroundColor: isSelected ? 'rgba(212,132,90,0.12)' : '#141414',
+        border: `2px solid ${isSelected ? '#d4845a' : '#2a2a2a'}`,
         borderRadius: borderRadius.lg,
         cursor: 'pointer',
         transition: 'all 150ms cubic-bezier(0.4, 0, 0.2, 1)',
@@ -112,16 +113,16 @@ export const RoommateQuizCard: React.FC<RoommateQuizCardProps> = ({
         justifyContent: 'center',
         width: '2.5rem',
         height: '2.5rem',
-        backgroundColor: isSelected ? colors.primary[100] : colors.neutral[100],
+        backgroundColor: isSelected ? 'rgba(212,132,90,0.18)' : '#1f1f1f',
         borderRadius: borderRadius.lg,
-        color: isSelected ? colors.primary[600] : colors.neutral[500],
+        color: isSelected ? '#d4845a' : '#8f8f8f',
         fontSize: '1.25rem',
     });
 
     const optionLabelStyles = (isSelected: boolean): React.CSSProperties => ({
         fontSize: '1rem',
         fontWeight: isSelected ? 600 : 500,
-        color: isSelected ? colors.primary[700] : colors.neutral[700],
+        color: isSelected ? '#e89a6c' : '#c0c0c0',
     });
 
     const radioStyles = (isSelected: boolean): React.CSSProperties => ({
@@ -132,8 +133,8 @@ export const RoommateQuizCard: React.FC<RoommateQuizCardProps> = ({
         height: '1.25rem',
         marginLeft: 'auto',
         borderRadius: borderRadius.full,
-        border: `2px solid ${isSelected ? colors.primary[500] : colors.neutral[300]}`,
-        backgroundColor: isSelected ? colors.primary[500] : colors.white,
+        border: `2px solid ${isSelected ? '#d4845a' : '#3a3a3a'}`,
+        backgroundColor: isSelected ? '#d4845a' : '#141414',
         transition: 'all 150ms',
     });
 
@@ -147,7 +148,7 @@ export const RoommateQuizCard: React.FC<RoommateQuizCardProps> = ({
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path
                 d="M10 3L4.5 8.5L2 6"
-                stroke={colors.white}
+                stroke={'#141414'}
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"

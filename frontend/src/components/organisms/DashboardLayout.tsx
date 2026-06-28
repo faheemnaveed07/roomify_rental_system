@@ -36,7 +36,7 @@ const DashboardLayout: React.FC = () => {
     }, [isConnected, onAgreementNotification, fetchLandlordAgreements]);
 
     return (
-        <div className="flex h-screen bg-[#F8FAFC]">
+        <div className="dv-app flex h-screen bg-[#F8FAFC]">
             <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(false)} />
 
             <div className="flex-1 flex flex-col h-full overflow-hidden">

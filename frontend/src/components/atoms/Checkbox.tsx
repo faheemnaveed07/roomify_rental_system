@@ -14,8 +14,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         const inputId = props.id || id;
 
         const customCheckboxStyles: React.CSSProperties = {
-            borderColor: error ? colors.error[500] : checked || indeterminate ? colors.primary[500] : colors.neutral[300],
-            backgroundColor: checked || indeterminate ? colors.primary[500] : colors.white,
+            borderColor: error ? colors.error[500] : checked || indeterminate ? '#d4845a' : '#3a3a3a',
+            backgroundColor: checked || indeterminate ? '#d4845a' : '#141414',
         };
 
         const CheckIcon = () => (
@@ -28,7 +28,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             >
                 <path
                     d="M10 3L4.5 8.5L2 6"
-                    stroke={colors.white}
+                    stroke={'#141414'}
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -46,7 +46,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             >
                 <path
                     d="M2 6H10"
-                    stroke={colors.white}
+                    stroke={'#141414'}
                     strokeWidth="2"
                     strokeLinecap="round"
                 />

@@ -4,7 +4,7 @@
 
 \chapter{Implementation}
 
-This chapter describes the practical implementation of the Domavi platform. It explains how the design presented in Chapter~4 was translated into working modules, algorithms, user interfaces, and integrated services using the MERN technology stack.
+This chapter describes the practical implementation of the Property Rental System platform. It explains how the design presented in Chapter~4 was translated into working modules, algorithms, user interfaces, and integrated services using the MERN technology stack.
 
 % -------------------------------------------------
 % 5.1 Development Environment
@@ -31,7 +31,7 @@ The platform was developed using a modern JavaScript and TypeScript toolchain. T
 
 \section{Core Module Implementation}
 
-Each major module of Domavi was implemented as a cohesive set of routes, a controller, and a service class on the backend, with corresponding pages and components on the frontend.
+Each major module of Property Rental System was implemented as a cohesive set of routes, a controller, and a service class on the backend, with corresponding pages and components on the frontend.
 
 \subsection{Module 1: Authentication and Verification}
 
@@ -59,7 +59,7 @@ The chat service manages conversations and messages between tenants and landlord
 
 \section{Algorithm Implementation}
 
-The most significant algorithm in Domavi is the roommate compatibility matching algorithm. It quantifies how well two users would live together by comparing their lifestyle profiles across five weighted categories and producing an overall compatibility score on a scale of 0 to 100.
+The most significant algorithm in Property Rental System is the roommate compatibility matching algorithm. It quantifies how well two users would live together by comparing their lifestyle profiles across five weighted categories and producing an overall compatibility score on a scale of 0 to 100.
 
 \subsection{Algorithm: Weighted Roommate Compatibility Scoring}
 
@@ -112,7 +112,7 @@ Algorithm RoommateMatch(P_user, Candidates, Weights):
 
 \section{External APIs / SDKs}
 
-Domavi integrates several third-party services to deliver its features.
+Property Rental System integrates several third-party services to deliver its features.
 
 \begin{table}[h]
 \centering
@@ -136,11 +136,11 @@ SMTP Email Service & Email verification and event notifications. & Authenticatio
 
 \section{User Interface Implementation}
 
-This section presents the major user interface screens of Domavi. Each screen is described in terms of its purpose, components, interaction flow, backend integration, and validation. Students should include screenshots of each major screen in the final report.
+This section presents the major user interface screens of Property Rental System. Each screen is described in terms of its purpose, components, interaction flow, backend integration, and validation. Students should include screenshots of each major screen in the final report.
 
 \subsection{UI Design Approach}
 
-The Domavi interface follows a clean, minimalistic design built with Tailwind CSS and a component library organised using the atomic design methodology, in which small atoms (buttons, inputs, badges) compose into molecules (property cards, search bars, filter chips) and organisms (complete sections). A consistent colour scheme, typography, and spacing scale are defined as design tokens to ensure visual consistency. The layout follows a mobile-first, responsive strategy so that the application adapts smoothly from mobile to desktop, and accessibility considerations such as readable font sizes and clear focus states are applied throughout.
+The Property Rental System interface follows a clean, minimalistic design built with Tailwind CSS and a component library organised using the atomic design methodology, in which small atoms (buttons, inputs, badges) compose into molecules (property cards, search bars, filter chips) and organisms (complete sections). A consistent colour scheme, typography, and spacing scale are defined as design tokens to ensure visual consistency. The layout follows a mobile-first, responsive strategy so that the application adapts smoothly from mobile to desktop, and accessibility considerations such as readable font sizes and clear focus states are applied throughout.
 
 \subsection{Screen-wise Implementation}
 
@@ -192,7 +192,7 @@ A navigation flow diagram should be included to show how the major screens, the 
 \section{Chapter Summary}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This chapter described the implementation of the Domavi platform using the MERN
+This chapter described the implementation of the Property Rental System platform using the MERN
 stack and TypeScript. It outlined the development environment, detailed the
 implementation of each core module, and presented the weighted roommate
 compatibility algorithm together with its pseudo code. The external APIs for

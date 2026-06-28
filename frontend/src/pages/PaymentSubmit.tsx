@@ -165,7 +165,7 @@ const PaymentSubmitPage: React.FC = () => {
     if (dataLoading) {
         return (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 400 }}>
-                <div style={{ width: 36, height: 36, border: '4px solid #e2e8f0', borderTopColor: '#6366f1', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                <div style={{ width: 36, height: 36, border: '4px solid #e2e8f0', borderTopColor: '#d4845a', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
                 <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
             </div>
         );
@@ -180,8 +180,8 @@ const PaymentSubmitPage: React.FC = () => {
         return (
             <div style={{ textAlign: 'center', padding: '80px 24px' }}>
                 <AlertTriangle size={48} color="#f59e0b" style={{ margin: '0 auto 16px' }} />
-                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b' }}>Booking Not Ready for Payment</h2>
-                <p style={{ color: '#64748b', marginTop: 8 }}>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f5f5f5' }}>Booking Not Ready for Payment</h2>
+                <p style={{ color: '#8f8f8f', marginTop: 8 }}>
                     {notReadyMessage}
                 </p>
                 <div style={{ marginTop: 20 }}>
@@ -197,10 +197,10 @@ const PaymentSubmitPage: React.FC = () => {
         return (
             <div style={{ textAlign: 'center', padding: '80px 24px' }}>
                 <AlertTriangle size={48} color="#f59e0b" style={{ margin: '0 auto 16px' }} />
-                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#1e293b' }}>
+                <h2 style={{ fontSize: 20, fontWeight: 700, color: '#f5f5f5' }}>
                     Booking Not Ready for Payment
                 </h2>
-                <p style={{ color: '#64748b', marginTop: 8, maxWidth: 560, marginInline: 'auto' }}>
+                <p style={{ color: '#8f8f8f', marginTop: 8, maxWidth: 560, marginInline: 'auto' }}>
                     {booking.status === 'pending'
                         ? 'Your booking is pending landlord approval. You can submit payment as soon as it is approved.'
                         : `Your booking is currently ${booking.status}. Payment submission is only available for approved bookings.`}
@@ -229,32 +229,32 @@ const PaymentSubmitPage: React.FC = () => {
         return (
             <div style={{ maxWidth: 560, margin: '60px auto', padding: '0 16px' }}>
                 <ToastContainer toasts={toasts} dismiss={dismiss} />
-                <div style={{ background: '#fff', borderRadius: 20, padding: 40, boxShadow: '0 4px 24px rgba(0,0,0,0.07)', textAlign: 'center' }}>
+                <div style={{ background: '#141414', borderRadius: 20, padding: 40, boxShadow: '0 4px 24px rgba(0,0,0,0.07)', textAlign: 'center' }}>
                     <CheckCircle size={56} color="#16a34a" style={{ margin: '0 auto 16px' }} />
-                    <h2 style={{ fontSize: 22, fontWeight: 800, color: '#1e293b', marginBottom: 8 }}>
+                    <h2 style={{ fontSize: 22, fontWeight: 800, color: '#f5f5f5', marginBottom: 8 }}>
                         Payment {submitted ? 'Submitted' : 'Already Submitted'}
                     </h2>
-                    <p style={{ color: '#64748b', marginBottom: 24 }}>
+                    <p style={{ color: '#8f8f8f', marginBottom: 24 }}>
                         Your receipt is under admin review. You'll be notified once it's verified.
                     </p>
                     {payment && (
-                        <div style={{ background: '#f8fafc', borderRadius: 12, padding: 20, marginBottom: 24, textAlign: 'left' }}>
+                        <div style={{ background: '#0a0a0a', borderRadius: 12, padding: 20, marginBottom: 24, textAlign: 'left' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                                <span style={{ color: '#64748b', fontSize: 13 }}>Status</span>
+                                <span style={{ color: '#8f8f8f', fontSize: 13 }}>Status</span>
                                 <Badge variant={badgeInfo.variant}>{badgeInfo.label}</Badge>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-                                <span style={{ color: '#64748b', fontSize: 13 }}>Amount</span>
-                                <span style={{ fontWeight: 700, color: '#1e293b' }}>PKR {(payment.amount ?? amountDue).toLocaleString()}</span>
+                                <span style={{ color: '#8f8f8f', fontSize: 13 }}>Amount</span>
+                                <span style={{ fontWeight: 700, color: '#f5f5f5' }}>PKR {(payment.amount ?? amountDue).toLocaleString()}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <span style={{ color: '#64748b', fontSize: 13 }}>Transaction ID</span>
-                                <span style={{ fontWeight: 600, color: '#334155', fontSize: 13 }}>
+                                <span style={{ color: '#8f8f8f', fontSize: 13 }}>Transaction ID</span>
+                                <span style={{ fontWeight: 600, color: '#c0c0c0', fontSize: 13 }}>
                                     {payment.transactionReference ?? '—'}
                                 </span>
                             </div>
                             {payment.status === 'rejected' && payment.rejectionReason && (
-                                <div style={{ marginTop: 16, padding: '12px 16px', background: '#fef2f2', borderRadius: 10, color: '#991b1b', fontSize: 13 }}>
+                                <div style={{ marginTop: 16, padding: '12px 16px', background: '#2a1414', borderRadius: 10, color: '#fca5a5', fontSize: 13 }}>
                                     <strong>Rejection reason:</strong> {payment.rejectionReason}
                                 </div>
                             )}
@@ -264,7 +264,7 @@ const PaymentSubmitPage: React.FC = () => {
                                         href={`${ASSETS_URL}${payment.proofOfPayment}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#6366f1', fontWeight: 600, fontSize: 13 }}
+                                        style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#d4845a', fontWeight: 600, fontSize: 13 }}
                                     >
                                         <Eye size={14} /> View Submitted Receipt
                                     </a>
@@ -287,16 +287,16 @@ const PaymentSubmitPage: React.FC = () => {
                 <ToastContainer toasts={toasts} dismiss={dismiss} />
 
                 <div style={{ marginBottom: 28 }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6366f1', marginBottom: 4 }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#d4845a', marginBottom: 4 }}>
                         Payment
                     </p>
-                    <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e293b' }}>Payment Unavailable</h1>
-                    <p style={{ color: '#64748b', marginTop: 4 }}>
+                    <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f5f5f5' }}>Payment Unavailable</h1>
+                    <p style={{ color: '#8f8f8f', marginTop: 4 }}>
                         This payment cannot proceed yet because the landlord has not configured a payout bank account.
                     </p>
                 </div>
 
-                <div style={{ background: '#fff', borderRadius: 16, padding: '20px 24px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ background: '#141414', borderRadius: 16, padding: '20px 24px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 16 }}>
                     {propertyImageSrc ? (
                         <img
                             src={propertyImageSrc}
@@ -307,28 +307,28 @@ const PaymentSubmitPage: React.FC = () => {
                             }}
                         />
                     ) : (
-                        <div style={{ width: 64, height: 64, borderRadius: 10, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <Building2 size={28} color="#94a3b8" />
+                        <div style={{ width: 64, height: 64, borderRadius: 10, background: '#1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Building2 size={28} color="#8f8f8f" />
                         </div>
                     )}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontWeight: 700, color: '#1e293b', fontSize: 16, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontWeight: 700, color: '#f5f5f5', fontSize: 16, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {property.title ?? 'Property'}
                         </p>
-                        <p style={{ fontSize: 13, color: '#64748b' }}>
+                        <p style={{ fontSize: 13, color: '#8f8f8f' }}>
                             {property.location?.city ?? ''}{property.location?.area ? `, ${property.location.area}` : ''}
                         </p>
                     </div>
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <p style={{ fontSize: 22, fontWeight: 800, color: '#6366f1' }}>
+                        <p style={{ fontSize: 22, fontWeight: 800, color: '#d4845a' }}>
                             PKR {amountDue.toLocaleString()}
                         </p>
-                        <p style={{ fontSize: 12, color: '#94a3b8' }}>due amount</p>
+                        <p style={{ fontSize: 12, color: '#8f8f8f' }}>due amount</p>
                     </div>
                 </div>
 
-                <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 16, padding: '16px 20px', marginBottom: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#92400e' }}>
+                <div style={{ background: '#241c0a', border: '1px solid #fde68a', borderRadius: 16, padding: '16px 20px', marginBottom: 20 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#fbbf24' }}>
                         <AlertTriangle size={18} />
                         <span style={{ fontSize: 14 }}>
                             The landlord hasn&apos;t set up bank accounts yet, so receipt submission is temporarily disabled for this booking.
@@ -350,17 +350,17 @@ const PaymentSubmitPage: React.FC = () => {
 
             {/* Header */}
             <div style={{ marginBottom: 28 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6366f1', marginBottom: 4 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#d4845a', marginBottom: 4 }}>
                     Payment
                 </p>
-                <h1 style={{ fontSize: 28, fontWeight: 800, color: '#1e293b' }}>Submit Payment</h1>
-                <p style={{ color: '#64748b', marginTop: 4 }}>
+                <h1 style={{ fontSize: 28, fontWeight: 800, color: '#f5f5f5' }}>Submit Payment</h1>
+                <p style={{ color: '#8f8f8f', marginTop: 4 }}>
                     Transfer the amount to the landlord's account and upload your receipt below.
                 </p>
             </div>
 
             {/* Property summary */}
-            <div style={{ background: '#fff', borderRadius: 16, padding: '20px 24px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ background: '#141414', borderRadius: 16, padding: '20px 24px', marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', alignItems: 'center', gap: 16 }}>
                 {propertyImageSrc ? (
                     <img
                         src={propertyImageSrc}
@@ -371,29 +371,29 @@ const PaymentSubmitPage: React.FC = () => {
                         }}
                     />
                 ) : (
-                    <div style={{ width: 64, height: 64, borderRadius: 10, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <Building2 size={28} color="#94a3b8" />
+                    <div style={{ width: 64, height: 64, borderRadius: 10, background: '#1f1f1f', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <Building2 size={28} color="#8f8f8f" />
                     </div>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontWeight: 700, color: '#1e293b', fontSize: 16, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ fontWeight: 700, color: '#f5f5f5', fontSize: 16, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {property.title ?? 'Property'}
                     </p>
-                    <p style={{ fontSize: 13, color: '#64748b' }}>
+                    <p style={{ fontSize: 13, color: '#8f8f8f' }}>
                         {property.location?.city ?? ''}{property.location?.area ? `, ${property.location.area}` : ''}
                     </p>
                 </div>
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <p style={{ fontSize: 22, fontWeight: 800, color: '#6366f1' }}>
+                    <p style={{ fontSize: 22, fontWeight: 800, color: '#d4845a' }}>
                         PKR {amountDue.toLocaleString()}
                     </p>
-                    <p style={{ fontSize: 12, color: '#94a3b8' }}>due amount</p>
+                    <p style={{ fontSize: 12, color: '#8f8f8f' }}>due amount</p>
                 </div>
             </div>
 
             {/* Bank details */}
-            <div style={{ background: '#f8f9ff', border: '1px solid #e0e7ff', borderRadius: 16, padding: '20px 24px', marginBottom: 20 }}>
-                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6366f1', marginBottom: 12 }}>
+            <div style={{ background: '#141414', border: '1px solid #e0e7ff', borderRadius: 16, padding: '20px 24px', marginBottom: 20 }}>
+                <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#d4845a', marginBottom: 12 }}>
                     Transfer to this account
                 </p>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
@@ -404,14 +404,14 @@ const PaymentSubmitPage: React.FC = () => {
                         ...(primaryAccount.iban ? [{ label: 'IBAN', value: primaryAccount.iban }] : []),
                     ].map(({ label, value }) => (
                         <div key={label}>
-                            <p style={{ fontSize: 11, color: '#94a3b8', marginBottom: 2 }}>{label}</p>
+                            <p style={{ fontSize: 11, color: '#8f8f8f', marginBottom: 2 }}>{label}</p>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                <p style={{ fontWeight: 600, color: '#1e293b', fontSize: 14 }}>{value}</p>
+                                <p style={{ fontWeight: 600, color: '#f5f5f5', fontSize: 14 }}>{value}</p>
                                 <button
                                     type="button"
                                     title="Copy"
                                     onClick={() => copyToClipboard(value)}
-                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#94a3b8' }}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 2, color: '#8f8f8f' }}
                                 >
                                     <Copy size={12} />
                                 </button>
@@ -423,20 +423,20 @@ const PaymentSubmitPage: React.FC = () => {
 
             {/* Form */}
             <form onSubmit={handleSubmit}>
-                <div style={{ background: '#fff', borderRadius: 16, padding: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', marginBottom: 20 }}>
+                <div style={{ background: '#141414', borderRadius: 16, padding: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: '#f5f5f5', marginBottom: 20 }}>
                         Payment Details
                     </h3>
 
                     {/* Payment type */}
                     <div style={{ marginBottom: 20 }}>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
+                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#c0c0c0', marginBottom: 8 }}>
                             Payment Type
                         </label>
                         <select
                             value={paymentType}
                             onChange={(e) => setPaymentType(e.target.value)}
-                            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, color: '#1e293b', background: '#fff', outline: 'none' }}
+                            style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #e2e8f0', fontSize: 14, color: '#f5f5f5', background: '#141414', outline: 'none' }}
                         >
                             <option value="security_deposit">Security Deposit</option>
                             <option value="monthly_rent">Monthly Rent</option>
@@ -457,13 +457,13 @@ const PaymentSubmitPage: React.FC = () => {
                             onBlur={() => setTxnError(validateTxn(txnRef))}
                             error={txnError}
                             helperText={`Minimum ${MIN_TXN_LENGTH} characters. Alphanumeric only.`}
-                            leftIcon={<CreditCard size={16} color="#94a3b8" />}
+                            leftIcon={<CreditCard size={16} color="#8f8f8f" />}
                         />
                     </div>
 
                     {/* Receipt upload */}
                     <div style={{ marginBottom: 8 }}>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 8 }}>
+                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#c0c0c0', marginBottom: 8 }}>
                             Payment Receipt *
                         </label>
                         <input
@@ -479,29 +479,29 @@ const PaymentSubmitPage: React.FC = () => {
                                 onClick={() => fileInputRef.current?.click()}
                                 style={{
                                     width: '100%', padding: '32px 16px', border: '2px dashed #c7d2fe',
-                                    borderRadius: 12, background: '#f5f3ff', cursor: 'pointer',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: '#6366f1',
+                                    borderRadius: 12, background: '#141414', cursor: 'pointer',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, color: '#d4845a',
                                 }}
                             >
                                 <Upload size={28} />
                                 <span style={{ fontWeight: 600, fontSize: 14 }}>Click to upload receipt</span>
-                                <span style={{ fontSize: 12, color: '#94a3b8' }}>JPG, PNG, WebP, PDF · max 5 MB</span>
+                                <span style={{ fontSize: 12, color: '#8f8f8f' }}>JPG, PNG, WebP, PDF · max 5 MB</span>
                             </button>
                         ) : (
                             <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1.5px solid #e0e7ff' }}>
                                 {receiptPreview === 'pdf' ? (
-                                    <div style={{ padding: '24px 20px', background: '#f8fafc', display: 'flex', alignItems: 'center', gap: 12 }}>
-                                        <FileText size={36} color="#6366f1" />
+                                    <div style={{ padding: '24px 20px', background: '#0a0a0a', display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <FileText size={36} color="#d4845a" />
                                         <div>
-                                            <p style={{ fontWeight: 600, color: '#1e293b', fontSize: 14 }}>{receiptFile.name}</p>
-                                            <p style={{ fontSize: 12, color: '#94a3b8' }}>{(receiptFile.size / 1024).toFixed(1)} KB</p>
+                                            <p style={{ fontWeight: 600, color: '#f5f5f5', fontSize: 14 }}>{receiptFile.name}</p>
+                                            <p style={{ fontSize: 12, color: '#8f8f8f' }}>{(receiptFile.size / 1024).toFixed(1)} KB</p>
                                         </div>
                                     </div>
                                 ) : (
                                     <img
                                         src={receiptPreview!}
                                         alt="Receipt preview"
-                                        style={{ width: '100%', maxHeight: 260, objectFit: 'contain', background: '#f8fafc', display: 'block' }}
+                                        style={{ width: '100%', maxHeight: 260, objectFit: 'contain', background: '#0a0a0a', display: 'block' }}
                                     />
                                 )}
                                 <button
@@ -515,7 +515,7 @@ const PaymentSubmitPage: React.FC = () => {
                                         position: 'absolute', top: 8, right: 8, width: 28, height: 28,
                                         borderRadius: '50%', background: 'rgba(0,0,0,0.55)', border: 'none',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer', color: '#fff',
+                                        cursor: 'pointer', color: '#141414',
                                     }}
                                 >
                                     <X size={14} />
@@ -523,7 +523,7 @@ const PaymentSubmitPage: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    style={{ width: '100%', padding: '8px', background: '#f1f5f9', border: 'none', cursor: 'pointer', fontSize: 13, color: '#6366f1', fontWeight: 600 }}
+                                    style={{ width: '100%', padding: '8px', background: '#1f1f1f', border: 'none', cursor: 'pointer', fontSize: 13, color: '#d4845a', fontWeight: 600 }}
                                 >
                                     Change file
                                 </button>
@@ -544,7 +544,7 @@ const PaymentSubmitPage: React.FC = () => {
                         >
                             {loading ? 'Submitting…' : 'Submit Payment'}
                         </Button>
-                        <p style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: '#94a3b8' }}>
+                        <p style={{ textAlign: 'center', marginTop: 12, fontSize: 12, color: '#8f8f8f' }}>
                             Your receipt will be reviewed by an admin. Booking confirms upon approval.
                         </p>
                     </div>
