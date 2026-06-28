@@ -1,7 +1,7 @@
-# Roomify — UI Improvement Plan
+# Domavi — UI Improvement Plan
 
 **Audit by:** Senior UI Designer Review
-**Project:** Roomify Rental System (MERN stack — React + Vite + TypeScript)
+**Project:** Domavi Rental System (MERN stack — React + Vite + TypeScript)
 **Workspace:** `/Users/mc/Developer/fyp/roomify_rental_system`
 **Date:** April 2026
 
@@ -23,7 +23,7 @@
 |------|------|
 | Bold typography, clear CTAs | Targeted at lawn/property maintenance, not rentals |
 | Eye-catching contact form section | Green palette evokes landscaping, not housing |
-| Footer is well-organized | Wavy/grass illustrations don't match Roomify's tone |
+| Footer is well-organized | Wavy/grass illustrations don't match Domavi's tone |
 | | Sections like "MYRTLE BEACH / GULF / FLAT" are vacation-rental, not student/urban rental |
 
 **Verdict:** ❌ Not suitable. Skip this.
@@ -35,7 +35,7 @@
 | Clean, modern, minimalist | Hero image (house in hand) is creative but you'd need licensing |
 | Search bar with **3 filters** (location, type, zip) — exactly aap ke use case ke liye | Plain — needs polish for property cards section |
 | Trust signals (partner logos) | "comapny" typo in design (just an artifact) |
-| Perfect blue palette — matches Roomify's `#2563EB` already configured | |
+| Perfect blue palette — matches Domavi's `#2563EB` already configured | |
 | Easy to implement in React + Tailwind | |
 
 **Verdict:** ✅ **Use this as base for Home/Landing page.**
@@ -50,7 +50,7 @@
 | Sort + grid/list toggle | |
 | Property cards with bed/bath/sqft icons | |
 
-**Verdict:** ✅ **Use this layout for `/browse` (Search) page** — adapt purple → Roomify blue.
+**Verdict:** ✅ **Use this layout for `/browse` (Search) page** — adapt purple → Domavi blue.
 
 ---
 
@@ -88,7 +88,7 @@
 - 3-column grid of PropertyCards ✓
 - Sort dropdown (Newest, Best Match, Price asc/desc) ✓
 - Skeleton loaders ✓
-- Compatibility score integration (unique to Roomify, great differentiator) ✓
+- Compatibility score integration (unique to Domavi, great differentiator) ✓
 - Empty state with "Clear Filters" CTA ✓
 - Pagination ("Load More") ✓
 
@@ -138,7 +138,7 @@
 
 ### 3.2 Search/Browse Page (`/browse` → `pages/Search.tsx`)
 
-**Reference:** Homearia design (Image 3) — but in Roomify blue, NOT purple
+**Reference:** Homearia design (Image 3) — but in Domavi blue, NOT purple
 
 This is **the most important change**. Currently 3-column grid; needs to become a 2-column split.
 
@@ -509,8 +509,8 @@ BEFORE                              AFTER (Homearia-inspired)
 
 Jab examiner poochay "design choices kaisi ki?", aap yeh bolain:
 
-1. **"Mtato design ka clean approach utha kar Roomify ke trust-focused brand mein blend kiya — kyun ke rental market mein trust hi sab kuch hai."**
-2. **"Search page ka split map+cards layout Homearia se inspired hai, lekin purple ki jagah Roomify ka primary blue use kiya — brand consistency ke liye."**
+1. **"Mtato design ka clean approach utha kar Domavi ke trust-focused brand mein blend kiya — kyun ke rental market mein trust hi sab kuch hai."**
+2. **"Search page ka split map+cards layout Homearia se inspired hai, lekin purple ki jagah Domavi ka primary blue use kiya — brand consistency ke liye."**
 3. **"Backend mein already 2dsphere index aur GeoJSON coordinates field maujood thi, to map integration ek architectural natural fit thi — re-engineer nahi karna pari."**
 4. **"Leaflet + OpenStreetMap chuna kyun ke open-source hai, FYP scope ke liye API key cost nahi, aur production scale par bhi battle-tested hai."**
 5. **"Atomic Design pattern follow kiya — har feature add karte waqt atom→molecule→organism progression maintain ki, jaise PropertyMap molecule banaya jo Search organism mein use hota hai."**

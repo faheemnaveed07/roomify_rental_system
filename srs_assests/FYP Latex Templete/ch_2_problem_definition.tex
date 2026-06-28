@@ -1,0 +1,170 @@
+% ==============================
+% Chapter 2 – Problem Definition
+% ==============================
+
+\chapter{Problem Definition}
+% --------------------------------
+% 2.1 Problem Statement
+% --------------------------------
+
+\section{Problem Statement}
+
+Students and young professionals seeking affordable shared accommodation in Pakistani cities face a rental market that is informal, opaque, and unsafe. Finding a single room or bed space near a university or workplace typically requires engaging local brokers who charge high commissions, or browsing unverified listings on general classified sites and social media groups where fraudulent advertisements and fake landlords are common. There is no reliable mechanism to confirm that a property exists, that the advertiser owns it, or that the parties involved are genuine. Compounding this, the selection of a roommate, an inherently social decision, is left entirely to chance, frequently resulting in conflict and stress. The affected stakeholders are tenants, who bear financial and security risks; genuine landlords, who lack a trustworthy channel to reach reliable tenants; and the wider community, which is denied a transparent housing marketplace. The problem is significant because it imposes avoidable financial cost, wasted time, exposure to fraud, and reduced quality of life on a large and growing population.
+
+% --------------------------------
+% 2.2 Proposed Solution Overview
+% --------------------------------
+
+\section{Proposed Solution Overview}
+
+Domavi is a web-based micro-rental and roommate matching platform that directly addresses the weaknesses of the current system. It provides a dedicated marketplace for single rooms, bed spaces, and hostels, replacing scattered and irrelevant listings with a focused, well-structured catalogue. To establish trust, the platform enforces a multi-layer verification system covering email and phone confirmation, administrator-reviewed CNIC verification, and property ownership validation, thereby reducing fraud. An intelligent roommate matching engine scores potential roommates on lifestyle, preferences, budget, location, and schedule, transforming roommate selection from guesswork into a data-driven decision. Commute-based search powered by the Google Maps API allows users to find accommodation within walking distance of their destination. Finally, secure in-app messaging, structured booking requests, payment recording, and auto-generated digital rental agreements automate the rental lifecycle. The result is a safer, cheaper, faster, and more transparent rental experience.
+
+% --------------------------------
+% 2.3 Objectives of the Proposed System
+% --------------------------------
+
+\section{Objectives of the Proposed System}
+
+The objectives of Domavi are defined to be specific, measurable, and directly aligned with the problems identified above. Each objective begins with an action verb and is achievable within the project constraints.
+
+\vspace{0.3cm}
+
+\textbf{Business Objectives (BO):}
+
+\begin{itemize}
+    \item BO-1: Develop a dedicated micro-rental marketplace that enables users to list, search, and book single rooms, bed spaces, and hostels.
+    \item BO-2: Provide an intelligent roommate matching engine that ranks potential roommates by multi-factor compatibility to reduce living conflicts.
+    \item BO-3: Ensure trust and safety through a multi-layer verification system covering identity, contact, and property ownership.
+    \item BO-4: Improve accommodation discovery by offering commute-based geospatial search relative to universities and workplaces.
+    \item BO-5: Automate the rental workflow through secure messaging, structured bookings, payment recording, and auto-generated digital rental agreements.
+    \item BO-6: Provide administrators with effective tools to verify users, oversee payments, and monitor platform activity.
+\end{itemize}
+
+% --------------------------------
+% 2.4 Scope of the System
+% --------------------------------
+
+\section{Scope of the System}
+
+Domavi is a responsive web application targeting students and young professionals seeking shared accommodation, the landlords who offer such accommodation, and the administrators who govern the platform. The system includes user registration and role-based access for tenants, landlords, and administrators; creation and management of room, bed-space, and hostel listings with images, pricing, amenities, and location; verification of users and properties; commute-based and filter-based search; roommate profile creation and compatibility-based matching; in-app messaging; booking requests and status management; payment recording and confirmation; auto-generated digital rental agreements; and an administrative dashboard with analytics.
+
+The system explicitly excludes full-house sales and commercial property transactions, live integration with a third-party payment gateway in the initial release, native mobile applications, and nationwide coverage beyond the initially targeted cities. These exclusions delineate the platform's coverage and are distinct from the operational limitations described in Chapter~1.
+
+% --------------------------------
+% 2.5 System Architecture and Modules
+% --------------------------------
+
+\section{System Architecture and Modules}
+
+Domavi follows a layered, client-server architecture organised into a presentation layer, an application (business logic) layer, and a data layer. The presentation layer is a React single-page application that communicates with the backend exclusively through a RESTful API. The application layer, built on Node.js and Express.js, hosts modular controllers and services that implement business rules and enforce role-based access control. The data layer is a MongoDB database accessed through Mongoose models. External services, including the Google Maps API, cloud media storage, and an email service, are integrated through the application layer. This modular design promotes loose coupling, reusability, and independent development and testing of each module, and a high-level architecture diagram is presented in Chapter~4.
+
+% --------------------------------
+% 2.5.1 Module Descriptions
+% --------------------------------
+
+\subsection{Module 1: User and Profile Management}
+
+This module handles registration, authentication, authorisation, and profile management for the three supported user roles: Tenant, Landlord, and Administrator. It issues and validates JWT-based sessions, enforces role-based access control, manages account status (pending, active, suspended), and supports email/phone confirmation and CNIC submission as part of the verification process.
+
+\textbf{Functional Requirements:}
+
+\begin{itemize}
+    \item FE-1: The system shall allow users to register using valid credentials and a selected role.
+    \item FE-2: The system shall authenticate users and issue a secure session token before granting access.
+    \item FE-3: The system shall allow users to view and update their profile information.
+    \item FE-4: The system shall enforce role-based access to protected resources.
+\end{itemize}
+
+\subsection{Module 2: Communication Module}
+
+This module enables secure, in-app interaction between tenants and landlords. It supports conversation threads, real-time message exchange, and notification of relevant events such as booking updates, allowing parties to negotiate and coordinate without sharing personal contact details prematurely.
+
+\textbf{Functional Requirements:}
+
+\begin{itemize}
+    \item FE-1: The system shall enable secure messaging between tenants and landlords.
+    \item FE-2: The system shall generate notifications for booking and verification events.
+    \item FE-3: The system shall maintain a persistent history of conversations and messages.
+\end{itemize}
+
+\subsection{Module 3: Property Listing and Search Module (Core)}
+
+This module delivers the core value of the platform. It allows landlords to create and manage micro-rental listings and allows tenants to search and filter those listings, including commute-based proximity search using the Google Maps API. It directly addresses the discovery problem identified in Section~2.1.
+
+\textbf{Functional Requirements:}
+
+\begin{itemize}
+    \item FE-1: The system shall allow landlords to create, update, and remove property listings.
+    \item FE-2: The system shall allow tenants to search and filter listings by location, price, room type, and gender preference.
+    \item FE-3: The system shall support commute-based search returning listings near a chosen location.
+    \item FE-4: The system shall display only verified and active listings in public search results.
+\end{itemize}
+
+\subsection{Module 4: Booking, Payment, and Agreement Module}
+
+This module manages the rental transaction lifecycle. Tenants submit booking requests, landlords accept or reject them, payments are recorded and confirmed, and a digital rental agreement is auto-generated as a PDF for the confirmed booking.
+
+\textbf{Functional Requirements:}
+
+\begin{itemize}
+    \item FE-1: The system shall allow tenants to submit booking requests for available listings.
+    \item FE-2: The system shall allow landlords to accept or reject booking requests.
+    \item FE-3: The system shall record payment details and update payment status upon confirmation.
+    \item FE-4: The system shall auto-generate a digital rental agreement for confirmed bookings.
+\end{itemize}
+
+\subsection{Module 5: Roommate Matching Module (Advanced)}
+
+This module provides the platform's distinctive intelligent capability. Users complete a lifestyle and preference profile, and the matching engine computes a weighted compatibility score against other profiles, returning a ranked list of the most compatible potential roommates.
+
+\textbf{Functional Requirements:}
+
+\begin{itemize}
+    \item FE-1: The system shall allow users to create and update a roommate lifestyle profile.
+    \item FE-2: The system shall compute a weighted compatibility score between roommate profiles.
+    \item FE-3: The system shall return a ranked list of top roommate matches for a given profile.
+\end{itemize}
+
+\subsection{Module 6: Administration Module}
+
+This module gives administrators control over the platform. It supports reviewing and approving CNIC and ownership verification requests, managing user accounts and status, overseeing payments, and viewing platform analytics.
+
+\textbf{Functional Requirements:}
+
+\begin{itemize}
+    \item FE-1: The system shall allow administrators to review and approve or reject verification requests.
+    \item FE-2: The system shall allow administrators to manage user accounts and account status.
+    \item FE-3: The system shall provide administrators with analytics on users, listings, bookings, and payments.
+\end{itemize}
+
+% --------------------------------
+% 2.7 Assumptions and Dependencies
+% --------------------------------
+
+\section{Assumptions and Dependencies}
+
+The design of Domavi rests on a number of assumptions and external dependencies that define its operating conditions.
+
+\begin{itemize}
+    \item The system assumes that users have access to a stable internet connection and a modern web browser.
+    \item The system assumes that users possess basic digital literacy and provide truthful information during verification.
+    \item The system depends on the continued availability and quota limits of the Google Maps API for geospatial features.
+    \item The system depends on third-party cloud media storage for images and verification documents, and on an SMTP email service for notifications.
+    \item The system requires administrator availability to process manual CNIC and ownership verification requests in a timely manner.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Chapter Summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This chapter defined the core problem addressed by Domavi and outlined the
+conceptual solution approach. Clear, measurable objectives were established to
+ensure alignment with the identified challenges of cost, fraud, discovery, and
+roommate incompatibility. The system scope and architectural overview were
+presented to define structural boundaries and major modules, namely user and
+profile management, communication, property listing and search, booking and
+agreements, roommate matching, and administration. Key assumptions and
+dependencies were also documented to clarify operational constraints.
+
+This chapter provides the problem foundation and sets the direction for the
+detailed requirement analysis and software design presented in the following chapters.

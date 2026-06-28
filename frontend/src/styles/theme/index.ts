@@ -1,5 +1,5 @@
 /**
- * Roomify Design System - Consolidated Theme Export
+ * Domavi Design System - Consolidated Theme Export
  */
 
 export { colors, type ColorKey, type PrimaryShade, type NeutralShade } from './colors';

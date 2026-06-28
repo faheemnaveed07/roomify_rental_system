@@ -1,0 +1,145 @@
+\contentsline {section}{Executive Summary}{v}{Doc-Start}%
+\contentsline {section}{List of Tables}{ix}{Doc-Start}%
+\contentsline {section}{List of Figures}{x}{Doc-Start}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Introduction}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Vision Statement}{1}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Related System Analysis}{2}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Project Deliverables}{3}{section.1.4}%
+\contentsline {section}{\numberline {1.5}System Limitations / Constraints}{4}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Tools and Technologies}{5}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Relevance to Course Modules}{5}{section.1.7}%
+\contentsline {subsection}{\numberline {1.7.1}Programming Fundamentals}{6}{subsection.1.7.1}%
+\contentsline {subsection}{\numberline {1.7.2}Data Structures and Algorithms}{6}{subsection.1.7.2}%
+\contentsline {subsection}{\numberline {1.7.3}Database Management Systems}{6}{subsection.1.7.3}%
+\contentsline {subsection}{\numberline {1.7.4}Software Engineering}{6}{subsection.1.7.4}%
+\contentsline {subsection}{\numberline {1.7.5}Other Relevant Courses}{6}{subsection.1.7.5}%
+\contentsline {section}{\numberline {1.8}Chapter Summary}{6}{section.1.8}%
+\contentsline {chapter}{\numberline {2}Problem Definition}{8}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Problem Statement}{8}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Proposed Solution Overview}{8}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Objectives of the Proposed System}{8}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Scope of the System}{9}{section.2.4}%
+\contentsline {section}{\numberline {2.5}System Architecture and Modules}{9}{section.2.5}%
+\contentsline {subsection}{\numberline {2.5.1}Module 1: User and Profile Management}{9}{subsection.2.5.1}%
+\contentsline {subsection}{\numberline {2.5.2}Module 2: Communication Module}{10}{subsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.5.3}Module 3: Property Listing and Search Module (Core)}{10}{subsection.2.5.3}%
+\contentsline {subsection}{\numberline {2.5.4}Module 4: Booking, Payment, and Agreement Module}{11}{subsection.2.5.4}%
+\contentsline {subsection}{\numberline {2.5.5}Module 5: Roommate Matching Module (Advanced)}{11}{subsection.2.5.5}%
+\contentsline {subsection}{\numberline {2.5.6}Module 6: Administration Module}{11}{subsection.2.5.6}%
+\contentsline {section}{\numberline {2.6}Assumptions and Dependencies}{12}{section.2.6}%
+\contentsline {section}{\numberline {2.7}Chapter Summary}{12}{section.2.7}%
+\contentsline {chapter}{\numberline {3}Requirement Analysis}{13}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Introduction to Requirement Analysis}{13}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Requirement Elicitation Techniques}{13}{section.3.2}%
+\contentsline {section}{\numberline {3.3}User Classes and Characteristics}{13}{section.3.3}%
+\contentsline {section}{\numberline {3.4}System Overview}{14}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Use Case Model}{14}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Use Case Diagram}{14}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Use Case Descriptions}{15}{subsection.3.5.2}%
+\contentsline {subsubsection}{\numberline {3.5.2.1}Module 1: User and Verification}{15}{subsubsection.3.5.2.1}%
+\contentsline {subsubsection}{\numberline {3.5.2.2}Module 2: Property and Search}{15}{subsubsection.3.5.2.2}%
+\contentsline {subsubsection}{\numberline {3.5.2.3}Module 3: Booking and Roommate Matching}{15}{subsubsection.3.5.2.3}%
+\contentsline {subsection}{\numberline {3.5.3}Event-Response Table}{15}{subsection.3.5.3}%
+\contentsline {section}{\numberline {3.6}Functional Requirements}{15}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}Module 1: User and Verification Management}{16}{subsection.3.6.1}%
+\contentsline {subsubsection}{\numberline {3.6.1.1}FR-1.1 User Registration}{16}{subsubsection.3.6.1.1}%
+\contentsline {subsubsection}{\numberline {3.6.1.2}FR-1.2 Multi-Layer Verification}{16}{subsubsection.3.6.1.2}%
+\contentsline {subsection}{\numberline {3.6.2}Module 2: Property Listing and Search}{16}{subsection.3.6.2}%
+\contentsline {subsubsection}{\numberline {3.6.2.1}FR-2.1 Manage Property Listings}{16}{subsubsection.3.6.2.1}%
+\contentsline {subsubsection}{\numberline {3.6.2.2}FR-2.2 Commute-Based Search}{16}{subsubsection.3.6.2.2}%
+\contentsline {subsection}{\numberline {3.6.3}Module 3: Booking, Payment, and Agreements}{16}{subsection.3.6.3}%
+\contentsline {subsubsection}{\numberline {3.6.3.1}FR-3.1 Booking Management}{16}{subsubsection.3.6.3.1}%
+\contentsline {subsubsection}{\numberline {3.6.3.2}FR-3.2 Digital Rental Agreement}{16}{subsubsection.3.6.3.2}%
+\contentsline {subsection}{\numberline {3.6.4}Module 4: Roommate Matching}{16}{subsection.3.6.4}%
+\contentsline {subsubsection}{\numberline {3.6.4.1}FR-4.1 Roommate Compatibility Matching}{16}{subsubsection.3.6.4.1}%
+\contentsline {subsection}{\numberline {3.6.5}Module 5: Communication and Administration}{16}{subsection.3.6.5}%
+\contentsline {subsubsection}{\numberline {3.6.5.1}FR-5.1 Secure Messaging}{16}{subsubsection.3.6.5.1}%
+\contentsline {subsubsection}{\numberline {3.6.5.2}FR-5.2 Administration and Analytics}{16}{subsubsection.3.6.5.2}%
+\contentsline {section}{\numberline {3.7}Non-Functional Requirements}{16}{section.3.7}%
+\contentsline {subsection}{\numberline {3.7.1}Performance Requirements}{17}{subsection.3.7.1}%
+\contentsline {subsection}{\numberline {3.7.2}Security Requirements}{17}{subsection.3.7.2}%
+\contentsline {subsection}{\numberline {3.7.3}Reliability Requirements}{18}{subsection.3.7.3}%
+\contentsline {subsection}{\numberline {3.7.4}Usability Requirements}{18}{subsection.3.7.4}%
+\contentsline {subsection}{\numberline {3.7.5}Scalability Requirements}{19}{subsection.3.7.5}%
+\contentsline {subsection}{\numberline {3.7.6}Maintainability Requirements}{19}{subsection.3.7.6}%
+\contentsline {section}{\numberline {3.8}External Interface Requirements}{19}{section.3.8}%
+\contentsline {subsection}{\numberline {3.8.1}User Interface Requirements}{20}{subsection.3.8.1}%
+\contentsline {subsection}{\numberline {3.8.2}Hardware Interface Requirements}{20}{subsection.3.8.2}%
+\contentsline {subsection}{\numberline {3.8.3}Software Interface Requirements}{20}{subsection.3.8.3}%
+\contentsline {subsection}{\numberline {3.8.4}Communication Interface Requirements}{21}{subsection.3.8.4}%
+\contentsline {section}{\numberline {3.9}Assumptions and Dependencies}{21}{section.3.9}%
+\contentsline {section}{\numberline {3.10}Requirement Traceability Matrix}{22}{section.3.10}%
+\contentsline {chapter}{\numberline {4}Software Design}{26}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Introduction to Software Design}{26}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Design Methodology and Software Process Model}{26}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Design Methodology}{26}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Software Process Model}{26}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}System Overview}{27}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Architectural Design}{27}{section.4.4}%
+\contentsline {section}{\numberline {4.5}Design Models}{28}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}Activity Diagrams}{28}{subsection.4.5.1}%
+\contentsline {subsubsection}{\numberline {4.5.1.1}Module 1: User Management}{29}{subsubsection.4.5.1.1}%
+\contentsline {subsubsection}{\numberline {4.5.1.2}Module 2: Property Listing and Booking}{29}{subsubsection.4.5.1.2}%
+\contentsline {subsubsection}{\numberline {4.5.1.3}Module 3: Admin Module}{30}{subsubsection.4.5.1.3}%
+\contentsline {subsection}{\numberline {4.5.2}Class Diagram}{30}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Sequence Diagrams}{31}{subsection.4.5.3}%
+\contentsline {subsubsection}{\numberline {4.5.3.1}Sequence Diagram -- User Login}{31}{subsubsection.4.5.3.1}%
+\contentsline {subsubsection}{\numberline {4.5.3.2}Sequence Diagram -- Booking and Agreement}{32}{subsubsection.4.5.3.2}%
+\contentsline {subsection}{\numberline {4.5.4}State Transition Diagrams}{32}{subsection.4.5.4}%
+\contentsline {section}{\numberline {4.6}Data Flow Diagrams}{32}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Level 1 Data Flow Diagram}{33}{subsection.4.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Level 2 Data Flow Diagram}{33}{subsection.4.6.2}%
+\contentsline {section}{\numberline {4.7}Data Design}{33}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Entity Relationship Diagram (ERD)}{34}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Database Architecture}{34}{subsection.4.7.2}%
+\contentsline {section}{\numberline {4.8}Database Schema Diagram}{34}{section.4.8}%
+\contentsline {subsection}{\numberline {4.8.1}Data Dictionary}{35}{subsection.4.8.1}%
+\contentsline {section}{\numberline {4.9}Database Collections}{35}{section.4.9}%
+\contentsline {subsection}{\numberline {4.9.1}User Collection}{35}{subsection.4.9.1}%
+\contentsline {subsection}{\numberline {4.9.2}Property Collection}{36}{subsection.4.9.2}%
+\contentsline {subsection}{\numberline {4.9.3}Booking, Payment, and Agreement Collections}{36}{subsection.4.9.3}%
+\contentsline {subsection}{\numberline {4.9.4}Relationships Between Collections}{37}{subsection.4.9.4}%
+\contentsline {subsection}{\numberline {4.9.5}Security and Data Integrity}{38}{subsection.4.9.5}%
+\contentsline {subsection}{\numberline {4.9.6}Scalability Considerations}{38}{subsection.4.9.6}%
+\contentsline {section}{\numberline {4.10}Chapter Summary}{39}{section.4.10}%
+\contentsline {chapter}{\numberline {5}Implementation}{40}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Development Environment}{40}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Core Module Implementation}{40}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Module 1: Authentication and Verification}{40}{subsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.2.2}Module 2: Property Listing and Search}{41}{subsection.5.2.2}%
+\contentsline {subsection}{\numberline {5.2.3}Module 3: Booking, Payment, and Agreement}{41}{subsection.5.2.3}%
+\contentsline {subsection}{\numberline {5.2.4}Module 4: Roommate Matching}{41}{subsection.5.2.4}%
+\contentsline {subsection}{\numberline {5.2.5}Module 5: Messaging and Administration}{41}{subsection.5.2.5}%
+\contentsline {section}{\numberline {5.3}Algorithm Implementation}{41}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Algorithm: Weighted Roommate Compatibility Scoring}{41}{subsection.5.3.1}%
+\contentsline {section}{\numberline {5.4}External APIs / SDKs}{42}{section.5.4}%
+\contentsline {section}{\numberline {5.5}User Interface Implementation}{43}{section.5.5}%
+\contentsline {subsection}{\numberline {5.5.1}UI Design Approach}{43}{subsection.5.5.1}%
+\contentsline {subsection}{\numberline {5.5.2}Screen-wise Implementation}{43}{subsection.5.5.2}%
+\contentsline {subsubsection}{\numberline {5.5.2.1}Screen 1: Authentication Screen}{43}{subsubsection.5.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.5.2.2}Screen 2: Search and Listings Screen}{43}{subsubsection.5.5.2.2}%
+\contentsline {subsubsection}{\numberline {5.5.2.3}Screen 3: Add Property Screen}{44}{subsubsection.5.5.2.3}%
+\contentsline {subsubsection}{\numberline {5.5.2.4}Screen 4: Roommate Matches Screen}{44}{subsubsection.5.5.2.4}%
+\contentsline {subsubsection}{\numberline {5.5.2.5}Screen 5: Admin Dashboard Screen}{44}{subsubsection.5.5.2.5}%
+\contentsline {subsection}{\numberline {5.5.3}Navigation Flow Diagram}{44}{subsection.5.5.3}%
+\contentsline {section}{\numberline {5.6}Chapter Summary}{44}{section.5.6}%
+\contentsline {chapter}{\numberline {6}Testing and Evaluation}{46}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Testing Strategy}{46}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Unit Testing}{46}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}UT-01: User Registration and Login}{46}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}UT-02: Roommate Compatibility Scoring}{47}{subsection.6.2.2}%
+\contentsline {section}{\numberline {6.3}Integration Testing}{47}{section.6.3}%
+\contentsline {section}{\numberline {6.4}System Testing}{47}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Performance Testing}{47}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Security Testing}{48}{section.6.6}%
+\contentsline {section}{\numberline {6.7}User Acceptance Testing}{48}{section.6.7}%
+\contentsline {section}{\numberline {6.8}Testing Summary}{48}{section.6.8}%
+\contentsline {chapter}{\numberline {7}Conclusion and Future Work}{50}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Conclusion}{50}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Future Work}{50}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Limitations}{51}{section.7.3}%
+\contentsline {chapter}{Appendices}{52}{appendix*.1}%
+\contentsline {section}{Appendix A – Turnitin Similarity Report}{52}{section*.2}%
+\contentsline {section}{Appendix B – AI Writing Detection Report}{53}{section*.2}%
+\contentsline {section}{Appendix C – Source Code}{54}{section*.2}%

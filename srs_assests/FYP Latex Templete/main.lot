@@ -1,0 +1,36 @@
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {1.1}{\ignorespaces Comparative Analysis of Existing Systems}}{3}{table.1.1}%
+\contentsline {table}{\numberline {1.2}{\ignorespaces Tools and Technologies Used in the Project}}{5}{table.1.2}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces User Classes and Characteristics}}{14}{table.3.1}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces UC-1.1: User Registration}}{16}{table.3.2}%
+\contentsline {table}{\numberline {3.3}{\ignorespaces UC-1.2: CNIC and Ownership Verification}}{17}{table.3.3}%
+\contentsline {table}{\numberline {3.4}{\ignorespaces UC-2.1: Create Property Listing}}{18}{table.3.4}%
+\contentsline {table}{\numberline {3.5}{\ignorespaces UC-2.2: Commute-Based Property Search}}{19}{table.3.5}%
+\contentsline {table}{\numberline {3.6}{\ignorespaces UC-3.1: Submit Booking Request}}{20}{table.3.6}%
+\contentsline {table}{\numberline {3.7}{\ignorespaces UC-3.2: Find Roommate Matches}}{21}{table.3.7}%
+\contentsline {table}{\numberline {3.8}{\ignorespaces Event-Response Table}}{22}{table.3.8}%
+\contentsline {table}{\numberline {3.9}{\ignorespaces Functional Requirement -- User Registration}}{22}{table.3.9}%
+\contentsline {table}{\numberline {3.10}{\ignorespaces Functional Requirement -- Multi-Layer Verification}}{23}{table.3.10}%
+\contentsline {table}{\numberline {3.11}{\ignorespaces Functional Requirement -- Manage Property Listings}}{23}{table.3.11}%
+\contentsline {table}{\numberline {3.12}{\ignorespaces Functional Requirement -- Commute-Based Search}}{23}{table.3.12}%
+\contentsline {table}{\numberline {3.13}{\ignorespaces Functional Requirement -- Booking Management}}{23}{table.3.13}%
+\contentsline {table}{\numberline {3.14}{\ignorespaces Functional Requirement -- Digital Rental Agreement}}{24}{table.3.14}%
+\contentsline {table}{\numberline {3.15}{\ignorespaces Functional Requirement -- Roommate Compatibility Matching}}{24}{table.3.15}%
+\contentsline {table}{\numberline {3.16}{\ignorespaces Functional Requirement -- Secure Messaging}}{24}{table.3.16}%
+\contentsline {table}{\numberline {3.17}{\ignorespaces Functional Requirement -- Administration and Analytics}}{24}{table.3.17}%
+\contentsline {table}{\numberline {3.18}{\ignorespaces Requirement Traceability Matrix}}{25}{table.3.18}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Data Dictionary -- User Collection}}{38}{table.4.1}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces User Collection Structure}}{38}{table.4.2}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces Property Collection Structure}}{39}{table.4.3}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces External APIs and Services Used}}{43}{table.5.1}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {6.1}{\ignorespaces Unit Test Cases – Authentication}}{46}{table.6.1}%
+\contentsline {table}{\numberline {6.2}{\ignorespaces Unit Test Cases – Roommate Matching}}{47}{table.6.2}%
+\contentsline {table}{\numberline {6.3}{\ignorespaces Integration Testing Summary}}{47}{table.6.3}%
+\contentsline {table}{\numberline {6.4}{\ignorespaces Performance Metrics}}{48}{table.6.4}%
+\contentsline {table}{\numberline {6.5}{\ignorespaces User Feedback Summary}}{48}{table.6.5}%
+\addvspace {10\p@ }

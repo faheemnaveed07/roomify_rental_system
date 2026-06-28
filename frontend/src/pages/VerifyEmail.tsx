@@ -69,7 +69,7 @@ const VerifyEmailPage: React.FC = () => {
                     to="/auth"
                     className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-xl text-sm transition-colors"
                 >
-                    Sign In to Roomify
+                    Sign In to Domavi
                 </Link>
             </motion.div>
         ),
@@ -119,7 +119,7 @@ const VerifyEmailPage: React.FC = () => {
                 className="relative z-10 w-full max-w-md"
             >
                 <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-200/60 p-10 text-center">
-                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-600 mb-8">Roomify</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-blue-600 mb-8">Domavi</p>
                     <AnimatePresence mode="wait">{content[state]}</AnimatePresence>
                 </div>
             </motion.div>

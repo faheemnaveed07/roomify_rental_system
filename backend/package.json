@@ -1,7 +1,7 @@
 {
-  "name": "roomify-backend",
+  "name": "domavi-backend",
   "version": "1.0.0",
-  "description": "Roomify Rental System Backend API",
+  "description": "Domavi Rental System Backend API",
   "main": "dist/src/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
@@ -67,12 +67,12 @@
     "node": ">=18.0.0"
   },
   "keywords": [
-    "roomify",
+    "domavi",
     "rental",
     "property",
     "roommate",
     "pakistan"
   ],
-  "author": "Roomify Team",
+  "author": "Domavi Team",
   "license": "MIT"
 }

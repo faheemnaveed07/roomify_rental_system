@@ -350,7 +350,7 @@ const HomePage: React.FC = () => {
                         <p className="text-xs font-bold uppercase tracking-widest text-primary-600 mb-3">Simple process</p>
                         <h2 className="text-4xl font-black text-slate-900 mb-4">Move in, in 3 steps</h2>
                         <p className="text-slate-500 max-w-md mx-auto">
-                            We've removed every friction point. From finding to signing — everything happens on Roomify.
+                            We've removed every friction point. From finding to signing — everything happens on Domavi.
                         </p>
                     </motion.div>
 
@@ -370,7 +370,7 @@ const HomePage: React.FC = () => {
                             <Step
                                 n="2"
                                 title="Book & sign digitally"
-                                description="Request a booking, chat with the landlord, and sign your rental agreement — all inside Roomify."
+                                description="Request a booking, chat with the landlord, and sign your rental agreement — all inside Domavi."
                             />
                             <Step
                                 n="3"
@@ -440,7 +440,7 @@ const HomePage: React.FC = () => {
                         viewport={{ once: true, margin: '-60px' }}
                         variants={fadeUp}
                     >
-                        <p className="text-xs font-bold uppercase tracking-widest text-primary-600 mb-3">Why Roomify</p>
+                        <p className="text-xs font-bold uppercase tracking-widest text-primary-600 mb-3">Why Domavi</p>
                         <h2 className="text-4xl font-black text-slate-900 mb-4">Built for modern renters</h2>
                         <p className="text-slate-500 max-w-md mx-auto">
                             Every feature crafted to make your rental journey smooth, safe, and stress-free.
@@ -551,12 +551,12 @@ const HomePage: React.FC = () => {
                         variants={stagger}
                     >
                         <Testimonial
-                            quote="Roomify helped me lock in a verified home within 24 hours of creating my profile. The booking process was seamless."
+                            quote="Domavi helped me lock in a verified home within 24 hours of creating my profile. The booking process was seamless."
                             name="Ayesha K."
                             role="Tenant · Gulgasht, Multan"
                         />
                         <Testimonial
-                            quote="As a landlord, I've filled all three of my properties through Roomify. The tenant quality is excellent and communication is built-in."
+                            quote="As a landlord, I've filled all three of my properties through Domavi. The tenant quality is excellent and communication is built-in."
                             name="Usman T."
                             role="Landlord · 3 properties"
                         />
@@ -584,7 +584,7 @@ const HomePage: React.FC = () => {
                             Ready to find your next home?
                         </motion.h2>
                         <motion.p variants={childFade} className="text-slate-400 text-lg">
-                            Join over 1,800 tenants who found their perfect place on Roomify.
+                            Join over 1,800 tenants who found their perfect place on Domavi.
                         </motion.p>
                         <motion.div variants={childFade} className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link

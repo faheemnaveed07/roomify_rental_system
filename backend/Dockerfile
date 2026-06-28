@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────────────────────
-# Roomify Backend — production image for Hugging Face Spaces (Docker SDK)
+# Domavi Backend — production image for Hugging Face Spaces (Docker SDK)
 # Multi-stage build: compile TypeScript in a builder, ship a slim runtime.
 # The app listens on PORT 7860 (the port Hugging Face Spaces exposes).
 # ──────────────────────────────────────────────────────────────────────────

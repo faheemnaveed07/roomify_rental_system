@@ -9,7 +9,7 @@
 // const services = ['AuthService', 'BookingService', 'PropertyService', 'RoommateMatcher', 'VerificationService'];
 // const serviceDir = path.join(__dirname, '../src/services');
 
-// console.log('📊 Roomify Service Progress Check\n');
+// console.log('📊 Domavi Service Progress Check\n');
 
 // services.forEach(serviceName => {
 //   const filePath = path.join(serviceDir, `${serviceName}.ts`);

@@ -1,5 +1,5 @@
 /**
- * Roomify Typography System
+ * Domavi Typography System
  * Primary: Inter (sans-serif)
  * Display: Playfair Display (serif)
  */

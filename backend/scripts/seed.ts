@@ -1,5 +1,5 @@
 /**
- * Roomify — Demo Data Seed Script
+ * Domavi — Demo Data Seed Script
  *
  * Run:
  *   npx ts-node -r tsconfig-paths/register scripts/seed.ts
@@ -269,7 +269,7 @@ const TENANTS = [
 
 // Admin demo account
 const ADMIN = {
-    firstName: 'Roomify',
+    firstName: 'Domavi',
     lastName: 'Admin',
     email: 'admin@demo.com',
     phone: '03001112233',

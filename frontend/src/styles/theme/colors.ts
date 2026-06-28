@@ -1,5 +1,5 @@
 /**
- * Roomify Color Palette
+ * Domavi Color Palette
  * Primary: #2563EB (Blue)
  * Secondary: #F59E0B (Amber)
  */

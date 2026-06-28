@@ -1,5 +1,5 @@
 /**
- * Roomify Responsive Breakpoints
+ * Domavi Responsive Breakpoints
  */
 
 export const breakpoints = {

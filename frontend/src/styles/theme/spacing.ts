@@ -1,5 +1,5 @@
 /**
- * Roomify Spacing System
+ * Domavi Spacing System
  * Based on 8pt grid system
  */
 

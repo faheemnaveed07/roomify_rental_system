@@ -1,7 +1,7 @@
 {
-    "name": "roomify-frontend",
+    "name": "domavi-frontend",
     "version": "1.0.0",
-    "description": "Roomify Rental System Frontend",
+    "description": "Domavi Rental System Frontend",
     "type": "module",
     "scripts": {
         "dev": "vite",

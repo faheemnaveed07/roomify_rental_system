@@ -1,0 +1,37 @@
+% ============================================
+% Chapter 7 – Conclusion and Future Work
+% ============================================
+
+\chapter{Conclusion and Future Work}
+
+% -------------------------------------------------
+% 7.1 Conclusion
+% -------------------------------------------------
+
+\section{Conclusion}
+
+This project set out to address a clear and pressing gap in the housing market: the difficulty that students and young professionals in Pakistan face when searching for affordable shared accommodation and compatible roommates. The existing rental ecosystem, dominated by informal brokers, unverified listings, and a complete absence of structured roommate matching, imposes high cost, fraud risk, wasted time, and avoidable interpersonal conflict on a large and growing population. No existing platform, whether a general classified site, a property portal, an international roommate service, or an informal social media group, adequately serves the micro-rental segment.
+
+In response, this project designed and implemented \textbf{Domavi}, a web-based micro-rental and roommate matching platform that unifies several capabilities within a single ecosystem. The platform provides a dedicated marketplace for single rooms, bed spaces, and hostels; an intelligent roommate matching engine that ranks potential roommates using a weighted, multi-factor compatibility score; a multi-layer trust and verification system covering email, CNIC, and property ownership; commute-based geospatial search powered by the Google Maps API; and end-to-end automation through secure messaging, structured bookings, payment recording, and auto-generated digital rental agreements. The system was built on the MERN stack with TypeScript, following a layered, role-based architecture supporting tenants, landlords, and administrators.
+
+The key achievements of the project include a fully functional platform spanning ten interconnected data collections and a complete REST API, a working weighted compatibility algorithm that replaces the roommate ``gamble'' with data-driven matching, and a verification workflow that meaningfully addresses the trust problem. The system was validated through unit, integration, system, performance, security, and user acceptance testing, all of which confirmed that it satisfies its functional and non-functional requirements and performs responsively under normal conditions.
+
+Overall, Domavi makes a tangible contribution by bringing structure, transparency, and safety to a previously informal process. It demonstrates that a focused, verification-driven, compatibility-aware platform can deliver real social value to an underserved market while remaining technically sound and commercially viable, fulfilling the objectives established at the outset of this Final Year Project.
+
+% -------------------------------------------------
+% 7.2 Future Work
+% -------------------------------------------------
+
+\section{Future Work}
+
+While Domavi delivers a complete and working platform, several enhancements are envisioned for future development. The most immediate is the development of native Android and iOS mobile applications to complement the responsive web client and reach users on the devices they use most. A second priority is the integration of a live payment gateway, including local options such as JazzCash and Easypaisa, to enable real-time, in-app transactions rather than recorded bank transfers.
+
+The roommate matching engine offers significant scope for advancement. Future versions could incorporate machine learning to learn from successful matches and user feedback, refining the compatibility weights and similarity functions over time to improve match quality. The verification process could be partially automated through document scanning and identity-verification services, reducing the administrative burden and accelerating onboarding. Additional features such as in-app review and rating systems for tenants and landlords, real-time push notifications, multilingual support, and an analytics dashboard for landlords would further enrich the platform. Finally, scalability enhancements such as database sharding, caching layers, and load balancing would prepare the platform for nationwide growth, while continued security hardening would maintain user trust as the user base expands.
+
+% -------------------------------------------------
+% 7.3 Limitations
+% -------------------------------------------------
+
+\section{Limitations}
+
+The current version of Domavi has a number of limitations. As a web-only platform, it requires an active internet connection and does not offer native mobile applications or offline functionality. The verification of CNIC and ownership documents relies on manual administrator review, which, while ensuring trust, limits the speed of fully automated onboarding. Payment handling in the initial release is based on recording and confirming bank-transfer details rather than processing live transactions through an integrated gateway. The roommate matching algorithm uses fixed category weights rather than weights learned from data, and the platform's initial coverage is focused on selected cities and university areas rather than nationwide. Finally, as an academic project developed by a two-member team within a fixed timeline, certain advanced features were intentionally scoped for future work, as described above.

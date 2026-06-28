@@ -33,7 +33,7 @@ const getTransporter = (): Transporter => {
 export const sendEmail = async (options: EmailOptions): Promise<boolean> => {
   try {
     const mailOptions: SendMailOptions = {
-      from: `"Roomify" <${env.EMAIL_FROM}>`,
+      from: `"Domavi" <${env.EMAIL_FROM}>`,
       to: options.to,
       subject: options.subject,
       html: options.html,
@@ -73,12 +73,12 @@ export const sendVerificationEmail = async (
     <body>
       <div class="container">
         <div class="header">
-          <div class="logo">Roomify</div>
+          <div class="logo">Domavi</div>
         </div>
         <div class="content">
           <h2>Verify Your Email</h2>
           <p>Hi ${name},</p>
-          <p>Welcome to Roomify! Please verify your email address to complete your registration.</p>
+          <p>Welcome to Domavi! Please verify your email address to complete your registration.</p>
           <p style="text-align: center; margin: 30px 0;">
             <a href="${verificationUrl}" class="button">Verify Email</a>
           </p>
@@ -87,7 +87,7 @@ export const sendVerificationEmail = async (
           <p>This link will expire in 24 hours.</p>
         </div>
         <div class="footer">
-          <p>© ${new Date().getFullYear()} Roomify. All rights reserved.</p>
+          <p>© ${new Date().getFullYear()} Domavi. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -96,7 +96,7 @@ export const sendVerificationEmail = async (
 
   return sendEmail({
     to: email,
-    subject: 'Verify Your Roomify Account',
+    subject: 'Verify Your Domavi Account',
     html,
     text: `Hi ${name}, Please verify your email by visiting: ${verificationUrl}`,
   });
@@ -126,7 +126,7 @@ export const sendPasswordResetEmail = async (
     <body>
       <div class="container">
         <div class="header">
-          <div class="logo">Roomify</div>
+          <div class="logo">Domavi</div>
         </div>
         <div class="content">
           <h2>Reset Your Password</h2>
@@ -139,7 +139,7 @@ export const sendPasswordResetEmail = async (
           <p>This link will expire in 1 hour.</p>
         </div>
         <div class="footer">
-          <p>© ${new Date().getFullYear()} Roomify. All rights reserved.</p>
+          <p>© ${new Date().getFullYear()} Domavi. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -148,7 +148,7 @@ export const sendPasswordResetEmail = async (
 
   return sendEmail({
     to: email,
-    subject: 'Reset Your Roomify Password',
+    subject: 'Reset Your Domavi Password',
     html,
     text: `Hi ${name}, Reset your password by visiting: ${resetUrl}`,
   });
@@ -182,7 +182,7 @@ export const sendVerificationStatusEmail = async (
     <body>
       <div class="container">
         <div class="header">
-          <div class="logo">Roomify</div>
+          <div class="logo">Domavi</div>
         </div>
         <div class="content">
           <h2>Document Verification Update</h2>
@@ -195,7 +195,7 @@ export const sendVerificationStatusEmail = async (
           ${!isApproved ? '<p>Please upload a new document and try again.</p>' : '<p>Your account verification is now complete!</p>'}
         </div>
         <div class="footer">
-          <p>© ${new Date().getFullYear()} Roomify. All rights reserved.</p>
+          <p>© ${new Date().getFullYear()} Domavi. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -204,7 +204,7 @@ export const sendVerificationStatusEmail = async (
 
   return sendEmail({
     to: email,
-    subject: `Document ${statusText} - Roomify`,
+    subject: `Document ${statusText} - Domavi`,
     html,
     text: `Hi ${name}, Your ${documentType} has been ${status}. ${reason || ''}`,
   });
@@ -251,7 +251,7 @@ export const sendBookingNotificationEmail = async (
     <body>
       <div class="container">
         <div class="header">
-          <div class="logo">Roomify</div>
+          <div class="logo">Domavi</div>
         </div>
         <div class="content">
           <h2>${subject}</h2>
@@ -263,7 +263,7 @@ export const sendBookingNotificationEmail = async (
           </p>
         </div>
         <div class="footer">
-          <p>© ${new Date().getFullYear()} Roomify. All rights reserved.</p>
+          <p>© ${new Date().getFullYear()} Domavi. All rights reserved.</p>
         </div>
       </div>
     </body>
@@ -272,7 +272,7 @@ export const sendBookingNotificationEmail = async (
 
   return sendEmail({
     to: email,
-    subject: `${subject} - Roomify`,
+    subject: `${subject} - Domavi`,
     html,
     text: `Hi ${name}, ${text} ${message || ''}`,
   });

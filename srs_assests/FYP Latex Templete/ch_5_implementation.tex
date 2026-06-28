@@ -1,0 +1,202 @@
+% ============================================
+% Chapter 5 – Implementation
+% ============================================
+
+\chapter{Implementation}
+
+This chapter describes the practical implementation of the Domavi platform. It explains how the design presented in Chapter~4 was translated into working modules, algorithms, user interfaces, and integrated services using the MERN technology stack.
+
+% -------------------------------------------------
+% 5.1 Development Environment
+% -------------------------------------------------
+
+\section{Development Environment}
+
+The platform was developed using a modern JavaScript and TypeScript toolchain. The development environment is summarised below.
+
+\begin{itemize}
+    \item \textbf{IDE / Editor:} Visual Studio Code with ESLint and Prettier for linting and formatting.
+    \item \textbf{Languages:} TypeScript across both the frontend and backend, with HTML and CSS in the presentation layer.
+    \item \textbf{Frontend Framework:} React with the Vite build tool, Tailwind CSS for styling, and Zustand for state management.
+    \item \textbf{Backend Framework:} Node.js with Express.js, organised into routes, controllers, services, and middleware.
+    \item \textbf{Database:} MongoDB with the Mongoose object data modelling library.
+    \item \textbf{Version Control:} Git with a GitHub repository for collaboration between the two team members.
+    \item \textbf{Operating System:} Cross-platform development on Windows and macOS.
+    \item \textbf{Hardware:} Standard development laptops with 8--16 GB RAM; no specialised GPU is required.
+\end{itemize}
+
+% -------------------------------------------------
+% 5.2 Core Module Implementation
+% -------------------------------------------------
+
+\section{Core Module Implementation}
+
+Each major module of Domavi was implemented as a cohesive set of routes, a controller, and a service class on the backend, with corresponding pages and components on the frontend.
+
+\subsection{Module 1: Authentication and Verification}
+
+This module implements registration, login, email verification, and password reset. The authentication service hashes passwords with bcrypt, issues JSON Web Tokens on successful login, and exposes middleware that validates tokens and enforces role-based access control. The verification service manages the upload of CNIC and ownership documents to cloud storage and records verification requests for administrative review.
+
+\subsection{Module 2: Property Listing and Search}
+
+The property service handles the creation, update, retrieval, and removal of listings. Each property stores its location as a GeoJSON point, and a 2dsphere index enables commute-based proximity queries. The search functionality combines geospatial filtering with attribute filters for price, room type, and gender preference, returning only active and verified listings to tenants.
+
+\subsection{Module 3: Booking, Payment, and Agreement}
+
+The booking service manages the lifecycle of a booking from pending request to acceptance, confirmation, and completion. The payment service records payment details and bank information and updates the payment status upon administrative confirmation. Once a booking is confirmed, the agreement service generates a digital rental agreement as a PDF and stores its reference against the booking.
+
+\subsection{Module 4: Roommate Matching}
+
+The roommate matching module is implemented in a dedicated matcher service that computes a weighted compatibility score between roommate profiles. Profiles capture lifestyle, preferences, budget, location, and schedule attributes. The service computes a score per category, applies category weights, aggregates them into an overall score, caches results to avoid recomputation, and returns a ranked list of top matches.
+
+\subsection{Module 5: Messaging and Administration}
+
+The chat service manages conversations and messages between tenants and landlords. The administration module provides endpoints for reviewing verification requests, managing user accounts and status, overseeing payments, and retrieving analytics, all protected by an admin-only access guard.
+
+% -------------------------------------------------
+% 5.3 Algorithm Implementation
+% -------------------------------------------------
+
+\section{Algorithm Implementation}
+
+The most significant algorithm in Domavi is the roommate compatibility matching algorithm. It quantifies how well two users would live together by comparing their lifestyle profiles across five weighted categories and producing an overall compatibility score on a scale of 0 to 100.
+
+\subsection{Algorithm: Weighted Roommate Compatibility Scoring}
+
+\textbf{Input:} Two roommate profiles, $P_1$ and $P_2$ \\
+\textbf{Output:} Overall compatibility score $S \in [0, 100]$
+
+The algorithm evaluates five categories with the following default weights: lifestyle (0.25), preferences (0.25), budget (0.20), location (0.15), and schedule (0.15). For each category it computes a normalised similarity score between the two profiles, multiplies it by the category weight, and sums the weighted scores to obtain the overall result. To find matches for a given user, the algorithm computes this score against all candidate profiles and returns the highest-scoring candidates.
+
+\textbf{Step-by-Step Working:}
+
+\begin{enumerate}
+    \item Retrieve the requesting user's roommate profile.
+    \item For each candidate profile:
+    \begin{itemize}
+        \item Compute the lifestyle similarity score.
+        \item Compute the preferences similarity score.
+        \item Compute the budget similarity score.
+        \item Compute the location similarity score.
+        \item Compute the schedule similarity score.
+        \item Multiply each category score by its weight and sum to obtain the overall score.
+        \item Cache the overall score for reuse.
+    \end{itemize}
+    \item Sort candidates in descending order of overall score.
+    \item Return the top N candidates as matches.
+\end{enumerate}
+
+\textbf{Pseudo Code:}
+
+\begin{verbatim}
+Algorithm RoommateMatch(P_user, Candidates, Weights):
+1. matches = []
+2. For each C in Candidates:
+      lifestyle  = similarity(P_user.lifestyle,   C.lifestyle)
+      prefs      = similarity(P_user.preferences, C.preferences)
+      budget     = similarity(P_user.budget,      C.budget)
+      location   = similarity(P_user.location,    C.location)
+      schedule   = similarity(P_user.schedule,    C.schedule)
+      score = lifestyle*0.25 + prefs*0.25 + budget*0.20
+              + location*0.15 + schedule*0.15
+      matches.add({ candidate: C, score: round(score) })
+3. Sort matches by score descending
+4. Return top N matches
+\end{verbatim}
+
+\textbf{Explanation:} The weighted approach allows the most behaviourally significant factors, lifestyle and preferences, to influence the result most strongly, while still accounting for budget, location, and schedule. Caching previously computed scores reduces repeated computation when the same pair is evaluated again. The algorithm integrates with the backend and is triggered when a tenant opens the roommate matches page.
+
+% -------------------------------------------------
+% 5.4 External APIs / SDKs
+% -------------------------------------------------
+
+\section{External APIs / SDKs}
+
+Domavi integrates several third-party services to deliver its features.
+
+\begin{table}[h]
+\centering
+\caption{External APIs and Services Used}
+\begin{tabularx}{\textwidth}{|p{3.2cm}|X|p{3.5cm}|}
+\hline
+\textbf{API / Service} & \textbf{Purpose} & \textbf{Used In Module} \\
+\hline
+Google Maps API & Geocoding of addresses, proximity-based search, and map display with location pins. & Property Search \\
+\hline
+Cloud Media Storage & Secure storage and delivery of property images and verification documents. & Property, Verification \\
+\hline
+SMTP Email Service & Email verification and event notifications. & Authentication, Notifications \\
+\hline
+\end{tabularx}
+\end{table}
+
+% -------------------------------------------------
+% 5.5 User Interface Implementation
+% -------------------------------------------------
+
+\section{User Interface Implementation}
+
+This section presents the major user interface screens of Domavi. Each screen is described in terms of its purpose, components, interaction flow, backend integration, and validation. Students should include screenshots of each major screen in the final report.
+
+\subsection{UI Design Approach}
+
+The Domavi interface follows a clean, minimalistic design built with Tailwind CSS and a component library organised using the atomic design methodology, in which small atoms (buttons, inputs, badges) compose into molecules (property cards, search bars, filter chips) and organisms (complete sections). A consistent colour scheme, typography, and spacing scale are defined as design tokens to ensure visual consistency. The layout follows a mobile-first, responsive strategy so that the application adapts smoothly from mobile to desktop, and accessibility considerations such as readable font sizes and clear focus states are applied throughout.
+
+\subsection{Screen-wise Implementation}
+
+\subsubsection{Screen 1: Authentication Screen}
+
+\textbf{Purpose:} Allows tenants and landlords to register and log in. \\
+\textbf{Components:} Email field, password field, role selector, login and sign-up buttons, and a forgot-password link. \\
+\textbf{Functional Flow:} On submission, the client validates the inputs and calls the authentication API; on success a token is stored and the user is redirected to their role-specific dashboard. \\
+\textbf{Backend Integration:} Calls the authentication endpoints; the server validates credentials and returns a JWT. \\
+\textbf{Validation:} Required-field, email-format, and password-strength validation with clear inline error messages.
+
+\subsubsection{Screen 2: Search and Listings Screen}
+
+\textbf{Purpose:} Enables tenants to discover accommodation near a chosen location. \\
+\textbf{Components:} Location input, filter controls (price, type, gender preference), a results list of property cards, and an interactive map. \\
+\textbf{Functional Flow:} Entering a location triggers a geospatial search; results update in both the list and the map. \\
+\textbf{Backend Integration:} Calls the property search endpoint with location and filter parameters. \\
+\textbf{Validation:} Graceful empty-state handling when no listings match.
+
+\subsubsection{Screen 3: Add Property Screen}
+
+\textbf{Purpose:} Allows verified landlords to create a new listing. \\
+\textbf{Components:} Form fields for title, description, type, price, amenities, location picker, and image upload. \\
+\textbf{Functional Flow:} The landlord completes the form and submits; the listing is created with pending-verification status. \\
+\textbf{Backend Integration:} Calls the property creation endpoint and uploads images to cloud storage. \\
+\textbf{Validation:} Required fields, valid price, and at least one image.
+
+\subsubsection{Screen 4: Roommate Matches Screen}
+
+\textbf{Purpose:} Displays a ranked list of compatible roommates. \\
+\textbf{Components:} Compatibility cards showing the candidate and their match score. \\
+\textbf{Functional Flow:} On load, the system computes and displays the top matches for the user's profile. \\
+\textbf{Backend Integration:} Calls the matching endpoint. \\
+\textbf{Security Considerations:} Only accessible to authenticated tenants with a completed profile.
+
+\subsubsection{Screen 5: Admin Dashboard Screen}
+
+\textbf{Purpose:} Provides administrators with oversight of the platform. \\
+\textbf{Components:} Navigation, summary data cards, verification queue, user management table, payment oversight, and analytics charts. \\
+\textbf{Functional Flow:} Data loads dynamically from administrative endpoints. \\
+\textbf{Backend Integration:} Calls admin-only endpoints. \\
+\textbf{Security Considerations:} Protected by role-based access control restricting access to administrators.
+
+\subsection{Navigation Flow Diagram}
+
+A navigation flow diagram should be included to show how the major screens, the authentication, search, property detail, booking, payments, messages, roommate matches, and admin screens, are connected and how users move between them according to their role. \textit{(Insert the finalised navigation flow diagram in the final report.)}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Chapter Summary}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+This chapter described the implementation of the Domavi platform using the MERN
+stack and TypeScript. It outlined the development environment, detailed the
+implementation of each core module, and presented the weighted roommate
+compatibility algorithm together with its pseudo code. The external APIs for
+mapping, media storage, and email were documented, and the major user interface
+screens were described in terms of their purpose, components, flow, integration,
+and validation. The next chapter presents the testing and evaluation of the
+implemented system.

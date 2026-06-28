@@ -17,7 +17,7 @@ const router = Router();
 router.get('/health', (_req, res) => {
     res.json({
         success: true,
-        message: 'Roomify API is running',
+        message: 'Domavi API is running',
         timestamp: new Date().toISOString(),
     });
 });

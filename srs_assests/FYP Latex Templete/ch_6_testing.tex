@@ -1,0 +1,159 @@
+% ============================================
+% Chapter 6 – Testing and Evaluation
+% ============================================
+
+\chapter{Testing and Evaluation}
+
+This chapter presents the testing strategies and evaluation procedures used to verify the correctness, reliability, and performance of the Domavi platform. Testing ensures that all functional and non-functional requirements defined in earlier chapters are satisfied. As Domavi is a web application, the evaluation focuses on unit, integration, system, performance, security, and user acceptance testing.
+
+% -------------------------------------------------
+% 6.1 Testing Strategy
+% -------------------------------------------------
+
+\section{Testing Strategy}
+
+Domavi was tested using a combination of automated and manual approaches applied throughout the Agile development cycle. Automated unit tests were written for backend services and controllers using the Jest testing framework, allowing individual functions such as authentication, booking creation, payment recording, and compatibility scoring to be verified in isolation. Integration testing validated the interaction between the React frontend, the Express REST API, and the MongoDB database, with API endpoints exercised to confirm correct request handling, authorisation, and data persistence. System testing was performed manually by walking through complete user journeys for each role, while performance and security testing assessed responsiveness and the robustness of authentication and access control. This layered strategy, moving from the smallest units up to the full system and finally to real users, ensured that defects were caught early and that the platform met its specified requirements.
+
+% -------------------------------------------------
+% 6.2 Unit Testing
+% -------------------------------------------------
+
+\section{Unit Testing}
+
+Unit testing verified individual functions and modules independently. Each major backend service was tested with valid and invalid inputs, and the expected output and pass/fail status were recorded.
+
+\subsection{UT-01: User Registration and Login}
+
+\begin{table}[h]
+\centering
+\caption{Unit Test Cases – Authentication}
+\begin{tabularx}{\textwidth}{|c|X|X|c|}
+\hline
+\textbf{Test ID} & \textbf{Input} & \textbf{Expected Output} & \textbf{Result} \\
+\hline
+UT-01 & Valid registration details & Account created with pending status & Pass \\
+\hline
+UT-02 & Missing or invalid email & Validation error displayed & Pass \\
+\hline
+UT-03 & Correct login credentials & JWT issued and access granted & Pass \\
+\hline
+UT-04 & Incorrect password & Access denied with error & Pass \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{UT-02: Roommate Compatibility Scoring}
+
+\begin{table}[h]
+\centering
+\caption{Unit Test Cases – Roommate Matching}
+\begin{tabularx}{\textwidth}{|c|X|X|c|}
+\hline
+\textbf{Test ID} & \textbf{Input} & \textbf{Expected Output} & \textbf{Result} \\
+\hline
+UT-05 & Two identical profiles & Compatibility score near 100 & Pass \\
+\hline
+UT-06 & Two opposite profiles & Low compatibility score & Pass \\
+\hline
+UT-07 & List of candidates & Ranked matches sorted by score & Pass \\
+\hline
+\end{tabularx}
+\end{table}
+
+% -------------------------------------------------
+% 6.3 Integration Testing
+% -------------------------------------------------
+
+\section{Integration Testing}
+
+Integration testing ensured that the platform's modules interact correctly, focusing on communication between the frontend and backend, the correct handling of authenticated API requests, and reliable database persistence. Key cross-module flows such as creating a listing and then searching for it, and submitting a booking and then recording a payment, were validated end to end.
+
+\begin{table}[h]
+\centering
+\caption{Integration Testing Summary}
+\begin{tabularx}{\textwidth}{|c|X|X|c|}
+\hline
+\textbf{Test ID} & \textbf{Modules Integrated} & \textbf{Expected Result} & \textbf{Result} \\
+\hline
+IT-01 & Frontend + Backend API & Data retrieved and rendered correctly & Pass \\
+\hline
+IT-02 & Backend + Database & Records stored and retrieved correctly & Pass \\
+\hline
+IT-03 & Property + Maps API & Geospatial search returns nearby listings & Pass \\
+\hline
+IT-04 & Booking + Payment + Agreement & Confirmed booking generates agreement & Pass \\
+\hline
+\end{tabularx}
+\end{table}
+
+% -------------------------------------------------
+% 6.4 System Testing
+% -------------------------------------------------
+
+\section{System Testing}
+
+System testing validated the complete application workflow for each user role. The tenant journey, registering, searching, viewing a property, messaging a landlord, submitting a booking, making a payment, and receiving an agreement, was tested end to end, as were the landlord journey of verification, listing, and booking management, and the administrator journey of verification review, user management, and analytics. Edge cases such as searches with no results, rejected bookings, unconfirmed payments, and access attempts to unauthorised resources were tested to confirm correct error handling and graceful degradation.
+
+% -------------------------------------------------
+% 6.5 Performance Testing
+% -------------------------------------------------
+
+\section{Performance Testing}
+
+Performance testing measured the responsiveness of key operations under normal conditions. Page loads and search results were observed to render within the target of approximately three seconds, and indexed geospatial queries returned results quickly. The indicative metrics below summarise observed performance during testing.
+
+\begin{table}[h]
+\centering
+\caption{Performance Metrics}
+\begin{tabularx}{\textwidth}{|c|X|c|}
+\hline
+\textbf{Metric} & \textbf{Description} & \textbf{Value} \\
+\hline
+Response Time & Average API response time & $\approx$ 220 ms \\
+\hline
+Search Latency & Geospatial search response time & $<$ 1 s \\
+\hline
+Dashboard Load & Time to render main dashboard & $<$ 3 s \\
+\hline
+\end{tabularx}
+\end{table}
+
+% -------------------------------------------------
+% 6.6 Security Testing
+% -------------------------------------------------
+
+\section{Security Testing}
+
+Security testing focused on authentication, authorisation, and data protection. Authentication was verified by confirming that protected endpoints reject requests without a valid JWT. Authorisation was tested by confirming that role-based access control prevents tenants from accessing landlord or administrator functions and vice versa. Password storage was checked to ensure that only salted bcrypt hashes are persisted, never plaintext passwords. Input handling was tested against malformed and malicious inputs, and the use of parameterised Mongoose queries mitigates injection risks. Communication over HTTPS and restricted access to verification documents were also verified.
+
+% -------------------------------------------------
+% 6.7 User Acceptance Testing (UAT)
+% -------------------------------------------------
+
+\section{User Acceptance Testing}
+
+User acceptance testing was conducted with a small group of representative users, primarily students, who performed realistic tasks such as searching for a room, viewing roommate matches, and submitting a booking request. Feedback was generally positive, confirming that the platform addresses a real need, and the suggestions gathered were used to refine the interface and performance.
+
+\begin{table}[h]
+\centering
+\caption{User Feedback Summary}
+\begin{tabularx}{\textwidth}{|X|X|}
+\hline
+\textbf{Feedback} & \textbf{Action Taken} \\
+\hline
+Navigation could be simpler & Navigation and menus simplified \\
+\hline
+Search felt slightly slow on first load & Queries and indexes optimised \\
+\hline
+Wanted clearer match explanations & Compatibility scores made more visible \\
+\hline
+\end{tabularx}
+\end{table}
+
+% -------------------------------------------------
+% 6.8 Testing Summary
+% -------------------------------------------------
+
+\section{Testing Summary}
+
+A comprehensive set of test cases was executed across unit, integration, system, performance, security, and acceptance testing. The unit and integration test cases passed, confirming that individual functions and module interactions behave as specified. System testing validated complete user journeys for all roles, performance testing showed responsive behaviour within target thresholds, and security testing confirmed that authentication, authorisation, and data protection mechanisms function correctly. User acceptance testing validated that the platform meets real user needs. On the basis of these results, the Domavi platform is considered to satisfy its functional and non-functional requirements and to be ready for demonstration and deployment.

@@ -725,7 +725,7 @@
   border: none;
 }
 
-/* Tighter popup styling to match Roomify card aesthetic */
+/* Tighter popup styling to match Domavi card aesthetic */
 .leaflet-popup-content-wrapper {
   border-radius: 12px;
   padding: 0;

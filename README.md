@@ -1,4 +1,4 @@
-# Roomify Rental System
+# Domavi Rental System
 
 A MERN stack rental property and roommate matching platform for Pakistan.
 

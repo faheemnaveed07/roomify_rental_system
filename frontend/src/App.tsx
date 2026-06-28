@@ -39,7 +39,7 @@ const PublicLayout: React.FC = () => (
         <footer className="bg-neutral-900 text-neutral-400 py-12 mt-20">
             <div className="container grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div>
-                    <h3 className="text-white font-bold text-xl mb-4">Roomify</h3>
+                    <h3 className="text-white font-bold text-xl mb-4">Domavi</h3>
                     <p className="max-w-xs">Simplifying rental search and verification for Pakistan's growing urban population.</p>
                 </div>
                 <div>
@@ -52,12 +52,12 @@ const PublicLayout: React.FC = () => (
                 </div>
                 <div>
                     <h4 className="text-white font-semibold mb-4">Contact</h4>
-                    <p>support@roomify.pk</p>
+                    <p>support@domavi.pk</p>
                     <p>Multan, Pakistan</p>
                 </div>
             </div>
             <div className="container border-t border-neutral-800 mt-12 pt-8 text-center text-sm">
-                © 2026 Roomify Rental System. Built with ❤️ for Multan.
+                © 2026 Domavi Rental System. Built with ❤️ for Multan.
             </div>
         </footer>
     </div>

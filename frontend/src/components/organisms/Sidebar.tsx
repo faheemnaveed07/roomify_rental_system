@@ -44,7 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             <div className="flex items-center justify-between h-16 px-5 border-b border-slate-100">
                 <Link to="/" className="flex items-center gap-2.5 font-black text-slate-900">
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white text-sm font-black shadow-md shadow-primary-200">R</span>
-                    <span className="text-base tracking-tight">Roomify</span>
+                    <span className="text-base tracking-tight">Domavi</span>
                 </Link>
                 <button type="button" aria-label="Close sidebar" onClick={onToggle}
                     className="lg:hidden text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors">

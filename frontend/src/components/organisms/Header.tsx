@@ -130,7 +130,7 @@ const Header: React.FC = () => {
                     >
                         R
                     </motion.span>
-                    <span className="text-base tracking-tight">Roomify</span>
+                    <span className="text-base tracking-tight">Domavi</span>
                 </Link>
 
                 {/* Role-based nav links */}

@@ -17,7 +17,7 @@ const createLogger = (): Logger => {
             errors({ stack: true }),
             logFormat
         ),
-        defaultMeta: { service: 'roomify-api' },
+        defaultMeta: { service: 'domavi-api' },
         transports: [
             // Console transport
             new transports.Console({

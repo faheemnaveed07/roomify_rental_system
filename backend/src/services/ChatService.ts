@@ -78,10 +78,10 @@ const scheduleOfflineEmailNotification = async (
             const safePreview = messagePreview.slice(0, 120);
             await sendEmail({
                 to: receiver.email,
-                subject: 'New message on Roomify',
+                subject: 'New message on Domavi',
                 html: `
                     <p>Hi ${receiver.firstName || 'there'},</p>
-                    <p>You received a new message from ${senderName} on Roomify:</p>
+                    <p>You received a new message from ${senderName} on Domavi:</p>
                     <blockquote>${safePreview}</blockquote>
                     <p>Open your Messages page to reply.</p>
                 `,

@@ -141,7 +141,7 @@ const AuthPage: React.FC = () => {
                     <div className="hidden lg:flex flex-col space-y-8">
                         <div>
                             <p className="text-xs font-bold uppercase tracking-[0.35em] text-blue-600 mb-3">
-                                Roomify Access
+                                Domavi Access
                             </p>
                             <h1 className="text-5xl font-extrabold text-slate-900 leading-tight">
                                 A smarter way to{' '}

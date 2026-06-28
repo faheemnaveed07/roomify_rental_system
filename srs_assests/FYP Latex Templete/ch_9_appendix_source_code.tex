@@ -1,0 +1,70 @@
+% ======================================
+% Appendix C – Source Code
+% ======================================
+
+The complete source code of the Domavi platform is maintained in a version-controlled Git repository. The repository contains the full frontend and backend implementation, shared type definitions, configuration templates, and setup instructions.
+
+\vspace{0.4cm}
+
+\noindent
+\textbf{Repository Link:}
+
+\begin{center}
+\textbf{\url{https://github.com/faheemnaveed07/roomify_rental_system}}
+\end{center}
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{Default Branch:} \texttt{main}
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{Repository Structure:}
+
+\begin{verbatim}
+roomify_rental_system/
+|-- backend/              # Express + TypeScript REST API
+|   |-- src/
+|   |   |-- config/       # Database, storage, and service configs
+|   |   |-- controllers/  # Route handlers
+|   |   |-- middleware/    # Auth, RBAC, error handling
+|   |   |-- models/        # Mongoose schemas
+|   |   |-- routes/        # API route definitions
+|   |   |-- services/      # Business logic (Auth, Booking, Matching, ...)
+|   |   |-- types/         # TypeScript interfaces
+|   |   `-- utils/         # Logger, email, validators
+|   `-- package.json
+|
+|-- frontend/             # React + Vite + TypeScript client
+|   |-- src/
+|   |   |-- components/    # Atomic design components
+|   |   |-- pages/         # Route pages
+|   |   |-- hooks/         # Custom React hooks
+|   |   |-- services/      # API clients
+|   |   |-- store/         # Zustand state management
+|   |   `-- styles/        # Design system tokens
+|   `-- package.json
+|
+|-- shared/               # Shared TypeScript types
+`-- README.md             # Setup and installation instructions
+\end{verbatim}
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{Technology Stack:} MERN (MongoDB, Express.js, React, Node.js) with TypeScript across the client and server.
+
+\vspace{0.5cm}
+
+\noindent
+\textbf{Setup and Configuration Notes:}
+
+\begin{itemize}
+    \item The repository includes a \texttt{README.md} with complete installation and run instructions for both the backend and frontend.
+    \item Environment variables are configured via \texttt{.env} files (templates provided as \texttt{.env.example}).
+    \item The following third-party services require API keys / credentials: MongoDB connection string, JWT secret, Google Maps API key, cloud media storage credentials, and an SMTP email service.
+    \item No GPU or specialised hardware is required; the project runs on standard development machines.
+    \item If the repository is private, it must be made public before final submission.
+\end{itemize}

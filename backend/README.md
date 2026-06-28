@@ -1,5 +1,5 @@
 ---
-title: Roomify Backend API
+title: Domavi Backend API
 emoji: 🏠
 colorFrom: blue
 colorTo: indigo
@@ -8,7 +8,7 @@ app_port: 7860
 pinned: false
 ---
 
-# Roomify Rental System — Backend API
+# Domavi Rental System — Backend API
 
 Express + TypeScript + MongoDB API with Socket.IO real-time notifications,
 role-based access control, and Cloudinary/S3 file uploads.
