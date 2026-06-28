@@ -295,33 +295,18 @@ const HomePage: React.FC = () => {
                 <div className="scan-line" />
 
                 <div className="relative z-10 h-full max-w-[1600px] mx-auto px-6 lg:px-10 flex flex-col justify-end pb-20 pt-32">
-                    {/* Top-right live + verified chip */}
-                    <div className="absolute top-32 right-6 lg:right-10 flex items-center gap-6 z-20">
-                        <div className="hidden md:flex items-center gap-3 font-mono text-[11px] text-[var(--fg-dim)]">
-                            <span className="rec-dot w-2 h-2 bg-[var(--verify)] rounded-full" />
-                            <span className="tracking-[0.2em]">LIVE · VERIFIED</span>
-                        </div>
-                        <div className="flex items-center gap-2 px-4 py-2.5 border border-white/20 bg-black/40 backdrop-blur-sm">
-                            <VerifiedBadge className="w-4 h-4" />
-                            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-[var(--verify-bright)]">CNIC Verified</span>
-                        </div>
-                    </div>
-
                     {/* Headline */}
                     <div className="reveal in-view max-w-5xl">
-                        <div className="section-marker mb-6">
-                            <span>MULTAN · BZU · PAKISTAN</span>
-                        </div>
                         <h1 className="font-display text-[13vw] md:text-[9.5vw] lg:text-[8vw] leading-[0.85] mb-8 text-[var(--fg)]">
                             <span className="headline-line">
                                 <span>A HOME YOU</span>
                             </span>
                             <span className="headline-line">
-                                <span className="text-stroke">CAN TRUST.</span>
+                                <span className="text-stroke">CAN TRUST</span>
                             </span>
                             <span className="headline-line">
                                 <span>
-                                    PEOPLE YOU'LL <span className="text-[var(--accent)]">CLICK</span> WITH.
+                                    PEOPLE YOU'LL <span className="text-[var(--accent)]">CLICK</span> WITH
                                 </span>
                             </span>
                         </h1>
@@ -418,15 +403,6 @@ const HomePage: React.FC = () => {
                                 <div className="font-heading text-sm text-[var(--fg)] tracking-wider">2,340 CNIC-verified</div>
                             </div>
                         </div>
-                        <div className="flex items-center gap-6 max-w-md w-full lg:w-auto">
-                            <div className="font-mono text-[10px] text-[var(--muted)] tracking-[0.2em]">
-                                {String(reel + 1).padStart(2, '0')} / {String(REEL.length).padStart(2, '0')}
-                            </div>
-                            <div className="flex-1 progress-bar min-w-[120px]">
-                                <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
-                            </div>
-                            <div className="font-mono text-[10px] text-[var(--accent)] tracking-[0.2em]">HOME REEL</div>
-                        </div>
                     </div>
                 </div>
 
@@ -436,13 +412,9 @@ const HomePage: React.FC = () => {
                         {Array.from({ length: 2 }).map((_, dup) => (
                             <React.Fragment key={dup}>
                                 {['CNIC VERIFIED', 'NO MORE SCAMS', 'TRUST FIRST', 'ROOMMATE MATCHING', 'SECURE AGREEMENTS', 'DEPOSIT PROTECTION'].map((t) => (
-                                    <React.Fragment key={t + dup}>
-                                        <span className="px-8">{t}</span>
-                                        <span className="text-[var(--accent)]">/</span>
-                                    </React.Fragment>
+                                    <span key={t + dup} className="px-8">{t}</span>
                                 ))}
                                 <span className="px-8 font-urdu">گھر dil se</span>
-                                <span className="text-[var(--accent)]">/</span>
                             </React.Fragment>
                         ))}
                     </div>
@@ -476,14 +448,14 @@ const HomePage: React.FC = () => {
                     <div className="reveal grid lg:grid-cols-12 gap-8 mb-20">
                         <div className="lg:col-span-6">
                             <div className="section-marker mb-6">
-                                <span>01 — Verification</span>
+                                <span>01 Verification</span>
                             </div>
                             <h2 className="font-display text-6xl md:text-7xl lg:text-8xl leading-[0.9] text-[var(--fg)]">
-                                Real verification.
+                                Real verification
                                 <br />
-                                <span className="text-stroke">Not just a label.</span>
+                                <span className="text-stroke">Not just a label</span>
                                 <br />
-                                <span className="text-[var(--accent)]">Proof, not promise.</span>
+                                <span className="text-[var(--accent)]">Proof, not promise</span>
                             </h2>
                         </div>
                         <div className="lg:col-span-5 lg:col-start-8 flex flex-col justify-end">
@@ -503,7 +475,7 @@ const HomePage: React.FC = () => {
                             <div key={step.n} className="info-card notch-corner p-7 group">
                                 <div className="flex items-center justify-between mb-8">
                                     <div className={`font-mono text-[11px] tracking-[0.2em] ${step.accent ? 'text-[var(--verify)]' : 'text-[var(--accent)]'}`}>
-                                        STEP / {step.n}
+                                        STEP {step.n}
                                     </div>
                                     <div
                                         className={`w-12 h-12 border flex items-center justify-center transition-colors ${
@@ -537,14 +509,14 @@ const HomePage: React.FC = () => {
                     <div className="reveal grid lg:grid-cols-12 gap-8 mb-16">
                         <div className="lg:col-span-5">
                             <div className="section-marker mb-6">
-                                <span>02 — Browse</span>
+                                <span>02 Browse</span>
                             </div>
                             <h2 className="font-display text-6xl md:text-7xl lg:text-8xl leading-[0.9] text-[var(--fg)]">
-                                Three goals.
+                                Three goals
                                 <br />
-                                <span className="text-stroke">One platform:</span>
+                                <span className="text-stroke">One platform</span>
                                 <br />
-                                <span className="text-[var(--accent)]">your next home.</span>
+                                <span className="text-[var(--accent)]">your next home</span>
                             </h2>
                         </div>
                         <div className="lg:col-span-6 lg:col-start-7 flex flex-col justify-end">
@@ -564,9 +536,9 @@ const HomePage: React.FC = () => {
                     {/* Goal program cards */}
                     <div className="reveal-stagger grid md:grid-cols-3 gap-6 lg:gap-8 mb-12">
                         {[
-                            { tag: '01 / ROOM', Icon: HomeIcon, title: 'FIND A ROOM', body: 'Affordable rooms in verified homes near your campus or workplace. Private or shared options.', a: 'Price Range', av: '₨5K–20K', b: 'Availability', bv: '312 ROOMS', cta: 'Explore Rooms', badge: 'VERIFIED', badgeAccent: false, seed: 'domavi-room-bed-dark', to: '/browse' },
-                            { tag: '02 / PLACE', Icon: Building2, title: 'RENT A PLACE', body: 'Apartments and houses with CNIC-verified landlords and digital rental agreements.', a: 'Price Range', av: '₨15K–60K', b: 'Availability', bv: '185 PLACES', cta: 'View Places', badge: 'VERIFIED', badgeAccent: false, seed: 'domavi-apartment-dark', to: '/browse' },
-                            { tag: '03 / ROOMMATE', Icon: UsersRound, title: 'FIND A ROOMMATE', body: 'Matched by lifestyle compatibility — sleep, study, cleanliness, social energy. Not just who is available.', a: 'Matching', av: 'AI-POWERED', b: 'Matched', bv: '612 PAIRS', cta: 'Try Matching', badge: 'MATCHING', badgeAccent: true, seed: 'domavi-friends-dark', to: '#matching' },
+                            { tag: '01 ROOM', Icon: HomeIcon, title: 'FIND A ROOM', body: 'Affordable rooms in verified homes near your campus or workplace. Private or shared options.', a: 'Price Range', av: '₨5K–20K', b: 'Availability', bv: '312 ROOMS', cta: 'Explore Rooms', badge: 'VERIFIED', badgeAccent: false, seed: 'domavi-room-bed-dark', to: '/browse' },
+                            { tag: '02 PLACE', Icon: Building2, title: 'RENT A PLACE', body: 'Apartments and houses with CNIC-verified landlords and digital rental agreements.', a: 'Price Range', av: '₨15K–60K', b: 'Availability', bv: '185 PLACES', cta: 'View Places', badge: 'VERIFIED', badgeAccent: false, seed: 'domavi-apartment-dark', to: '/browse' },
+                            { tag: '03 ROOMMATE', Icon: UsersRound, title: 'FIND A ROOMMATE', body: 'Matched by lifestyle compatibility — sleep, study, cleanliness, social energy. Not just who is available.', a: 'Matching', av: 'AI-POWERED', b: 'Matched', bv: '612 PAIRS', cta: 'Try Matching', badge: 'MATCHING', badgeAccent: true, seed: 'domavi-friends-dark', to: '#matching' },
                         ].map((c) => (
                             <article key={c.tag} className="program-card info-card notch-corner group">
                                 <div className="relative h-72 overflow-hidden">
@@ -652,14 +624,14 @@ const HomePage: React.FC = () => {
                     <div className="reveal grid lg:grid-cols-12 gap-8 mb-16">
                         <div className="lg:col-span-7">
                             <div className="section-marker mb-6">
-                                <span>03 — Roommate Matching</span>
+                                <span>03 Roommate Matching</span>
                             </div>
                             <h2 className="font-display text-6xl md:text-7xl lg:text-8xl leading-[0.9] text-[var(--fg)]">
                                 People who <span className="text-[var(--accent)]">fit</span>
                                 <br />
-                                your life. <span className="text-stroke">Not just</span>
+                                your life <span className="text-stroke">Not just</span>
                                 <br />
-                                your budget.
+                                your budget
                             </h2>
                         </div>
                         <div className="lg:col-span-4 lg:col-start-9 flex flex-col justify-end">
@@ -751,10 +723,10 @@ const HomePage: React.FC = () => {
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
                     <div className="reveal mb-16">
                         <div className="section-marker mb-6">
-                            <span>04 — Trust &amp; Safety</span>
+                            <span>04 Trust &amp; Safety</span>
                         </div>
                         <h2 className="font-display text-6xl md:text-7xl lg:text-8xl leading-[0.9] max-w-4xl text-[var(--fg)]">
-                            Built so you never have to <span className="text-[var(--accent)]">worry.</span>
+                            Built so you never have to <span className="text-[var(--accent)]">worry</span>
                         </h2>
                     </div>
                     <div className="reveal-stagger grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -782,10 +754,10 @@ const HomePage: React.FC = () => {
                     <div className="reveal grid lg:grid-cols-12 gap-8 items-end">
                         <div className="lg:col-span-8">
                             <div className="section-marker mb-6">
-                                <span>05 — Member Stories</span>
+                                <span>05 Member Stories</span>
                             </div>
                             <h2 className="font-display text-6xl md:text-7xl lg:text-8xl leading-[0.9] text-[var(--fg)]">
-                                Real people. <span className="text-stroke">Real homes.</span>
+                                Real people <span className="text-stroke">Real homes</span>
                             </h2>
                         </div>
                         <div className="lg:col-span-4 flex lg:justify-end">

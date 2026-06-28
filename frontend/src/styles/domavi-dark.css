@@ -232,7 +232,7 @@
     color: var(--accent);
     text-transform: uppercase;
 }
-.domavi-dark .section-marker::before { content: ''; width: 32px; height: 1px; background: var(--accent); }
+/* decorative leading line removed per request */
 
 /* --- Nav link --- */
 .domavi-dark .nav-link {

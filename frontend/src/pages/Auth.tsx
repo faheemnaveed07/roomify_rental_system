@@ -140,9 +140,9 @@ const AuthPage: React.FC = () => {
                                 <span>DOMAVI ACCESS</span>
                             </div>
                             <h1 className="font-display text-7xl leading-[0.9] text-[var(--fg)]">
-                                A home you can <span className="text-[var(--accent)]">trust.</span>
+                                A home you can <span className="text-[var(--accent)]">trust</span>
                                 <br />
-                                <span className="text-stroke">People you'll click with.</span>
+                                <span className="text-stroke">People you'll click with</span>
                             </h1>
                             <p className="mt-5 text-lg text-[var(--fg-dim)] max-w-md leading-relaxed">
                                 Every member CNIC-verified. Real listings, secure agreements, and roommate matching — built for Multan.
