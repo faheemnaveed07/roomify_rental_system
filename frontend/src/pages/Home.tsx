@@ -14,6 +14,7 @@ import {
     UsersRound,
     ChevronDown,
 } from 'lucide-react';
+import HeroOrbit from '../components/molecules/HeroOrbit';
 
 /* ============================================================================
  * DOMAVI — Home (public / pre-login landing)
@@ -78,12 +79,19 @@ function Counter({ value, className = '' }: { value: number; className?: string 
 }
 
 // ── Data ────────────────────────────────────────────────────────────────────
-const REEL = [
-    { seed: 'domavi-chai-aangan', alt: 'Students sharing chai in a courtyard' },
-    { seed: 'domavi-keys-door', alt: 'Getting the keys to a new home' },
-    { seed: 'domavi-room-sunlight', alt: 'Sunlit room' },
-    { seed: 'domavi-boxes-move', alt: 'Moving in' },
-    { seed: 'domavi-handshake-landlord', alt: 'Landlord and tenant' },
+/**
+ * Curated Unsplash photos. These replaced picsum.photos placeholders, which
+ * returned unrelated stock images (a beach lifeguard tower for a DHA room).
+ */
+const UNSPLASH = (id: string, w = 800, h = 600) =>
+    `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=80`;
+
+/** Member avatars shown in the hero trust strip */
+const HERO_AVATARS = [
+    'photo-1633332755192-727a05c4013d',
+    'photo-1494790108377-be9c29b29330',
+    'photo-1507003211169-0a1dd7228f2d',
+    'photo-1438761681033-6461ffad8d80',
 ];
 
 const GOALS = [
@@ -94,19 +102,19 @@ const GOALS = [
 ];
 
 const LISTINGS = [
-    { seed: 'dlist1', title: 'PRIVATE ROOM · BZU', area: 'BOSAN ROAD, MULTAN', price: '₨12,000/mo', host: 'AHMED R.', hostSeed: 'dav1', match: '92%', type: 'room' },
-    { seed: 'dlist2', title: '2-BED · GULGASHT', area: 'GULGASHT COLONY, MULTAN', price: '₨28,000/mo', host: 'HASSAN M.', hostSeed: 'dav2', match: 'WHOLE', type: 'place' },
-    { seed: 'dlist3', title: 'SHARED ROOM · GIRLS', area: 'SHAH RUKN-E-ALAM', price: '₨9,500/mo', host: 'FATIMA N.', hostSeed: 'dav3', match: '87%', type: 'roommate' },
-    { seed: 'dlist4', title: 'STUDIO · CANTT', area: 'CANTT AREA, MULTAN', price: '₨22,000/mo', host: 'BILAL K.', hostSeed: 'dav4', match: 'WHOLE', type: 'place' },
-    { seed: 'dlist5', title: 'PRIVATE ROOM · NFC', area: 'NEW MULTAN', price: '₨11,000/mo', host: 'ZAINAB A.', hostSeed: 'dav5', match: '90%', type: 'room' },
-    { seed: 'dlist6', title: 'ROOMMATE WANTED', area: 'MUMTAZABAD, MULTAN', price: '₨8,000/mo', host: 'OMAR S.', hostSeed: 'dav6', match: '84%', type: 'roommate' },
+    { seed: 'photo-1505691938895-1758d7feb511', title: 'PRIVATE ROOM · BZU', area: 'BOSAN ROAD, MULTAN', price: '₨12,000/mo', host: 'AHMED R.', hostSeed: 'photo-1633332755192-727a05c4013d', match: '92%', type: 'room' },
+    { seed: 'photo-1560448204-e02f11c3d0e2', title: '2-BED · GULGASHT', area: 'GULGASHT COLONY, MULTAN', price: '₨28,000/mo', host: 'HASSAN M.', hostSeed: 'photo-1507003211169-0a1dd7228f2d', match: 'WHOLE', type: 'place' },
+    { seed: 'photo-1502672260266-1c1ef2d93688', title: 'SHARED ROOM · GIRLS', area: 'SHAH RUKN-E-ALAM', price: '₨9,500/mo', host: 'FATIMA N.', hostSeed: 'photo-1494790108377-be9c29b29330', match: '87%', type: 'roommate' },
+    { seed: 'photo-1522708323590-d24dbb6b0267', title: 'STUDIO · CANTT', area: 'CANTT AREA, MULTAN', price: '₨22,000/mo', host: 'BILAL K.', hostSeed: 'photo-1568602471122-7832951cc4c5', match: 'WHOLE', type: 'place' },
+    { seed: 'photo-1598928506311-c55ded91a20c', title: 'PRIVATE ROOM · NFC', area: 'NEW MULTAN', price: '₨11,000/mo', host: 'ZAINAB A.', hostSeed: 'photo-1438761681033-6461ffad8d80', match: '90%', type: 'room' },
+    { seed: 'photo-1493809842364-78817add7ffb', title: 'ROOMMATE WANTED', area: 'MUMTAZABAD, MULTAN', price: '₨8,000/mo', host: 'OMAR S.', hostSeed: 'photo-1500648767791-00dcc994a43e', match: '84%', type: 'roommate' },
 ];
 
 const STORIES = [
-    { seed: 'dstory1', name: 'AYESHA K.', meta: 'Tenant · Gulgasht', quote: 'Domavi helped me lock in a CNIC-verified home within 24 hours. No agent, no scam, no stress.' },
-    { seed: 'dstory2', name: 'USMAN T.', meta: 'Landlord · 3 properties', quote: 'I filled all three of my properties through Domavi. Tenants arrive already verified — that changes everything.' },
-    { seed: 'dstory3', name: 'SARA M.', meta: 'Tenant · DHA Multan', quote: 'The roommate matching is unreal. Found someone with my exact schedule and budget in under a week.' },
-    { seed: 'dstory4', name: 'HAMZA R.', meta: 'Student · BZU', quote: 'Coming from another city, I had no contacts. Domavi made finding a safe room near campus actually easy.' },
+    { seed: 'photo-1494790108377-be9c29b29330', name: 'AYESHA K.', meta: 'Tenant · Gulgasht', quote: 'Domavi helped me lock in a CNIC-verified home within 24 hours. No agent, no scam, no stress.' },
+    { seed: 'photo-1507003211169-0a1dd7228f2d', name: 'USMAN T.', meta: 'Landlord · 3 properties', quote: 'I filled all three of my properties through Domavi. Tenants arrive already verified — that changes everything.' },
+    { seed: 'photo-1438761681033-6461ffad8d80', name: 'SARA M.', meta: 'Tenant · DHA Multan', quote: 'The roommate matching is unreal. Found someone with my exact schedule and budget in under a week.' },
+    { seed: 'photo-1633332755192-727a05c4013d', name: 'HAMZA R.', meta: 'Student · BZU', quote: 'Coming from another city, I had no contacts. Domavi made finding a safe room near campus actually easy.' },
 ];
 
 const MATCH_ROWS = [
@@ -119,9 +127,6 @@ const MATCH_ROWS = [
 const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const rootRef = useRef<HTMLDivElement>(null);
-
-    // Hero reel
-    const [reel, setReel] = useState(0);
 
     // Search + verified toggle
     const [verifiedOnly, setVerifiedOnly] = useState(false);
@@ -158,12 +163,6 @@ const HomePage: React.FC = () => {
         els.forEach((el) => io.observe(el));
         return () => io.disconnect();
     }, []);
-
-    // ── Hero reel auto-advance ──────────────────────────────────────────────
-    useEffect(() => {
-        const to = setTimeout(() => setReel((r) => (r + 1) % REEL.length), 5200);
-        return () => clearTimeout(to);
-    }, [reel]);
 
     // ── Sticky CTA visibility ───────────────────────────────────────────────
     useEffect(() => {
@@ -269,21 +268,21 @@ const HomePage: React.FC = () => {
             </div>
 
             {/* ===================== HERO ===================== */}
-            <section className="relative h-screen min-h-[760px] w-full overflow-hidden" id="hero">
-                <div className="absolute inset-0">
-                    {REEL.map((f, i) => (
-                        <div key={f.seed} className={`reel-frame ${i === reel ? 'active' : ''}`}>
-                            <img src={`https://picsum.photos/seed/${f.seed}/1920/1080`} alt={f.alt} />
-                        </div>
-                    ))}
+            <section className="relative min-h-screen w-full overflow-hidden flex items-center" id="hero">
+                {/* Ambient light — replaces the old stock-photo reel */}
+                <div className="absolute inset-0 pointer-events-none" aria-hidden>
+                    <div className="absolute -top-1/4 -right-1/4 h-[75vh] w-[75vh] rounded-full bg-[#d4845a]/10 blur-3xl" />
+                    <div className="absolute -bottom-1/4 -left-1/4 h-[60vh] w-[60vh] rounded-full bg-[#2d8f5e]/10 blur-3xl" />
                 </div>
-                <div className="hero-overlay" />
                 <div className="scan-line" />
 
-                <div className="relative z-10 h-full max-w-[1600px] mx-auto px-6 lg:px-10 flex flex-col justify-end pb-20 pt-32">
+                <div className="relative z-10 w-full max-w-[1600px] mx-auto px-6 lg:px-10 pt-32 pb-28">
+                    <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-16 items-center">
+                    {/* ---------- LEFT: copy, search, trust ---------- */}
+                    <div>
                     {/* Headline */}
-                    <div className="reveal in-view max-w-5xl">
-                        <h1 className="font-display text-[13vw] md:text-[9.5vw] lg:text-[8vw] leading-[0.85] mb-8 text-[var(--fg)]">
+                    <div className="reveal in-view">
+                        <h1 className="font-display text-[13vw] sm:text-[9vw] lg:text-[5.4vw] xl:text-[5rem] leading-[0.88] mb-6 text-[var(--fg)]">
                             <span className="headline-line">
                                 <span>A HOME YOU</span>
                             </span>
@@ -302,7 +301,7 @@ const HomePage: React.FC = () => {
                     </div>
 
                     {/* Search bar */}
-                    <div className="mt-10 max-w-3xl bg-[#141414]/80 backdrop-blur-md border border-[var(--border-light)] p-1.5">
+                    <div className="mt-10 bg-[#141414]/80 backdrop-blur-md border border-[var(--border-light)] p-1.5">
                         <div className="flex flex-col sm:flex-row gap-0">
                             <div className="flex-1 flex items-center gap-3 px-4 py-2.5 border-b sm:border-b-0 sm:border-r border-[var(--border-light)]">
                                 <MapPin className="text-[var(--accent)] w-3.5 h-3.5 shrink-0" />
@@ -372,10 +371,10 @@ const HomePage: React.FC = () => {
                     <div className="mt-6 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
                         <div className="flex items-center gap-4">
                             <div className="flex -space-x-3">
-                                {['dav1', 'dav2', 'dav3', 'dav4'].map((s) => (
+                                {HERO_AVATARS.map((s) => (
                                     <img
                                         key={s}
-                                        src={`https://picsum.photos/seed/${s}/120/120`}
+                                        src={UNSPLASH(s, 120, 120)}
                                         className="w-11 h-11 rounded-full border-2 border-[var(--bg)] object-cover img-noir"
                                         alt=""
                                     />
@@ -389,6 +388,13 @@ const HomePage: React.FC = () => {
                                 <div className="font-heading text-sm text-[var(--fg)] tracking-wider">2,340 CNIC-verified</div>
                             </div>
                         </div>
+                    </div>
+                    </div>
+
+                    {/* ---------- RIGHT: animated property orbit ---------- */}
+                    <div className="reveal in-view">
+                        <HeroOrbit />
+                    </div>
                     </div>
                 </div>
 
@@ -522,13 +528,13 @@ const HomePage: React.FC = () => {
                     {/* Goal program cards */}
                     <div className="reveal-stagger grid md:grid-cols-3 gap-6 lg:gap-8 mb-12">
                         {[
-                            { tag: '01 ROOM', Icon: HomeIcon, title: 'FIND A ROOM', body: 'Affordable rooms in verified homes near your campus or workplace. Private or shared options.', a: 'Price Range', av: '₨5K–20K', b: 'Availability', bv: '312 ROOMS', cta: 'Explore Rooms', badge: 'VERIFIED', badgeAccent: false, seed: 'domavi-room-bed-dark', to: '/browse' },
-                            { tag: '02 PLACE', Icon: Building2, title: 'RENT A PLACE', body: 'Apartments and houses with CNIC-verified landlords and digital rental agreements.', a: 'Price Range', av: '₨15K–60K', b: 'Availability', bv: '185 PLACES', cta: 'View Places', badge: 'VERIFIED', badgeAccent: false, seed: 'domavi-apartment-dark', to: '/browse' },
-                            { tag: '03 ROOMMATE', Icon: UsersRound, title: 'FIND A ROOMMATE', body: 'Matched by lifestyle compatibility — sleep, study, cleanliness, social energy. Not just who is available.', a: 'Matching', av: 'AI-POWERED', b: 'Matched', bv: '612 PAIRS', cta: 'Try Matching', badge: 'MATCHING', badgeAccent: true, seed: 'domavi-friends-dark', to: '#matching' },
+                            { tag: '01 ROOM', Icon: HomeIcon, title: 'FIND A ROOM', body: 'Affordable rooms in verified homes near your campus or workplace. Private or shared options.', a: 'Price Range', av: '₨5K–20K', b: 'Availability', bv: '312 ROOMS', cta: 'Explore Rooms', badge: 'VERIFIED', badgeAccent: false, seed: 'photo-1505691938895-1758d7feb511', to: '/browse' },
+                            { tag: '02 PLACE', Icon: Building2, title: 'RENT A PLACE', body: 'Apartments and houses with CNIC-verified landlords and digital rental agreements.', a: 'Price Range', av: '₨15K–60K', b: 'Availability', bv: '185 PLACES', cta: 'View Places', badge: 'VERIFIED', badgeAccent: false, seed: 'photo-1600596542815-ffad4c1539a9', to: '/browse' },
+                            { tag: '03 ROOMMATE', Icon: UsersRound, title: 'FIND A ROOMMATE', body: 'Matched by lifestyle compatibility — sleep, study, cleanliness, social energy. Not just who is available.', a: 'Matching', av: 'AI-POWERED', b: 'Matched', bv: '612 PAIRS', cta: 'Try Matching', badge: 'MATCHING', badgeAccent: true, seed: 'photo-1522708323590-d24dbb6b0267', to: '#matching' },
                         ].map((c) => (
                             <article key={c.tag} className="program-card info-card notch-corner group">
                                 <div className="relative h-72 overflow-hidden">
-                                    <img src={`https://picsum.photos/seed/${c.seed}/800/600`} className="program-img w-full h-full object-cover img-noir" alt={c.title} />
+                                    <img src={UNSPLASH(c.seed, 800, 600)} className="program-img w-full h-full object-cover img-noir" alt={c.title} />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] via-transparent to-transparent" />
                                     <div className="absolute top-4 left-4 font-mono text-[11px] text-[var(--accent)] tracking-[0.2em]">{c.tag}</div>
                                     <div
@@ -573,7 +579,7 @@ const HomePage: React.FC = () => {
                         {filteredListings.map((l) => (
                             <div key={l.seed} className="listing-card info-card overflow-hidden">
                                 <div className="relative aspect-[4/3] overflow-hidden">
-                                    <img src={`https://picsum.photos/seed/${l.seed}/600/450`} className="w-full h-full object-cover img-noir" alt={l.title} />
+                                    <img src={UNSPLASH(l.seed, 600, 450)} className="w-full h-full object-cover img-noir" alt={l.title} />
                                     <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-[var(--verify)] text-white text-[10px] font-mono tracking-[0.15em] px-2.5 py-1">
                                         <ShieldCheck className="w-2.5 h-2.5" /> VERIFIED
                                     </div>
@@ -587,7 +593,7 @@ const HomePage: React.FC = () => {
                                     </p>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <img src={`https://picsum.photos/seed/${l.hostSeed}/48/48`} className="w-6 h-6 rounded-full object-cover img-noir" alt="" />
+                                            <img src={UNSPLASH(l.hostSeed, 96, 96)} className="w-6 h-6 rounded-full object-cover img-noir" alt="" />
                                             <span className="font-mono text-[10px] text-[var(--fg-dim)]">{l.host}</span>
                                         </div>
                                         <div className="listing-actions flex items-center gap-3">
@@ -764,7 +770,7 @@ const HomePage: React.FC = () => {
                     {STORIES.map((s) => (
                         <div key={s.seed} className="story-card">
                             <div className="relative h-56 overflow-hidden">
-                                <img src={`https://picsum.photos/seed/${s.seed}/600/400`} className="w-full h-full object-cover img-noir" alt={s.name} draggable={false} />
+                                <img src={UNSPLASH(s.seed, 600, 400)} className="w-full h-full object-cover img-noir" alt={s.name} draggable={false} />
                                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-card)] via-transparent to-transparent" />
                                 <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-[var(--verify)] text-white text-[10px] font-mono tracking-[0.15em] px-2.5 py-1">
                                     <ShieldCheck className="w-2.5 h-2.5" /> VERIFIED
