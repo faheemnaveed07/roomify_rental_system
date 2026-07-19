@@ -11,6 +11,7 @@ import paymentRoutes from './payment.routes';
 import agreementRoutes from './agreement.routes';
 import matchingRoutes from './matching.routes';
 import roommateProfileRoutes from './roommateProfile.routes';
+import verificationRoutes from './verification.routes';
 
 const router = Router();
 
@@ -46,5 +47,6 @@ router.use('/payments', paymentRoutes);
 router.use('/agreements', agreementRoutes);
 router.use('/matching', matchingRoutes);
 router.use('/roommate-profile', roommateProfileRoutes);
+router.use('/verification', verificationRoutes);
 
 export default router;

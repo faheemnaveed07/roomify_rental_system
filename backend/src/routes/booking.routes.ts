@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { bookingController } from '../controllers/booking.controller';
 import { authenticate } from '../middleware/auth.middleware';
+import { requireVerifiedUser } from '../middleware/role.middleware';
 
 const router = Router();
 
@@ -12,7 +13,8 @@ router.use(authenticate);
  * @desc    Create a new booking request
  * @access  Private
  */
-router.post('/request', bookingController.requestBooking);
+// Sending a booking request requires a fully verified tenant (email + CNIC).
+router.post('/request', requireVerifiedUser, bookingController.requestBooking);
 
 /**
  * @route   GET /api/bookings/my-bookings

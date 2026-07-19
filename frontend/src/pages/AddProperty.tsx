@@ -1,11 +1,54 @@
 import React from 'react';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, ShieldAlert, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PropertyUploadForm from '../components/organisms/PropertyUploadForm';
+import { verificationService } from '../services/api';
 
 const AddProperty: React.FC = () => {
     const navigate = useNavigate();
     const [isSuccess, setIsSuccess] = React.useState(false);
+
+    // Listing is gated on verification server-side; check up front so the
+    // landlord gets a clear next step instead of a rejected submit.
+    const [verified, setVerified] = React.useState<boolean | null>(null);
+    React.useEffect(() => {
+        verificationService
+            .getStatus()
+            .then((s) => setVerified(s.fullyVerified))
+            // If the check itself fails, don't block — the server still enforces it.
+            .catch(() => setVerified(true));
+    }, []);
+
+    if (verified === null) {
+        return (
+            <div className="flex min-h-[50vh] items-center justify-center">
+                <Loader2 className="h-7 w-7 animate-spin text-[#2563EB]" />
+            </div>
+        );
+    }
+
+    if (verified === false) {
+        return (
+            <div className="max-w-xl mx-auto py-20 text-center space-y-6">
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-50 text-amber-500">
+                    <ShieldAlert size={40} />
+                </div>
+                <div>
+                    <h1 className="text-3xl font-black text-[#1E293B]">Verification required</h1>
+                    <p className="mt-2 font-medium text-neutral-500">
+                        To keep Domavi trustworthy, you need a verified email and CNIC before you can list a
+                        property.
+                    </p>
+                </div>
+                <button
+                    onClick={() => navigate('/verify')}
+                    className="rounded-2xl bg-[#2563EB] px-8 py-3 font-bold text-white transition-all hover:opacity-90"
+                >
+                    Get verified
+                </button>
+            </div>
+        );
+    }
 
     if (isSuccess) {
         return (

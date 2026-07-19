@@ -125,6 +125,45 @@ export const authService = {
     },
 };
 
+export interface VerificationMilestone {
+    key: string;
+    label: string;
+    done: boolean;
+}
+
+export interface VerificationStatus {
+    emailVerified: boolean;
+    cnicVerified: boolean;
+    cnicNumber: string | null;
+    fullyVerified: boolean;
+    cnic: {
+        front: { url: string; status: string } | null;
+        back: { url: string; status: string } | null;
+    };
+    milestones: VerificationMilestone[];
+    progress: number;
+}
+
+export const verificationService = {
+    getStatus: async (): Promise<VerificationStatus> => {
+        const response = await api.get<ApiResponse<VerificationStatus>>('/verification/status');
+        return response.data.data!;
+    },
+    /** Demo simulation — see the backend controller note */
+    confirmEmail: async (): Promise<void> => {
+        await api.post<ApiResponse<unknown>>('/verification/email/confirm');
+    },
+    uploadCnic: async (front: File, back: File, cnicNumber?: string): Promise<void> => {
+        const formData = new FormData();
+        formData.append('front', front);
+        formData.append('back', back);
+        if (cnicNumber) formData.append('cnicNumber', cnicNumber);
+        await api.post<ApiResponse<unknown>>('/verification/cnic', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+    },
+};
+
 export interface PlatformStats {
     activeListings: number;
     verifiedMembers: number;

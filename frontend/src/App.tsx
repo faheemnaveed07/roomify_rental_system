@@ -28,6 +28,7 @@ import AdminAnalyticsPage from './pages/AdminAnalytics';
 import AdminPaymentsPage from './pages/AdminPayments';
 import PaymentSubmitPage from './pages/PaymentSubmit';
 import AgreementPage from './pages/Agreement';
+import VerificationPage from './pages/Verification';
 
 // ── Public layout: Header + main content + footer ──────────────────
 const PublicLayout: React.FC = () => (
@@ -126,6 +127,11 @@ const App: React.FC = () => {
                 <Route path="/property/:id" element={
                     <ProtectedRoute>
                         <PropertyDetailPage />
+                    </ProtectedRoute>
+                } />
+                <Route path="/verify" element={
+                    <ProtectedRoute>
+                        <VerificationPage />
                     </ProtectedRoute>
                 } />
                 <Route path="/my-bookings" element={

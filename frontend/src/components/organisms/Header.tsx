@@ -87,6 +87,7 @@ const Header: React.FC = () => {
         if (!user?.role) return [];
         if (user.role === UserRole.TENANT) {
             return [
+                { label: 'Get Verified', path: '/verify', icon: ShieldCheck },
                 { label: 'Browse Properties', path: '/browse', icon: Home },
                 { label: 'Roommate Matches', path: '/roommate-matches', icon: Star },
                 { label: 'My Bookings', path: '/my-bookings', icon: CalendarCheck },
@@ -97,6 +98,7 @@ const Header: React.FC = () => {
         }
         if (user.role === UserRole.LANDLORD) {
             return [
+                { label: 'Get Verified', path: '/verify', icon: ShieldCheck },
                 { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
                 { label: 'My Properties', path: '/dashboard/properties', icon: Building2 },
                 { label: 'Booking Requests', path: '/dashboard/requests', icon: CalendarCheck },

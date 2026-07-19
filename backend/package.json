@@ -12,7 +12,8 @@
     "approve-properties": "ts-node -r tsconfig-paths/register scripts/approve-properties.ts",
     "seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
     "seed:clear": "ts-node -r tsconfig-paths/register scripts/seed.ts --clear",
-    "seed:reset": "ts-node -r tsconfig-paths/register scripts/seed.ts --clear-all"
+    "seed:reset": "ts-node -r tsconfig-paths/register scripts/seed.ts --clear-all",
+    "users:cleanup": "ts-node -r tsconfig-paths/register scripts/cleanup-users.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.490.0",
