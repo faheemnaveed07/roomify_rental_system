@@ -12,6 +12,7 @@ import {
 } from '@shared/types/user.types';
 import { logger } from '../utils/logger';
 import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/email';
+import { AppError } from '../utils/AppError';
 
 /** Hash a raw token with SHA-256 for safe DB storage */
 const hashToken = (raw: string): string =>
@@ -29,7 +30,7 @@ export class AuthService {
     async register(userData: IUserRegistration): Promise<{ user: IUserDocument; tokens: IAuthTokens }> {
         const existingUser = await User.findOne({ email: userData.email.toLowerCase() });
         if (existingUser) {
-            throw new Error('Email already registered');
+            throw new AppError('Email already registered', 409, 'EMAIL_EXISTS');
         }
 
         // Generate a one-time email verification token (raw → hashed in DB)
@@ -62,20 +63,20 @@ export class AuthService {
     async login(credentials: IUserLogin): Promise<{ user: IUserDocument; tokens: IAuthTokens }> {
         const user = await User.findByEmail(credentials.email);
         if (!user) {
-            throw new Error('Invalid email or password');
+            throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
         }
 
         const isPasswordValid = await user.comparePassword(credentials.password);
         if (!isPasswordValid) {
-            throw new Error('Invalid email or password');
+            throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
         }
 
         if (user.status === UserStatus.SUSPENDED) {
-            throw new Error('Account is suspended');
+            throw new AppError('Account is suspended', 403, 'ACCOUNT_SUSPENDED');
         }
 
         if (user.status === UserStatus.DEACTIVATED) {
-            throw new Error('Account is deactivated');
+            throw new AppError('Account is deactivated', 403, 'ACCOUNT_DEACTIVATED');
         }
 
         const tokens = this.generateTokens(user);
@@ -95,12 +96,12 @@ export class AuthService {
     async refreshTokens(refreshToken: string): Promise<IAuthTokens> {
         const payload = this.verifyRefreshToken(refreshToken);
         if (!payload) {
-            throw new Error('Invalid refresh token');
+            throw new AppError('Invalid refresh token', 401, 'INVALID_REFRESH_TOKEN');
         }
 
         const user = await User.findById(payload.userId).select('+refreshToken');
         if (!user || user.refreshToken !== refreshToken) {
-            throw new Error('Invalid refresh token');
+            throw new AppError('Invalid refresh token', 401, 'INVALID_REFRESH_TOKEN');
         }
 
         const tokens = this.generateTokens(user);
@@ -119,7 +120,7 @@ export class AuthService {
         }).select('+emailVerificationToken +emailVerificationExpires');
 
         if (!user) {
-            throw new Error('Verification link is invalid or has expired');
+            throw new AppError('Verification link is invalid or has expired', 400, 'INVALID_VERIFICATION_TOKEN');
         }
 
         user.emailVerified = true;
@@ -167,7 +168,7 @@ export class AuthService {
         }).select('+passwordResetToken +passwordResetExpires');
 
         if (!user) {
-            throw new Error('Password reset link is invalid or has expired');
+            throw new AppError('Password reset link is invalid or has expired', 400, 'INVALID_RESET_TOKEN');
         }
 
         user.password = newPassword;
