@@ -234,7 +234,9 @@ export class PropertyController {
             const [activeListings, verifiedMembers, landlords, cities] = await Promise.all([
                 Property.countDocuments({ status: 'active' }),
                 User.countDocuments({ emailVerified: true }),
-                User.countDocuments({ role: 'landlord' }),
+                // Verified landlords only — the landing page labels this
+                // "Verified landlords", so it must not count unverified ones.
+                User.countDocuments({ role: 'landlord', emailVerified: true }),
                 Property.distinct('location.city', { status: 'active' }),
             ]);
 
