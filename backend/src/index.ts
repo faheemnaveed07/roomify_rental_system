@@ -18,6 +18,14 @@ import { initializeSocket } from './config/socket';
 import { isAllowedOrigin } from './utils/origins';
 
 const app = express();
+
+// Behind a reverse proxy (Hugging Face Space / Vercel rewrite / Render / Koyeb):
+// trust the first proxy hop so Express reads the real client IP from
+// X-Forwarded-For. Without this, express-rate-limit throws
+// ERR_ERL_UNEXPECTED_X_FORWARDED_FOR on the auth routes (login/password/refresh),
+// which failed the request and surfaced in the browser as "Something went wrong".
+app.set('trust proxy', 1);
+
 const httpServer = createServer(app);
 
 // Initialize Socket.IO
