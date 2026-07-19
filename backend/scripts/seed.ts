@@ -36,31 +36,44 @@ const firstNamesM = ['Ali', 'Ahmed', 'Usman', 'Hassan', 'Bilal', 'Imran', 'Farha
 const firstNamesF = ['Ayesha', 'Fatima', 'Sana', 'Nadia', 'Zainab', 'Mariam', 'Hira', 'Sara'];
 const lastNames = ['Khan', 'Malik', 'Qureshi', 'Chaudhry', 'Siddiqui', 'Ahmed', 'Ali', 'Butt', 'Sheikh', 'Ansari', 'Rizvi', 'Mirza'];
 
-const cities: { city: string; coords: [number, number]; areas: string[] }[] = [
-    {
-        city: 'Lahore',
-        coords: [74.3587, 31.5204],
-        areas: ['DHA Phase 5', 'Gulberg III', 'Model Town', 'Bahria Town', 'Johar Town', 'Garden Town', 'Faisal Town', 'Wapda Town'],
-    },
-    {
-        city: 'Karachi',
-        coords: [67.0099, 24.8607],
-        areas: ['DHA Phase 6', 'Clifton', 'Gulshan-e-Iqbal', 'PECHS', 'North Nazimabad', 'Gulistan-e-Jauhar', 'Bahria Town'],
-    },
-    {
-        city: 'Islamabad',
-        coords: [73.0479, 33.6844],
-        areas: ['F-6', 'F-7', 'F-8', 'G-9', 'G-10', 'E-11', 'DHA Islamabad', 'Bahria Enclave'],
-    },
+/**
+ * Seed geography — Multan + Vehari only.
+ *
+ * Two deliberate changes from the old version:
+ *  1. Scoped to the cities the product actually serves (and the only two the
+ *     landlord upload form allows), instead of scattering demo data across five
+ *     cities the app can't even list.
+ *  2. Coordinates are per-AREA, not per-city. Previously every listing got the
+ *     city centroid plus ±0.025° (~2.8 km) of random noise, so the "area" name
+ *     and the map pin had no relationship — that's why the browse map looked
+ *     wrong. These are real approximate centres for each locality.
+ *
+ * GeoJSON order: [lng, lat].
+ */
+const cities: { city: string; areas: { name: string; coords: [number, number] }[] }[] = [
     {
         city: 'Multan',
-        coords: [71.4753, 30.1984],
-        areas: ['Gulgasht Colony', 'Cantt', 'Shah Rukn-e-Alam', 'Bosan Road', 'New Multan'],
+        areas: [
+            { name: 'Gulgasht Colony', coords: [71.4900, 30.2280] },
+            { name: 'Bosan Road', coords: [71.4870, 30.2360] },
+            { name: 'Cantt', coords: [71.4900, 30.1870] },
+            { name: 'Shah Rukn-e-Alam', coords: [71.4610, 30.1930] },
+            { name: 'New Multan', coords: [71.4530, 30.2050] },
+            { name: 'Model Town', coords: [71.4700, 30.2000] },
+            { name: 'Wapda Town', coords: [71.4650, 30.2450] },
+            { name: 'Mumtazabad', coords: [71.4930, 30.1730] },
+            { name: 'Hussain Agahi', coords: [71.4720, 30.1980] },
+            { name: 'BZU Area', coords: [71.5120, 30.2620] },
+            { name: 'DHA Multan', coords: [71.5400, 30.1200] },
+        ],
     },
     {
-        city: 'Rawalpindi',
-        coords: [73.0651, 33.5651],
-        areas: ['Saddar', 'Bahria Town Phase 8', 'Gulraiz Housing', 'Askari 14', 'Chaklala Scheme'],
+        city: 'Vehari',
+        areas: [
+            { name: 'Vehari City', coords: [72.3489, 30.0445] },
+            { name: 'Model Town Vehari', coords: [72.3400, 30.0500] },
+            { name: 'Luddan Road', coords: [72.3600, 30.0300] },
+        ],
     },
 ];
 
@@ -232,27 +245,36 @@ const templates: PropertyTemplate[] = [
     },
 ];
 
-// Placeholder images rotated from picsum for variety
+/**
+ * Property photos.
+ *
+ * These used to be picsum.photos random images, which is why a shared room in
+ * DHA could show a beach lifeguard tower. These are real interior/exterior
+ * property photos from Unsplash so demo listings actually look like listings.
+ */
+const UNSPLASH = (id: string) =>
+    `https://images.unsplash.com/${id}?auto=format&fit=crop&w=800&q=80`;
+
 const imageUrls = [
     [
-        { url: 'https://picsum.photos/seed/room1/800/600', publicId: 'seed_room1', isPrimary: true },
-        { url: 'https://picsum.photos/seed/room1b/800/600', publicId: 'seed_room1b', isPrimary: false },
+        { url: UNSPLASH('photo-1505691938895-1758d7feb511'), publicId: 'seed_room1', isPrimary: true },
+        { url: UNSPLASH('photo-1502672260266-1c1ef2d93688'), publicId: 'seed_room1b', isPrimary: false },
     ],
     [
-        { url: 'https://picsum.photos/seed/apt2/800/600', publicId: 'seed_apt2', isPrimary: true },
-        { url: 'https://picsum.photos/seed/apt2b/800/600', publicId: 'seed_apt2b', isPrimary: false },
+        { url: UNSPLASH('photo-1560448204-e02f11c3d0e2'), publicId: 'seed_apt2', isPrimary: true },
+        { url: UNSPLASH('photo-1522708323590-d24dbb6b0267'), publicId: 'seed_apt2b', isPrimary: false },
     ],
     [
-        { url: 'https://picsum.photos/seed/house3/800/600', publicId: 'seed_house3', isPrimary: true },
-        { url: 'https://picsum.photos/seed/house3b/800/600', publicId: 'seed_house3b', isPrimary: false },
+        { url: UNSPLASH('photo-1600596542815-ffad4c1539a9'), publicId: 'seed_house3', isPrimary: true },
+        { url: UNSPLASH('photo-1600585154340-be6161a56a0c'), publicId: 'seed_house3b', isPrimary: false },
     ],
     [
-        { url: 'https://picsum.photos/seed/flat4/800/600', publicId: 'seed_flat4', isPrimary: true },
-        { url: 'https://picsum.photos/seed/flat4b/800/600', publicId: 'seed_flat4b', isPrimary: false },
+        { url: UNSPLASH('photo-1493809842364-78817add7ffb'), publicId: 'seed_flat4', isPrimary: true },
+        { url: UNSPLASH('photo-1484154218962-a197022b5858'), publicId: 'seed_flat4b', isPrimary: false },
     ],
     [
-        { url: 'https://picsum.photos/seed/villa5/800/600', publicId: 'seed_villa5', isPrimary: true },
-        { url: 'https://picsum.photos/seed/villa5b/800/600', publicId: 'seed_villa5b', isPrimary: false },
+        { url: UNSPLASH('photo-1600607687939-ce8a6c25118c'), publicId: 'seed_villa5', isPrimary: true },
+        { url: UNSPLASH('photo-1598928506311-c55ded91a20c'), publicId: 'seed_villa5b', isPrimary: false },
     ],
 ];
 
@@ -284,8 +306,18 @@ async function seed() {
     await mongoose.connect(mongoUri.replace(/\blocalhost\b/, '127.0.0.1'));
     console.log('✅ Connected to MongoDB:', mongoUri);
 
-    const shouldClear = process.argv.includes('--clear');
-    if (shouldClear) {
+    // --clear      : remove only previously-seeded demo data
+    // --clear-all  : ALSO remove every landlord-created listing (full reset).
+    //                Use this to wipe the old dummy listings that were saved with
+    //                the hardcoded Multan coordinate before the map picker existed.
+    const shouldClearAll = process.argv.includes('--clear-all');
+    const shouldClear = shouldClearAll || process.argv.includes('--clear');
+
+    if (shouldClearAll) {
+        const { deletedCount } = await Property.deleteMany({});
+        await User.deleteMany({ email: /demo\.com$/ });
+        console.log(`🗑  FULL RESET — removed ALL ${deletedCount} properties + demo users`);
+    } else if (shouldClear) {
         await User.deleteMany({ email: /demo\.com$/ });
         await Property.deleteMany({ 'images.publicId': /^seed_/ });
         console.log('🗑  Cleared existing seed data');
@@ -387,15 +419,18 @@ async function seed() {
             const tmpl = templates[tIdx];
 
             const cityData = pick(cities);
-            const area = pick(cityData.areas);
+            const areaData = pick(cityData.areas);
+            const area = areaData.name;
             const streetNum = randInt(1, 50);
             const address = `House ${streetNum}, ${randInt(1, 15)}-${pick(streetNames)}, ${area}`;
 
-            // Small coordinate jitter so properties don't overlap on a map
-            const jitter = () => (Math.random() - 0.5) * 0.05;
+            // Tiny jitter (~±150 m) around the REAL area centre, so several
+            // listings in the same locality don't stack on one pixel while still
+            // landing inside the area they claim to be in.
+            const jitter = () => (Math.random() - 0.5) * 0.003;
             const coords: [number, number] = [
-                cityData.coords[0] + jitter(),
-                cityData.coords[1] + jitter(),
+                areaData.coords[0] + jitter(),
+                areaData.coords[1] + jitter(),
             ];
 
             const rent = randInt(tmpl.rentRange[0], tmpl.rentRange[1]);

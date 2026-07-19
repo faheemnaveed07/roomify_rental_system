@@ -20,6 +20,10 @@ import type { IPropertyFilter } from '@shared/types';
 
 export interface ParsedFilters extends IPropertyFilter {
     q?: string;
+    /** Geo search (map "Search this area" / "Near me"). Stored flat in the URL. */
+    lat?: number;
+    lng?: number;
+    radius?: number;
 }
 
 export interface PaginationState {
@@ -69,7 +73,21 @@ export function useSearchFilters() {
     const [searchParams, setSearchParams] = useSearchParams();
 
     /** All current filter + pagination values, parsed from the URL. */
-    const filters: FiltersWithPagination = useMemo(() => ({
+    const filters: FiltersWithPagination = useMemo(() => {
+        // Geo params live flat in the URL (?lat=&lng=&radius=) but the API layer
+        // expects them nested under `nearLocation`, so derive that here.
+        const lat = getNum(searchParams, 'lat');
+        const lng = getNum(searchParams, 'lng');
+        const radius = getNum(searchParams, 'radius');
+
+        return {
+        lat,
+        lng,
+        radius,
+        nearLocation:
+            lat !== undefined && lng !== undefined
+                ? { latitude: lat, longitude: lng, maxDistanceKm: radius ?? 5 }
+                : undefined,
         q:               getStr(searchParams, 'q'),
         city:            getStr(searchParams, 'city'),
         area:            getStr(searchParams, 'area'),
@@ -87,7 +105,8 @@ export function useSearchFilters() {
         limit:     getNum(searchParams, 'limit') ?? 10,
         sortBy:    getStr(searchParams, 'sortBy')    ?? 'createdAt',
         sortOrder: (getStr(searchParams, 'sortOrder') ?? 'desc') as 'asc' | 'desc',
-    }), [searchParams]);
+        };
+    }, [searchParams]);
 
     /**
      * Merge a partial update into the URL. Always resets page to 1 when

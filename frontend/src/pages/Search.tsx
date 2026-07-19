@@ -1,7 +1,7 @@
 import React, { useRef, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { LayoutGrid, Map as MapIcon, X } from 'lucide-react';
+import { LayoutGrid, Map as MapIcon, X, Crosshair } from 'lucide-react';
 import { useAuthStore } from '../store/auth.store';
 import PropertyCard, { PropertyStatus } from '../components/molecules/PropertyCard';
 import PropertyMap, { MapProperty } from '../components/molecules/PropertyMap';
@@ -131,6 +131,44 @@ const SearchPage: React.FC = () => {
     const handleLoadMore = () => {
         setFilters({ page: (filters.page ?? 1) + 1 });
     };
+
+    // ── Geo search (map "Search this area" / "Near me") ──────────────────────
+    // These write flat lat/lng/radius params; useSearchFilters turns them into
+    // `nearLocation`, which the API layer sends to the backend's $near query.
+    const geoActive = filters.lat !== undefined && filters.lng !== undefined;
+    const [locating, setLocating] = useState(false);
+
+    const handleSearchArea = useCallback(
+        (center: { lat: number; lng: number }, radiusKm: number) => {
+            setFilters({
+                lat: Number(center.lat.toFixed(6)),
+                lng: Number(center.lng.toFixed(6)),
+                radius: radiusKm,
+            });
+        },
+        [setFilters],
+    );
+
+    const handleNearMe = useCallback(() => {
+        if (!navigator.geolocation) return;
+        setLocating(true);
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                setFilters({
+                    lat: Number(pos.coords.latitude.toFixed(6)),
+                    lng: Number(pos.coords.longitude.toFixed(6)),
+                    radius: 5,
+                });
+                setLocating(false);
+            },
+            () => setLocating(false),
+            { enableHighAccuracy: true, timeout: 10000 },
+        );
+    }, [setFilters]);
+
+    const clearGeo = useCallback(() => {
+        setFilters({ lat: undefined, lng: undefined, radius: undefined });
+    }, [setFilters]);
 
     const handleFavoriteToggle = (id: string, next: boolean) => {
         setFavorites((prev) => {
@@ -312,6 +350,36 @@ const SearchPage: React.FC = () => {
                         </label>
                     )}
 
+                    {/* Geo search: "Near me", or a chip showing the active area filter */}
+                    {geoActive ? (
+                        <span className="inline-flex items-center gap-2 rounded-full bg-primary-50 border border-primary-100 px-3 py-1.5 text-xs font-semibold text-primary-700">
+                            <Crosshair size={12} />
+                            Within {filters.radius ?? 5} km of this area
+                            <button
+                                type="button"
+                                onClick={clearGeo}
+                                aria-label="Clear area filter"
+                                className="hover:text-primary-900"
+                            >
+                                <X size={12} />
+                            </button>
+                        </span>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={handleNearMe}
+                            disabled={locating}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 disabled:opacity-60"
+                        >
+                            {locating ? (
+                                <span className="h-3 w-3 animate-spin rounded-full border-2 border-neutral-400 border-t-transparent" />
+                            ) : (
+                                <Crosshair size={12} />
+                            )}
+                            {locating ? 'Locating…' : 'Near me'}
+                        </button>
+                    )}
+
                     {/* View toggle (visible on lg+ only — mobile uses tab switcher below) */}
                     <div className="hidden lg:inline-flex items-center bg-neutral-100 rounded-lg p-1">
                         <button
@@ -486,6 +554,8 @@ const SearchPage: React.FC = () => {
                             selectedId={selectedId}
                             onMarkerHover={(id) => setHoveredId(id)}
                             onMarkerClick={(id) => handleCardClick(id)}
+                            onSearchArea={handleSearchArea}
+                            searching={isLoading}
                         />
                     </div>
                 )}
