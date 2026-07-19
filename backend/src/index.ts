@@ -71,6 +71,13 @@ app.use(csrfMiddleware.validateRequestMethod);
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
+// Root — lightweight liveness so Hugging Face's edge/health-check and uptime
+// pingers get a 200 on "/" (the App tab otherwise shows a 500 for an API-only
+// Space). Real health/DB status lives at /api/health.
+app.get('/', (_req, res) => {
+    res.status(200).json({ status: 'ok', service: 'Domavi API', health: '/api/health' });
+});
+
 app.use('/api', routes);
 
 // Error handling middleware (should be last)
