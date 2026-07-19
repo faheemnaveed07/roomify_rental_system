@@ -187,12 +187,11 @@
     from { transform: rotate(0deg); }
     to { transform: rotate(-360deg); }
 }
+/* Display is set by the markup (block / absolute) so these only drive motion. */
 .dv-orbit-spin {
-    display: inline-block;
     animation: dv-orbit-rotate var(--dv-orbit-duration, 38s) linear infinite;
 }
 .dv-orbit-spin-rev {
-    display: inline-block;
     animation: dv-orbit-rotate-rev var(--dv-orbit-duration, 38s) linear infinite;
 }
 /* Inner ring drifts slower for depth. Set on the ring; chips inherit the var so
