@@ -15,6 +15,7 @@ import {
     ChevronDown,
 } from 'lucide-react';
 import HeroOrbit from '../components/molecules/HeroOrbit';
+import { propertyService, PlatformStats } from '../services/api';
 
 /* ============================================================================
  * DOMAVI — Home (public / pre-login landing)
@@ -87,13 +88,6 @@ const UNSPLASH = (id: string, w = 800, h = 600) =>
     `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&h=${h}&q=80`;
 
 /** Member avatars shown in the hero trust strip */
-const HERO_AVATARS = [
-    'photo-1633332755192-727a05c4013d',
-    'photo-1494790108377-be9c29b29330',
-    'photo-1507003211169-0a1dd7228f2d',
-    'photo-1438761681033-6461ffad8d80',
-];
-
 const GOALS = [
     { key: 'all', label: 'All' },
     { key: 'room', label: 'Room' },
@@ -129,8 +123,6 @@ const HomePage: React.FC = () => {
     const rootRef = useRef<HTMLDivElement>(null);
 
     // Search + verified toggle
-    const [verifiedOnly, setVerifiedOnly] = useState(false);
-    const [toast, setToast] = useState(false);
     const [location, setLocation] = useState('');
     const [budget, setBudget] = useState('');
     const [ptype, setPtype] = useState('');
@@ -143,6 +135,25 @@ const HomePage: React.FC = () => {
 
     // Sticky CTA
     const [showSticky, setShowSticky] = useState(false);
+
+    // Live platform stats. Left null until they load — the band is hidden rather
+    // than showing invented numbers if the API is unreachable.
+    const [stats, setStats] = useState<PlatformStats | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+        propertyService
+            .getStats()
+            .then((s) => {
+                if (!cancelled) setStats(s);
+            })
+            .catch(() => {
+                /* keep the stats band hidden */
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     // ── Scroll-reveal observer ──────────────────────────────────────────────
     useEffect(() => {
@@ -172,24 +183,11 @@ const HomePage: React.FC = () => {
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
 
-    // ── Verified toggle → toast ─────────────────────────────────────────────
-    const toggleVerified = () => {
-        setVerifiedOnly((v) => {
-            const next = !v;
-            if (next) {
-                setToast(true);
-                window.setTimeout(() => setToast(false), 3200);
-            }
-            return next;
-        });
-    };
-
     const handleSearch = () => {
-        navigate('/browse', { state: { query: location, filters: { city: location, budget, type: ptype, verifiedOnly } } });
+        navigate('/browse', { state: { query: location, filters: { city: location, budget, type: ptype } } });
     };
 
     const filteredListings = goal === 'all' ? LISTINGS : LISTINGS.filter((l) => l.type === goal);
-    const listingCount = verifiedOnly ? 612 : 847;
 
     // ── Matching score (60 base + 10 per answered row, capped 100) ───────────
     const answered = Object.keys(prefs).length;
@@ -240,17 +238,6 @@ const HomePage: React.FC = () => {
             {/* Grain overlay */}
             <div className="grain" aria-hidden />
 
-            {/* Verified toast */}
-            <div className={`dv-toast ${toast ? 'visible' : ''}`} role="status" aria-live="polite">
-                <div className="flex items-center gap-3">
-                    <VerifiedBadge className="w-6 h-6" />
-                    <div>
-                        <p className="font-heading text-sm text-[var(--fg)] tracking-wider">VERIFIED FILTER ACTIVE</p>
-                        <p className="font-mono text-[10px] text-[var(--muted)] tracking-wider mt-0.5">Showing CNIC-verified listings only</p>
-                    </div>
-                </div>
-            </div>
-
             {/* Sticky CTA */}
             <div className={`sticky-cta ${showSticky ? 'visible' : ''}`}>
                 <div className="bg-[#050505]/95 backdrop-blur-md border-t border-[var(--border)] px-6 py-3 flex items-center justify-between max-w-[1600px] mx-auto">
@@ -295,8 +282,8 @@ const HomePage: React.FC = () => {
                                 </span>
                             </span>
                         </h1>
-                        <p className="max-w-xl text-[var(--fg-dim)] text-base md:text-lg leading-relaxed font-body">
-                            No more scams, no more guessing. Every member verified by CNIC. Find a real room, a real place, or real people — safely.
+                        <p className="max-w-lg text-[var(--fg-dim)] text-base md:text-lg leading-relaxed font-body">
+                            Every member verified by CNIC — find a real room, a real place, or real people.
                         </p>
                     </div>
 
@@ -348,46 +335,6 @@ const HomePage: React.FC = () => {
                                 <span className="hidden sm:inline">Search</span>
                             </button>
                         </div>
-                        <div className="flex items-center justify-between mt-2 px-4 pb-2">
-                            <div className="flex items-center gap-3">
-                                <div
-                                    className={`toggle-track ${verifiedOnly ? 'active' : ''}`}
-                                    onClick={toggleVerified}
-                                    role="switch"
-                                    aria-checked={verifiedOnly}
-                                    aria-label="Verified only"
-                                    tabIndex={0}
-                                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && toggleVerified()}
-                                >
-                                    <div className="toggle-thumb" />
-                                </div>
-                                <span className="font-mono text-[10px] text-[var(--muted)] tracking-[0.15em] uppercase">Verified only</span>
-                            </div>
-                            <span className="font-mono text-[10px] text-[var(--muted)] tracking-[0.15em]">{listingCount} LISTINGS</span>
-                        </div>
-                    </div>
-
-                    {/* Bottom strip */}
-                    <div className="mt-6 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-                        <div className="flex items-center gap-4">
-                            <div className="flex -space-x-3">
-                                {HERO_AVATARS.map((s) => (
-                                    <img
-                                        key={s}
-                                        src={UNSPLASH(s, 120, 120)}
-                                        className="w-11 h-11 rounded-full border-2 border-[var(--bg)] object-cover img-noir"
-                                        alt=""
-                                    />
-                                ))}
-                                <div className="w-11 h-11 rounded-full border-2 border-[var(--bg)] bg-[var(--accent)] flex items-center justify-center font-display text-sm text-black">
-                                    +2K
-                                </div>
-                            </div>
-                            <div>
-                                <div className="font-mono text-[10px] text-[var(--muted)] tracking-[0.2em] uppercase">Verified Members</div>
-                                <div className="font-heading text-sm text-[var(--fg)] tracking-wider">2,340 CNIC-verified</div>
-                            </div>
-                        </div>
                     </div>
                     </div>
 
@@ -413,15 +360,16 @@ const HomePage: React.FC = () => {
                 </div>
             </section>
 
-            {/* ===================== STATS ===================== */}
+            {/* ===================== STATS (live from the API) ===================== */}
+            {stats && (
             <section className="border-y border-[var(--border)] bg-[var(--bg-darker)] relative overflow-hidden">
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
                     <div className="reveal-stagger grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6">
                         {[
-                            { v: 2340, label: 'CNIC-verified members', color: 'text-[var(--verify-bright)]' },
-                            { v: 847, label: 'Active listings', color: 'text-[var(--fg)]' },
-                            { v: 612, label: 'Roommates matched', color: 'text-[var(--accent)]' },
-                            { v: 5, label: 'Cities active', color: 'text-[var(--fg)]' },
+                            { v: stats.verifiedMembers, label: 'Verified members', color: 'text-[var(--verify-bright)]' },
+                            { v: stats.activeListings, label: 'Active listings', color: 'text-[var(--fg)]' },
+                            { v: stats.landlords, label: 'Verified landlords', color: 'text-[var(--accent)]' },
+                            { v: stats.cities, label: 'Cities covered', color: 'text-[var(--fg)]' },
                         ].map((s) => (
                             <div key={s.label} className="border-l border-[var(--border-light)] pl-6">
                                 <div className={`font-display text-6xl md:text-7xl number-display ${s.color}`}>
@@ -433,6 +381,7 @@ const HomePage: React.FC = () => {
                     </div>
                 </div>
             </section>
+            )}
 
             {/* ===================== VERIFICATION ===================== */}
             <section className="relative py-28 lg:py-36" id="verification">

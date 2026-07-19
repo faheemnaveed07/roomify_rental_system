@@ -3,6 +3,8 @@ import { propertyService } from '../services/PropertyService';
 import { propertyCreateSchema, paginationSchema, propertySearchQuerySchema } from '../utils/validators';
 import { IPropertyFilter, IPropertyCreate } from '@shared/types/property.types';
 import { ApiResponse } from '@shared/types/api.types';
+import { Property } from '../models/Property';
+import { User } from '../models/User';
 
 export class PropertyController {
     async create(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -212,6 +214,38 @@ export class PropertyController {
                     totalPages: result.totalPages,
                     hasNextPage: result.page < result.totalPages,
                     hasPrevPage: result.page > 1,
+                },
+            };
+
+            res.json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /**
+     * Public platform stats for the landing page.
+     *
+     * Aggregate counts only (no user data), so the marketing numbers always
+     * reflect the real database instead of hardcoded marketing figures.
+     */
+    async getStats(_req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const [activeListings, verifiedMembers, landlords, cities] = await Promise.all([
+                Property.countDocuments({ status: 'active' }),
+                User.countDocuments({ emailVerified: true }),
+                User.countDocuments({ role: 'landlord' }),
+                Property.distinct('location.city', { status: 'active' }),
+            ]);
+
+            const response: ApiResponse = {
+                success: true,
+                message: 'Platform stats retrieved successfully',
+                data: {
+                    activeListings,
+                    verifiedMembers,
+                    landlords,
+                    cities: cities.length,
                 },
             };
 

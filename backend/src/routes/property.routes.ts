@@ -7,6 +7,8 @@ const router = Router();
 
 // Public routes
 router.get('/search', propertyController.search.bind(propertyController));
+// NOTE: must stay above '/:id', otherwise that route swallows "stats".
+router.get('/stats', propertyController.getStats.bind(propertyController));
 router.get('/featured', propertyController.getFeatured.bind(propertyController));
 router.get('/nearby', propertyController.getNearby.bind(propertyController));
 router.get('/:id', optionalAuth, propertyController.getById.bind(propertyController));

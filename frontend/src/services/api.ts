@@ -125,6 +125,13 @@ export const authService = {
     },
 };
 
+export interface PlatformStats {
+    activeListings: number;
+    verifiedMembers: number;
+    landlords: number;
+    cities: number;
+}
+
 export const propertyService = {
     /**
      * Fetch properties with full filter + pagination support.
@@ -199,6 +206,11 @@ export const propertyService = {
     },
     getById: async (id: string): Promise<IProperty> => {
         const response = await api.get<ApiResponse<IProperty>>(`/properties/${id}`);
+        return response.data.data!;
+    },
+    /** Public aggregate counts for the landing page stats band */
+    getStats: async (): Promise<PlatformStats> => {
+        const response = await api.get<ApiResponse<PlatformStats>>('/properties/stats');
         return response.data.data!;
     },
     create: async (propertyData: IPropertyCreate | (IPropertyCreate & { owner: string })): Promise<IProperty> => {
