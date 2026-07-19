@@ -34,6 +34,8 @@ interface PropertyMapProps {
     defaultCenter?: [number, number]; // [lat, lng]
     defaultZoom?: number;
     className?: string;
+    /** Map height floor — lower this when embedding (e.g. the property detail page) */
+    minHeight?: number | string;
 }
 
 const MULTAN_CENTER: [number, number] = [30.1575, 71.5249];
@@ -83,6 +85,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
     defaultCenter = MULTAN_CENTER,
     defaultZoom = 12,
     className,
+    minHeight = '500px',
 }) => {
     const mapRef = useRef<L.Map | null>(null);
 
@@ -106,7 +109,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
                 center={defaultCenter}
                 zoom={defaultZoom}
                 scrollWheelZoom={true}
-                style={{ height: '100%', width: '100%', minHeight: '500px' }}
+                style={{ height: '100%', width: '100%', minHeight }}
                 ref={(map) => {
                     if (map) mapRef.current = map;
                 }}

@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { propertyService, bookingService, chatService, matchingService, resolveAssetUrl } from '../services/api';
 import { useAuthStore } from '../store/auth.store';
 import { IProperty } from '@shared/types';
 import Button from '../components/atoms/Button';
 import { Badge } from '../components/atoms/Badge';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, MapPin } from 'lucide-react';
+import PropertyMap, { MapProperty } from '../components/molecules/PropertyMap';
 
 interface ScoreBreakdown {
     category: string;
@@ -30,6 +31,33 @@ const PropertyDetailPage: React.FC = () => {
     const [matchScore, setMatchScore] = useState<number | null>(null);
     const [matchBreakdown, setMatchBreakdown] = useState<ScoreBreakdown[]>([]);
     const [hasProfile, setHasProfile] = useState<boolean | null>(null);
+
+    // Single-marker map for this property. Rendered only when the listing has
+    // real coordinates (legacy rows may have none / null-island).
+    const mapProperties = useMemo<MapProperty[] | null>(() => {
+        const coords = property?.location?.coordinates;
+        if (
+            !property ||
+            !Array.isArray(coords) ||
+            coords.length !== 2 ||
+            typeof coords[0] !== 'number' ||
+            typeof coords[1] !== 'number' ||
+            (coords[0] === 0 && coords[1] === 0)
+        ) {
+            return null;
+        }
+        return [
+            {
+                id: 'this-property',
+                title: property.title,
+                price: property.rent?.amount ?? 0,
+                currency: property.rent?.currency ?? 'PKR',
+                city: property.location.city,
+                area: property.location.area,
+                coordinates: [coords[0], coords[1]] as [number, number],
+            },
+        ];
+    }, [property]);
 
     useEffect(() => {
         if (!id) return;
@@ -119,6 +147,19 @@ const PropertyDetailPage: React.FC = () => {
                         <h2 className="text-2xl font-bold mb-4">Description</h2>
                         <p className="text-lg text-neutral-600 leading-relaxed">{property.description}</p>
                     </section>
+
+                    {mapProperties && (
+                        <section className="mb-12">
+                            <h2 className="text-2xl font-bold mb-4">Location</h2>
+                            <p className="text-neutral-500 mb-4 flex items-center gap-2">
+                                <MapPin size={16} />
+                                {property.location.address}, {property.location.area}, {property.location.city}
+                            </p>
+                            <div className="h-[320px]">
+                                <PropertyMap properties={mapProperties} minHeight={320} />
+                            </div>
+                        </section>
+                    )}
                 </div>
 
                 <div className="lg:col-span-1">

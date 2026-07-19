@@ -120,9 +120,8 @@ const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const rootRef = useRef<HTMLDivElement>(null);
 
-    // Hero reel + progress
+    // Hero reel
     const [reel, setReel] = useState(0);
-    const [progress, setProgress] = useState(0);
 
     // Search + verified toggle
     const [verifiedOnly, setVerifiedOnly] = useState(false);
@@ -160,23 +159,10 @@ const HomePage: React.FC = () => {
         return () => io.disconnect();
     }, []);
 
-    // ── Hero reel auto-advance + progress bar ───────────────────────────────
+    // ── Hero reel auto-advance ──────────────────────────────────────────────
     useEffect(() => {
-        const dur = 5200;
-        setProgress(0);
-        const start = performance.now();
-        let raf = 0;
-        const tick = (t: number) => {
-            const p = Math.min(100, ((t - start) / dur) * 100);
-            setProgress(p);
-            if (p < 100) raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
-        const to = setTimeout(() => setReel((r) => (r + 1) % REEL.length), dur);
-        return () => {
-            cancelAnimationFrame(raf);
-            clearTimeout(to);
-        };
+        const to = setTimeout(() => setReel((r) => (r + 1) % REEL.length), 5200);
+        return () => clearTimeout(to);
     }, [reel]);
 
     // ── Sticky CTA visibility ───────────────────────────────────────────────

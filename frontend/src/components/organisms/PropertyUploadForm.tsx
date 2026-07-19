@@ -20,6 +20,7 @@ import { useLocalUpload } from '../../hooks/useLocalUpload';
 import { useAuthStore } from '../../store/auth.store';
 import Button from '../atoms/Button';
 import Input from '../atoms/Input';
+import LocationPicker from '../molecules/LocationPicker';
 
 // Validation Schema
 const propertySchema = z.object({
@@ -30,11 +31,20 @@ const propertySchema = z.object({
         amount: z.number().min(1000, 'Rent must be at least 1,000 PKR'),
         securityDeposit: z.number().min(0),
     }),
-    location: z.object({
-        address: z.string().min(5, 'Address is required'),
-        city: z.enum(['Multan', 'Vehari']),
-        area: z.string().min(2, 'Area is required'),
-    }),
+    location: z
+        .object({
+            address: z.string().min(5, 'Address is required'),
+            city: z.enum(['Multan', 'Vehari']),
+            area: z.string().min(2, 'Area is required'),
+            // GeoJSON [lng, lat] — set by dropping a pin on the map.
+            coordinates: z
+                .tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)])
+                .optional(),
+        })
+        .refine((loc) => Array.isArray(loc.coordinates) && loc.coordinates.length === 2, {
+            message: 'Please pin the property location on the map',
+            path: ['coordinates'],
+        }),
     size: z.object({
         value: z.number().positive('Size must be positive'),
         unit: z.enum(['sqft', 'sqm', 'marla', 'kanal']),
@@ -85,6 +95,9 @@ const PropertyUploadForm: React.FC<PropertyUploadFormProps> = ({ onSuccess }) =>
     });
 
     const propertyType = watch('propertyType');
+    const locCity = watch('location.city');
+    const locArea = watch('location.area');
+    const locAddress = watch('location.address');
 
     // Drag & Drop Handler
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
@@ -126,7 +139,9 @@ const PropertyUploadForm: React.FC<PropertyUploadFormProps> = ({ onSuccess }) =>
                     address: data.location.address,
                     city: data.location.city,
                     area: data.location.area,
-                    coordinates: [71.5249, 30.1575], // Defaults for Multan
+                    // Real coordinates picked by the landlord on the map (GeoJSON [lng, lat]).
+                    // Validation above guarantees this is set before we get here.
+                    coordinates: data.location.coordinates as [number, number],
                 },
                 rent: {
                     amount: data.rent.amount,
@@ -392,6 +407,19 @@ const PropertyUploadForm: React.FC<PropertyUploadFormProps> = ({ onSuccess }) =>
                         control={control}
                         render={({ field }) => (
                             <Input {...field} label="Full Address" placeholder="Street number, House number..." error={errors.location?.address?.message} />
+                        )}
+                    />
+                    <Controller
+                        name="location.coordinates"
+                        control={control}
+                        render={({ field }) => (
+                            <LocationPicker
+                                value={field.value as [number, number] | undefined}
+                                onChange={field.onChange}
+                                city={locCity}
+                                searchQuery={[locAddress, locArea, locCity].filter(Boolean).join(', ')}
+                                error={errors.location?.coordinates?.message as string | undefined}
+                            />
                         )}
                     />
                 </section>
