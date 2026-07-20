@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { env } from '../config/environment';
-import { ITokenPayload } from '@shared/types/user.types';
+import { ITokenPayload, UserStatus } from '@shared/types/user.types';
+import { User } from '../models/User';
 
 // Extend Express Request type
 declare global {
@@ -12,11 +13,21 @@ declare global {
     }
 }
 
-export const authenticate = (
+/**
+ * Authenticate the caller.
+ *
+ * A signed JWT alone is not enough: the account it names may since have been
+ * deleted, suspended, or had its role changed, and the token would happily keep
+ * working until it expired. (Deleting users left stale sessions that still
+ * passed role checks and then failed further down in confusing ways.) So the
+ * token is verified for authenticity, then the account is re-read from the
+ * database and THAT is the source of truth for role and status.
+ */
+export const authenticate = async (
     req: Request,
     res: Response,
     next: NextFunction
-): void => {
+): Promise<void> => {
     try {
         // ✅ Try to read from httpOnly cookie first
         let token = req.cookies.accessToken;
@@ -37,16 +48,46 @@ export const authenticate = (
             return;
         }
 
+        let decoded: ITokenPayload;
         try {
-            const decoded = jwt.verify(token, env.JWT_SECRET) as ITokenPayload;
-            req.user = decoded;
-            next();
-        } catch (error) {
+            decoded = jwt.verify(token, env.JWT_SECRET) as ITokenPayload;
+        } catch {
             res.status(401).json({
                 success: false,
                 message: 'Invalid or expired token',
             });
+            return;
         }
+
+        const account = await User.findById(decoded.userId).select('email role status');
+
+        if (!account) {
+            // Token is validly signed but the account is gone.
+            res.status(401).json({
+                success: false,
+                message: 'Your session is no longer valid. Please sign in again.',
+                error: { code: 'SESSION_INVALID', message: 'Account no longer exists' },
+            });
+            return;
+        }
+
+        if (account.status === UserStatus.SUSPENDED || account.status === UserStatus.DEACTIVATED) {
+            res.status(403).json({
+                success: false,
+                message: `Your account is ${account.status}.`,
+                error: { code: 'ACCOUNT_INACTIVE', message: `Account is ${account.status}` },
+            });
+            return;
+        }
+
+        // Use the CURRENT role/email, not whatever the token was minted with.
+        req.user = {
+            userId: decoded.userId,
+            email: account.email,
+            role: account.role,
+        } as ITokenPayload;
+
+        next();
     } catch (error) {
         next(error);
     }

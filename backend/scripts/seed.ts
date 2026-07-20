@@ -448,7 +448,9 @@ async function seed() {
                 title: tmpl.titleFn(area, cityData.city),
                 description: tmpl.descFn(area),
                 propertyType: tmpl.type,
-                status: 'active',
+                // Leave the first listing of each landlord awaiting review, so the
+                // admin approval queue actually has something in it to demo.
+                status: p === 0 ? 'pending_verification' : 'active',
                 location: {
                     type: 'Point',
                     coordinates: coords,
