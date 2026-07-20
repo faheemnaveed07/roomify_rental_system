@@ -474,6 +474,10 @@ export const adminPropertyService = {
         const response = await api.get<ApiResponse<any[]>>('/admin/properties', { params });
         return response.data;
     },
+    getCounts: async (): Promise<Record<string, number>> => {
+        const response = await api.get<ApiResponse<Record<string, number>>>('/admin/properties/counts');
+        return response.data.data!;
+    },
     approve: async (propertyId: string): Promise<any> => {
         const response = await api.post<ApiResponse<any>>(`/admin/properties/${propertyId}/approve`);
         return response.data.data!;

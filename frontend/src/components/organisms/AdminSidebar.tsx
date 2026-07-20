@@ -9,7 +9,10 @@ import {
     LogOut,
     X,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../../store/auth.store';
+import { adminPropertyService } from '../../services/api';
+import { PropertyStatus } from '@shared/types/property.types';
 
 interface AdminSidebarProps {
     isOpen: boolean;
@@ -20,7 +23,7 @@ const navGroups = [
     {
         label: 'Overview',
         items: [
-            { icon: ShieldCheck, label: 'Pending Approvals', path: '/admin', end: true },
+            { icon: ShieldCheck, label: 'Pending Approvals', path: '/admin', end: true, badge: 'pending' as const },
         ],
     },
     {
@@ -41,6 +44,14 @@ const navGroups = [
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
     const { logout } = useAuthStore();
+
+    // Shows at a glance whether the queue is genuinely empty or just filtered.
+    const { data: counts } = useQuery({
+        queryKey: ['admin-property-counts'],
+        queryFn: () => adminPropertyService.getCounts(),
+        staleTime: 30_000,
+    });
+    const pendingCount = counts?.[PropertyStatus.PENDING_VERIFICATION] ?? 0;
 
     return (
         <aside
@@ -98,7 +109,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
                                     {({ isActive }) => (
                                         <>
                                             <item.icon size={17} className={isActive ? 'text-primary-600' : ''} />
-                                            {item.label}
+                                            <span className="flex-1">{item.label}</span>
+                                            {'badge' in item && item.badge === 'pending' && pendingCount > 0 && (
+                                                <span className="rounded-full bg-primary-600 px-2 py-0.5 text-[11px] font-bold text-white">
+                                                    {pendingCount}
+                                                </span>
+                                            )}
                                         </>
                                     )}
                                 </NavLink>

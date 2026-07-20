@@ -21,6 +21,7 @@ router.post('/documents/:id/reject', adminController.rejectDocument.bind(adminCo
 // Property verification
 router.get('/properties', adminController.getAllProperties.bind(adminController));
 router.get('/properties/pending', adminController.getPendingProperties.bind(adminController));
+router.get('/properties/counts', adminController.getPropertyCounts.bind(adminController));
 router.post('/properties/:id/approve', adminController.approveProperty.bind(adminController));
 router.post('/properties/:id/reject', adminController.rejectProperty.bind(adminController));
 

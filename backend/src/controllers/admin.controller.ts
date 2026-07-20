@@ -166,6 +166,45 @@ export class AdminController {
         }
     }
 
+    /**
+     * How many listings sit in each status. The review queue uses this to show
+     * counts on its tabs, so an admin can tell "nothing to review" apart from
+     * "the filter is hiding everything".
+     */
+    async getPropertyCounts(_req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { Property } = await import('../models/Property');
+
+            const rows = await Property.aggregate<{ _id: string; count: number }>([
+                { $group: { _id: '$status', count: { $sum: 1 } } },
+            ]);
+
+            const counts: Record<string, number> = {
+                [PropertyStatus.PENDING_VERIFICATION]: 0,
+                [PropertyStatus.ACTIVE]: 0,
+                [PropertyStatus.REJECTED]: 0,
+                [PropertyStatus.RENTED]: 0,
+                [PropertyStatus.INACTIVE]: 0,
+            };
+            let total = 0;
+
+            for (const row of rows) {
+                counts[row._id] = row.count;
+                total += row.count;
+            }
+
+            const response: ApiResponse = {
+                success: true,
+                message: 'Property counts retrieved successfully',
+                data: { ...counts, total },
+            };
+
+            res.json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async approveProperty(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const adminId = req.user?.userId;

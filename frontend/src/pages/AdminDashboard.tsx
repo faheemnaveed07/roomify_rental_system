@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminPropertyService } from '../services/api';
 import { PropertyStatus } from '@shared/types/property.types';
@@ -10,7 +11,7 @@ import {
     TableHeader,
     TableRow,
 } from '../components/ui/table';
-import { CheckCircle, XCircle, Search, Building2, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, Search, Building2, ChevronLeft, ChevronRight, AlertTriangle, RotateCcw, EyeOff, Inbox } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import {
@@ -28,13 +29,15 @@ interface ConfirmDialogProps {
     confirmLabel: string;
     confirmVariant?: 'default' | 'destructive';
     requireReason?: boolean;
+    busy?: boolean;
+    error?: string | null;
     onConfirm: (reason?: string) => void;
     onCancel: () => void;
 }
 
-function ConfirmDialog({ title, description, confirmLabel, confirmVariant = 'default', requireReason, onConfirm, onCancel }: ConfirmDialogProps) {
+function ConfirmDialog({ title, description, confirmLabel, confirmVariant = 'default', requireReason, busy, error, onConfirm, onCancel }: ConfirmDialogProps) {
     const [reason, setReason] = useState('');
-    const canConfirm = !requireReason || reason.trim().length >= 5;
+    const canConfirm = (!requireReason || reason.trim().length >= 5) && !busy;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -65,8 +68,14 @@ function ConfirmDialog({ title, description, confirmLabel, confirmVariant = 'def
                     </div>
                 )}
 
+                {error && (
+                    <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+                        {error}
+                    </p>
+                )}
+
                 <div className="flex gap-3 justify-end">
-                    <Button variant="outline" onClick={onCancel}>Cancel</Button>
+                    <Button variant="outline" onClick={onCancel} disabled={busy}>Cancel</Button>
                     <Button
                         variant={confirmVariant === 'destructive' ? 'destructive' : 'default'}
                         disabled={!canConfirm}
@@ -118,17 +127,113 @@ function SkeletonRow() {
     );
 }
 
+// ── Row actions ─────────────────────────────────────────────────────
+function RowActions({ property, onAction }: { property: any; onAction: (a: DialogAction) => void }) {
+    if (property.status === PropertyStatus.PENDING_VERIFICATION) {
+        return (
+            <div className="flex items-center gap-2">
+                <Button
+                    size="sm"
+                    className="h-8 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+                    onClick={() => onAction('approve')}
+                >
+                    <CheckCircle className="w-3.5 h-3.5" />
+                    Approve
+                </Button>
+                <Button size="sm" variant="destructive" className="h-8 gap-1.5" onClick={() => onAction('reject')}>
+                    <XCircle className="w-3.5 h-3.5" />
+                    Reject
+                </Button>
+            </div>
+        );
+    }
+
+    if (property.status === PropertyStatus.ACTIVE) {
+        return (
+            <Button size="sm" variant="outline" className="h-8 gap-1.5" onClick={() => onAction('takedown')}>
+                <EyeOff className="w-3.5 h-3.5" />
+                Take down
+            </Button>
+        );
+    }
+
+    if (property.status === PropertyStatus.REJECTED || property.status === PropertyStatus.INACTIVE) {
+        return (
+            <Button size="sm" variant="outline" className="h-8 gap-1.5" onClick={() => onAction('restore')}>
+                <RotateCcw className="w-3.5 h-3.5" />
+                Restore
+            </Button>
+        );
+    }
+
+    // Rented listings are under an active tenancy — not the admin's to move.
+    return <span className="text-xs text-slate-400 italic">—</span>;
+}
+
 // ── Main page ───────────────────────────────────────────────────────
-type DialogState =
-    | { mode: 'approve'; id: string; title: string }
-    | { mode: 'reject'; id: string; title: string }
-    | null;
+/**
+ * Every row offers the action that makes sense for its status, so the queue is
+ * never a wall of dashes: pending listings can be approved or rejected, live
+ * ones can be taken down, and rejected/inactive ones can be restored.
+ */
+type DialogAction = 'approve' | 'restore' | 'reject' | 'takedown';
+type DialogState = { action: DialogAction; id: string; title: string } | null;
+
+const DIALOG_COPY: Record<DialogAction, {
+    title: string;
+    describe: (name: string) => string;
+    confirmLabel: string;
+    busyLabel: string;
+    destructive?: boolean;
+    requireReason?: boolean;
+}> = {
+    approve: {
+        title: 'Approve property?',
+        describe: (n) => `"${n}" will become publicly visible to tenants.`,
+        confirmLabel: 'Approve',
+        busyLabel: 'Approving…',
+    },
+    restore: {
+        title: 'Restore listing?',
+        describe: (n) => `"${n}" will be approved and published again.`,
+        confirmLabel: 'Restore',
+        busyLabel: 'Restoring…',
+    },
+    reject: {
+        title: 'Reject property?',
+        describe: (n) => `Provide a reason for rejecting "${n}". The landlord will be notified.`,
+        confirmLabel: 'Reject',
+        busyLabel: 'Rejecting…',
+        destructive: true,
+        requireReason: true,
+    },
+    takedown: {
+        title: 'Take this listing down?',
+        describe: (n) => `"${n}" is live right now. Taking it down hides it from tenants until it is restored.`,
+        confirmLabel: 'Take down',
+        busyLabel: 'Taking down…',
+        destructive: true,
+        requireReason: true,
+    },
+};
+
+function errorMessage(err: unknown): string {
+    const res = (err as { response?: { data?: { message?: string } } })?.response;
+    return res?.data?.message ?? (err as Error)?.message ?? 'Something went wrong. Please try again.';
+}
 
 const AdminDashboardPage: React.FC = () => {
     const queryClient = useQueryClient();
+    const { pathname } = useLocation();
+
+    // "Pending Approvals" (/admin) opens on the review queue; "Properties"
+    // (/admin/properties) opens on the full inventory.
+    const isReviewQueue = pathname === '/admin';
 
     // Filters
-    const [status, setStatus] = useState<string>('all');
+    const [status, setStatus] = useState<string>(
+        isReviewQueue ? PropertyStatus.PENDING_VERIFICATION : 'all'
+    );
     const [city, setCity] = useState('');
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
@@ -156,8 +261,15 @@ const AdminDashboardPage: React.FC = () => {
     const meta = data?.meta;
     const totalPages = meta?.totalPages ?? 1;
 
+    const { data: counts } = useQuery({
+        queryKey: ['admin-property-counts'],
+        queryFn: () => adminPropertyService.getCounts(),
+        staleTime: 30_000,
+    });
+
     const invalidate = useCallback(() => {
         queryClient.invalidateQueries({ queryKey: ['admin-properties'] });
+        queryClient.invalidateQueries({ queryKey: ['admin-property-counts'] });
     }, [queryClient]);
 
     // Mutations
@@ -172,22 +284,65 @@ const AdminDashboardPage: React.FC = () => {
         onSuccess: () => { setDialog(null); invalidate(); },
     });
 
+    const openDialog = useCallback((next: NonNullable<DialogState>) => {
+        approveMutation.reset();
+        rejectMutation.reset();
+        setDialog(next);
+    }, [approveMutation, rejectMutation]);
+
     const handleFilterChange = useCallback((setter: (v: string) => void) => (v: string) => {
         setter(v);
         setPage(1);
     }, []);
 
-    const isPending = (s: string) => s === PropertyStatus.PENDING_VERIFICATION;
+    const TABS: { value: string; label: string; count?: number }[] = [
+        { value: PropertyStatus.PENDING_VERIFICATION, label: 'Needs review', count: counts?.[PropertyStatus.PENDING_VERIFICATION] },
+        { value: PropertyStatus.ACTIVE, label: 'Live', count: counts?.[PropertyStatus.ACTIVE] },
+        { value: PropertyStatus.REJECTED, label: 'Rejected', count: counts?.[PropertyStatus.REJECTED] },
+        { value: 'all', label: 'All', count: counts?.total },
+    ];
 
     return (
         <div className="space-y-8">
             {/* Header */}
             <div>
                 <p className="text-sm font-semibold uppercase tracking-widest text-primary-600">Admin</p>
-                <h1 className="text-3xl font-extrabold text-slate-900">Property Management</h1>
+                <h1 className="text-3xl font-extrabold text-slate-900">
+                    {isReviewQueue ? 'Review Queue' : 'Property Management'}
+                </h1>
                 <p className="text-slate-500 mt-2 max-w-2xl">
-                    Review listings, approve or reject properties, and manage all active inventory.
+                    {isReviewQueue
+                        ? 'Listings waiting for approval land here. Approve to publish, reject with a reason to send back.'
+                        : 'Review listings, approve or reject properties, and manage all active inventory.'}
                 </p>
+            </div>
+
+            {/* Status tabs */}
+            <div className="flex flex-wrap gap-2">
+                {TABS.map((tab) => {
+                    const active = status === tab.value;
+                    return (
+                        <button
+                            key={tab.value}
+                            type="button"
+                            onClick={() => handleFilterChange(setStatus)(tab.value)}
+                            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
+                                active
+                                    ? 'border-primary-200 bg-primary-50 text-primary-700'
+                                    : 'border-slate-200 bg-white text-slate-500 hover:text-slate-800'
+                            }`}
+                        >
+                            {tab.label}
+                            {tab.count != null && (
+                                <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                                    active ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-500'
+                                }`}>
+                                    {tab.count}
+                                </span>
+                            )}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Filters */}
@@ -260,9 +415,21 @@ const AdminDashboardPage: React.FC = () => {
                                 ? (
                                     <TableRow>
                                         <TableCell colSpan={6} className="py-16 text-center text-slate-400">
-                                            <Building2 className="w-10 h-10 mx-auto mb-3 text-slate-300" />
-                                            <p className="font-medium text-slate-500">No properties found</p>
-                                            <p className="text-sm mt-1">Try adjusting your filters.</p>
+                                            {status === PropertyStatus.PENDING_VERIFICATION && !city && !search ? (
+                                                <>
+                                                    <Inbox className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+                                                    <p className="font-medium text-slate-500">Nothing waiting for review</p>
+                                                    <p className="text-sm mt-1">
+                                                        New listings show up here the moment a landlord publishes one.
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Building2 className="w-10 h-10 mx-auto mb-3 text-slate-300" />
+                                                    <p className="font-medium text-slate-500">No properties found</p>
+                                                    <p className="text-sm mt-1">Try adjusting your filters.</p>
+                                                </>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 )
@@ -298,30 +465,12 @@ const AdminDashboardPage: React.FC = () => {
                                             <StatusBadge status={property.status} />
                                         </TableCell>
                                         <TableCell>
-                                            {isPending(property.status) ? (
-                                                <div className="flex items-center gap-2">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="default"
-                                                        className="h-8 gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
-                                                        onClick={() => setDialog({ mode: 'approve', id: property._id, title: property.title })}
-                                                    >
-                                                        <CheckCircle className="w-3.5 h-3.5" />
-                                                        Approve
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="destructive"
-                                                        className="h-8 gap-1.5"
-                                                        onClick={() => setDialog({ mode: 'reject', id: property._id, title: property.title })}
-                                                    >
-                                                        <XCircle className="w-3.5 h-3.5" />
-                                                        Reject
-                                                    </Button>
-                                                </div>
-                                            ) : (
-                                                <span className="text-xs text-slate-400 italic">—</span>
-                                            )}
+                                            <RowActions
+                                                property={property}
+                                                onAction={(action) =>
+                                                    openDialog({ action, id: property._id, title: property.title })
+                                                }
+                                            />
                                         </TableCell>
                                     </TableRow>
                                 ))
@@ -364,27 +513,30 @@ const AdminDashboardPage: React.FC = () => {
             )}
 
             {/* Confirm dialog */}
-            {dialog?.mode === 'approve' && (
-                <ConfirmDialog
-                    title="Approve property?"
-                    description={`"${dialog.title}" will become publicly visible to tenants.`}
-                    confirmLabel={approveMutation.isPending ? 'Approving…' : 'Approve'}
-                    onCancel={() => setDialog(null)}
-                    onConfirm={() => approveMutation.mutate(dialog.id)}
-                />
-            )}
+            {dialog && (() => {
+                const copy = DIALOG_COPY[dialog.action];
+                const publishes = dialog.action === 'approve' || dialog.action === 'restore';
+                const mutation = publishes ? approveMutation : rejectMutation;
 
-            {dialog?.mode === 'reject' && (
-                <ConfirmDialog
-                    title="Reject property?"
-                    description={`Provide a reason for rejecting "${dialog.title}". The landlord will be notified.`}
-                    confirmLabel={rejectMutation.isPending ? 'Rejecting…' : 'Reject'}
-                    confirmVariant="destructive"
-                    requireReason
-                    onCancel={() => setDialog(null)}
-                    onConfirm={(reason) => rejectMutation.mutate({ id: dialog.id, reason: reason! })}
-                />
-            )}
+                return (
+                    <ConfirmDialog
+                        key={dialog.action + dialog.id}
+                        title={copy.title}
+                        description={copy.describe(dialog.title)}
+                        confirmLabel={mutation.isPending ? copy.busyLabel : copy.confirmLabel}
+                        confirmVariant={copy.destructive ? 'destructive' : 'default'}
+                        requireReason={copy.requireReason}
+                        busy={mutation.isPending}
+                        error={mutation.isError ? errorMessage(mutation.error) : null}
+                        onCancel={() => setDialog(null)}
+                        onConfirm={(reason) =>
+                            publishes
+                                ? approveMutation.mutate(dialog.id)
+                                : rejectMutation.mutate({ id: dialog.id, reason: reason! })
+                        }
+                    />
+                );
+            })()}
         </div>
     );
 };
