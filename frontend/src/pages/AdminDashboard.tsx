@@ -328,7 +328,7 @@ const AdminDashboardPage: React.FC = () => {
                             onClick={() => handleFilterChange(setStatus)(tab.value)}
                             className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
                                 active
-                                    ? 'border-primary-200 bg-primary-50 text-primary-700'
+                                    ? 'border-primary-100 bg-primary-50 text-primary-700'
                                     : 'border-slate-200 bg-white text-slate-500 hover:text-slate-800'
                             }`}
                         >
