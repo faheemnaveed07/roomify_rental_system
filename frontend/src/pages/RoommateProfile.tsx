@@ -770,7 +770,21 @@ const RoommateProfilePage: React.FC = () => {
                     </div>
 
                     {/* Step content */}
-                    <form onSubmit={onSubmit}>
+                    {/* Enter inside a field must not submit the wizard. The tag
+                        inputs only swallow Enter when they have something to add,
+                        so an empty one fell through to the browser's implicit
+                        submit — and step 4 is the step that carries the submit
+                        button, so the profile saved and navigated away while the
+                        user was still filling it in. */}
+                    <form
+                        onSubmit={onSubmit}
+                        onKeyDown={(e) => {
+                            const tag = (e.target as HTMLElement).tagName;
+                            if (e.key === 'Enter' && tag !== 'TEXTAREA' && tag !== 'BUTTON') {
+                                e.preventDefault();
+                            }
+                        }}
+                    >
                         <div className="px-6 py-6 min-h-[400px] overflow-hidden relative">
                             <AnimatePresence mode="wait" custom={direction}>
                                 <motion.div

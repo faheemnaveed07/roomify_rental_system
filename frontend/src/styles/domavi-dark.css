@@ -721,6 +721,23 @@
     background-color: var(--dv-bg-card);
     color: var(--dv-fg);
 }
+
+/* The Input atom is a CSS module whose `.input:focus { background: #fff }` has
+   higher specificity than `.dv-app input`. So the moment you clicked into a
+   field it turned pure white while the text stayed near-white — you could not
+   see what you were typing. Same story for the disabled grey. */
+.dv-app input:focus,
+.dv-app textarea:focus,
+.dv-app select:focus {
+    background-color: var(--dv-bg-card) !important;
+    color: var(--dv-fg) !important;
+}
+.dv-app input:disabled,
+.dv-app textarea:disabled,
+.dv-app select:disabled {
+    background-color: var(--dv-bg-elev) !important;
+    color: var(--dv-muted) !important;
+}
 .dv-app input::placeholder,
 .dv-app textarea::placeholder { color: var(--dv-muted); }
 .dv-app .placeholder-slate-400::placeholder,
