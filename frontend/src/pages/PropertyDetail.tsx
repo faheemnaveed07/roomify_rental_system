@@ -326,8 +326,10 @@ const PropertyDetailPage: React.FC = () => {
                                         `Hi, I'm interested in "${property.title}". Can we discuss the details?`
                                     );
                                     navigate('/messages');
-                                } catch (error) {
-                                    console.error('Failed to start conversation:', error);
+                                } catch (error: any) {
+                                    // This used to log to the console and stop:
+                                    // the button did nothing, with no clue why.
+                                    toast.error(error?.message ?? 'Could not open a chat with this landlord.');
                                 }
                             }}
                         >

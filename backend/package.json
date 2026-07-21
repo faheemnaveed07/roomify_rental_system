@@ -15,7 +15,8 @@
     "seed:reset": "ts-node -r tsconfig-paths/register scripts/seed.ts --clear-all",
     "users:cleanup": "ts-node -r tsconfig-paths/register scripts/cleanup-users.ts",
     "queue:pending": "ts-node -r tsconfig-paths/register scripts/queue-pending.ts",
-    "db:prune": "ts-node -r tsconfig-paths/register scripts/prune-orphans.ts"
+    "db:prune": "ts-node -r tsconfig-paths/register scripts/prune-orphans.ts",
+    "db:fix-indexes": "ts-node -r tsconfig-paths/register scripts/drop-stale-indexes.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.490.0",

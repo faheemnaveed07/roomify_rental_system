@@ -110,6 +110,8 @@ export interface CreateMessageDTO {
         name: string;
         size: number;
     }[];
+    /** Stable per send attempt, so a client retry does not store a second copy. */
+    clientMessageId?: string;
 }
 
 export interface GetConversationsDTO {
@@ -182,8 +184,20 @@ class ChatService {
      * Send a new message
      */
     async sendMessage(data: CreateMessageDTO): Promise<IMessageDocument> {
-        const { conversationId, senderId, receiverId, propertyId, content, messageType, attachments } = data;
+        const { conversationId, senderId, receiverId, propertyId, content, messageType, attachments, clientMessageId } = data;
         validateAttachments(attachments);
+
+        // A retry of a send that actually succeeded — hand back what we stored
+        // rather than creating a duplicate.
+        if (clientMessageId) {
+            const alreadyStored = await Message.findOne({ clientMessageId })
+                .populate('sender', 'firstName lastName avatar')
+                .populate('receiver', 'firstName lastName avatar');
+            if (alreadyStored) {
+                logger.info(`Duplicate send ignored for clientMessageId ${clientMessageId}`);
+                return alreadyStored;
+            }
+        }
 
         // Validate users exist
         const [sender, receiver] = await Promise.all([
@@ -221,6 +235,7 @@ class ChatService {
             messageType: messageType || MessageType.TEXT,
             attachments: attachments || [],
             isRead: false,
+            clientMessageId,
         });
 
         // Update conversation - cast unreadCount to Map<string, number> for TypeScript

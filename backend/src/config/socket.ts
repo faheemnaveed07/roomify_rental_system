@@ -23,6 +23,8 @@ interface ChatMessageData {
         name: string;
         size: number;
     }[];
+    /** Stable across the client's retries of one send. */
+    clientMessageId?: string;
 }
 
 interface TypingData {
@@ -30,7 +32,16 @@ interface TypingData {
     isTyping: boolean;
 }
 
-const connectedUsers: Map<string, SocketUser> = new Map();
+/**
+ * userId → the socket ids that user currently holds.
+ *
+ * One user routinely has several sockets open at once (the messages list and an
+ * open chat window each create their own). Keying by userId alone meant the
+ * newest socket overwrote the previous one and closing ANY of them marked the
+ * user offline everywhere — peers saw "Offline" and the backend even sent them
+ * "you missed a message" email while they were sitting in the app.
+ */
+const connectedUsers: Map<string, Set<string>> = new Map();
 
 const socketOptions: Partial<ServerOptions> = {
     cors: {
@@ -55,17 +66,23 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
 
         // User joins with their user ID
         socket.on('user:join', (userId: string) => {
-            const user: SocketUser = {
-                id: userId,
-                socketId: socket.id,
-                userId,
-            };
-            connectedUsers.set(userId, user);
+            const sockets = connectedUsers.get(userId) ?? new Set<string>();
+            const wasOffline = sockets.size === 0;
+            sockets.add(socket.id);
+            connectedUsers.set(userId, sockets);
             socket.join(`user:${userId}`);
             logger.info(`User ${userId} joined with socket ${socket.id}`);
-            
-            // Notify user is online
-            io.emit('user:online', { userId, online: true });
+
+            // Presence was broadcast-only, so a socket that connected after its
+            // peer was already online never learned about them and showed
+            // "Offline" forever. Hand the joiner the current roster.
+            socket.emit('user:online-list', {
+                userIds: Array.from(connectedUsers.keys()).filter((id) => id !== userId),
+            });
+
+            if (wasOffline) {
+                io.emit('user:online', { userId, online: true });
+            }
         });
 
         // Subscribe to property updates
@@ -102,6 +119,7 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
                     content: data.content,
                     messageType: data.messageType,
                     attachments: data.attachments,
+                    clientMessageId: data.clientMessageId,
                 });
 
                 // Get conversation ID
@@ -113,8 +131,15 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
                     conversationId,
                 });
 
-                // Also emit to receiver's user room (in case they're not in the conversation room)
+                // Both sides need this: the receiver to be notified at all, and
+                // the SENDER so their own conversation list moves the thread to
+                // the top with the new preview. Without the sender copy their
+                // sidebar kept showing the previous message until a reload.
                 io.to(`user:${data.receiverId}`).emit('chat:new-message', {
+                    message,
+                    conversationId,
+                });
+                io.to(`user:${data.senderId}`).emit('chat:new-message', {
                     message,
                     conversationId,
                 });
@@ -160,12 +185,16 @@ export const initializeSocket = (httpServer: HttpServer): Server => {
         });
 
         socket.on('disconnect', () => {
-            const user = Array.from(connectedUsers.values()).find((u) => u.socketId === socket.id);
-            if (user) {
-                connectedUsers.delete(user.userId);
-                // Notify user is offline
-                io.emit('user:online', { userId: user.userId, online: false });
-                logger.info(`User ${user.userId} disconnected`);
+            for (const [userId, sockets] of connectedUsers) {
+                if (!sockets.delete(socket.id)) continue;
+
+                // Offline only once the user's LAST socket is gone.
+                if (sockets.size === 0) {
+                    connectedUsers.delete(userId);
+                    io.emit('user:online', { userId, online: false });
+                    logger.info(`User ${userId} disconnected`);
+                }
+                break;
             }
             logger.info(`Socket disconnected: ${socket.id}`);
         });
@@ -201,7 +230,8 @@ export const emitAgreementNotification = (userId: string, event: string, data: u
     }
 };
 
-export const getConnectedUsers = (): Map<string, SocketUser> => connectedUsers;
+/** userId → their live socket ids. A user is online while this set is non-empty. */
+export const getConnectedUsers = (): Map<string, Set<string>> => connectedUsers;
 
 export const isUserOnline = (userId: string): boolean => connectedUsers.has(userId);
 

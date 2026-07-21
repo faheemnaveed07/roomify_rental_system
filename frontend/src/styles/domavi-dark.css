@@ -603,9 +603,18 @@
 .dv-app .border-neutral-300,
 .dv-app .border-gray-100,
 .dv-app .border-gray-200,
+.dv-app .border-neutral-50,
+.dv-app .border-neutral-400,
 .dv-app .border-slate-200\/60 { border-color: var(--dv-border-light) !important; }
+.dv-app .divide-neutral-50 > :not([hidden]) ~ :not([hidden]) { border-color: var(--dv-border) !important; }
 
 /* ---- Text remaps ---- */
+/* The -800 step was missed in the first pass, so section headings written as
+   text-slate-800 (the upload form's "Location", "House Configuration", …) came
+   out near-black on a near-black card. */
+.dv-app .text-slate-800,
+.dv-app .text-neutral-800,
+.dv-app .text-gray-800,
 .dv-app .text-slate-900,
 .dv-app .text-neutral-900,
 .dv-app .text-gray-900,
@@ -635,6 +644,9 @@
 .dv-app .bg-primary-500.text-white,
 .dv-app .bg-primary.text-white,
 .dv-app .bg-\[\#2563EB\].text-white { color: #1a0e07 !important; }
+/* Timestamp/tick row inside a sent chat bubble: primary-200 is a pale blue left
+   over from the old palette, which sits on terracotta with almost no contrast. */
+.dv-app .text-primary-200 { color: rgba(26, 14, 7, 0.65) !important; }
 .dv-app .text-primary-600,
 .dv-app .text-primary-700,
 .dv-app .text-primary,
@@ -687,11 +699,27 @@
 .dv-app .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--dv-border) !important; }
 
 /* ---- Inputs / placeholders ---- */
+/* Native widgets the browser paints itself — the <select> dropdown list, the
+   date picker and its calendar glyph, autofilled fields, scrollbars — ignore our
+   CSS and default to a light rendering. Declaring the scheme is what actually
+   flips them; without it a transparent <select> opens a white popup and paints
+   our near-white text on it, i.e. invisible options. */
+.dv-app,
+.domavi-dark {
+    color-scheme: dark;
+}
+
 .dv-app input,
 .dv-app textarea,
 .dv-app select {
     color: var(--dv-fg);
     background-color: transparent;
+}
+/* Belt and braces: some engines still paint options from the element's own box. */
+.dv-app select option,
+.dv-app select optgroup {
+    background-color: var(--dv-bg-card);
+    color: var(--dv-fg);
 }
 .dv-app input::placeholder,
 .dv-app textarea::placeholder { color: var(--dv-muted); }

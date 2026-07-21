@@ -7,6 +7,8 @@ export interface IMessageDocument extends Document, Omit<ISharedMessage, '_id' |
     conversation: Types.ObjectId;
     sender: Types.ObjectId;
     receiver: Types.ObjectId;
+    /** Client-generated id for one send attempt; see the schema field. */
+    clientMessageId?: string;
 }
 
 const attachmentSchema = new Schema({
@@ -53,6 +55,16 @@ const messageSchema = new Schema<IMessageDocument>(
             default: null,
         },
         attachments: [attachmentSchema],
+        /**
+         * Client-generated id for one send attempt. The client retries a send
+         * when the ack is slow, which on a cold backend means a message that
+         * arrived fine gets sent two or three times; this lets the server
+         * recognise the retry instead of storing it again.
+         */
+        clientMessageId: {
+            type: String,
+            default: undefined,
+        },
     },
     {
         timestamps: true,
@@ -62,6 +74,7 @@ const messageSchema = new Schema<IMessageDocument>(
 // Indexes for efficient queries
 messageSchema.index({ conversation: 1, createdAt: -1 });
 messageSchema.index({ sender: 1, receiver: 1 });
+messageSchema.index({ clientMessageId: 1 }, { unique: true, sparse: true });
 
 export const Message = mongoose.model<IMessageDocument>('Message', messageSchema);
 export default Message;

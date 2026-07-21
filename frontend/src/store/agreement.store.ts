@@ -82,8 +82,11 @@ export const useAgreementStore = create<AgreementStore>((set) => ({
             const agreement = await agreementService.getByBooking(bookingId);
             set({ agreement, loading: false });
         } catch (err: any) {
-            // 404 means no agreement yet — not a real error
-            if (err.response?.status === 404) {
+            // 404 means no agreement yet — not a real error. (The interceptor
+            // rejects with ApiError, which carries `status`; the old
+            // `err.response.status` read was always undefined, so this branch
+            // never ran and "no agreement yet" surfaced as a red error.)
+            if (err?.status === 404) {
                 set({ agreement: null, loading: false });
             } else {
                 const message = err.response?.data?.message || err.message || 'Failed to fetch agreement';

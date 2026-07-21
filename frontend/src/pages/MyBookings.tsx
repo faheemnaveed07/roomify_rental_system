@@ -16,7 +16,7 @@ const MyBookingsPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [paymentLoading, setPaymentLoading] = useState<string | null>(null);
-    const { toasts, success, dismiss } = useToast();
+    const { toasts, success, error: toastError, dismiss } = useToast();
 
     useEffect(() => {
         const fetchBookings = async () => {
@@ -64,15 +64,17 @@ const MyBookingsPage: React.FC = () => {
     const handleInitiatePayment = async (booking: any, method: 'bank_transfer' | 'cash') => {
         setPaymentLoading(booking._id);
         try {
-            const landlordId = typeof booking.property.owner === 'string' 
-                ? booking.property.owner 
-                : booking.property.owner._id;
-            
+            // The booking's own landlord ref — property is populated without
+            // `owner`, so reading property.owner._id threw and blanked the page.
+            const landlordId = typeof booking.landlord === 'string'
+                ? booking.landlord
+                : booking.landlord?._id;
+
             await paymentService.createPayment({
                 bookingId: booking._id,
                 landlordId,
                 propertyId: booking.property._id,
-                paymentType: 'rent',
+                paymentType: 'monthly_rent',
                 paymentMethod: method,
                 amount: booking.rentDetails?.monthlyRent,
                 currency: 'PKR',
@@ -80,7 +82,9 @@ const MyBookingsPage: React.FC = () => {
             });
             navigate('/payments');
         } catch (err: any) {
-            setError(err.message);
+            // A failed payment start must not replace the booking list — the
+            // page-level `error` state is reserved for a failed initial load.
+            toastError(err?.message ?? 'Could not start the payment.');
         } finally {
             setPaymentLoading(null);
         }

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { chatService } from '../services/api';
+import { useAuthStore } from './auth.store';
 
 interface Message {
     _id: string;
@@ -45,6 +46,8 @@ interface ChatState {
     startPropertyInquiry: (landlordId: string, propertyId: string, message: string) => Promise<any>;
     setTyping: (conversationId: string, userId: string, isTyping: boolean) => void;
     updateConversationLastMessage: (conversationId: string, message: Message) => void;
+    /** The peer read our messages — flip the ticks without a reload. */
+    markOwnMessagesRead: (conversationId: string, readerId: string) => void;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -105,10 +108,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
     markAsRead: async (conversationId) => {
         try {
             await chatService.markAsRead(conversationId);
+            // Zero OUR entry. The old code spread unreadCount into an identical
+            // object, so the sidebar badge kept its count and bold styling for
+            // the rest of the session even though the server had cleared it.
+            const me = useAuthStore.getState().user?.id;
             set((state) => ({
-                conversations: state.conversations.map(conv => 
-                    conv._id === conversationId 
-                        ? { ...conv, unreadCount: { ...conv.unreadCount } }
+                conversations: state.conversations.map(conv =>
+                    conv._id === conversationId
+                        ? { ...conv, unreadCount: { ...conv.unreadCount, ...(me ? { [me]: 0 } : {}) } }
                         : conv
                 ),
             }));
@@ -164,13 +171,37 @@ export const useChatStore = create<ChatState>((set, get) => ({
     },
 
     updateConversationLastMessage: (conversationId, message) => {
+        const me = useAuthStore.getState().user?.id;
+        const fromSomeoneElse = !!me && message.sender?._id !== me;
+
         set((state) => ({
             conversations: state.conversations.map(conv =>
                 conv._id === conversationId
-                    ? { ...conv, lastMessage: message, lastMessageAt: message.createdAt }
+                    ? {
+                        ...conv,
+                        lastMessage: message,
+                        lastMessageAt: message.createdAt,
+                        // An incoming message has to raise our badge; previously
+                        // only a page reload ever showed it.
+                        unreadCount: fromSomeoneElse
+                            ? { ...conv.unreadCount, [me!]: (conv.unreadCount?.[me!] ?? 0) + 1 }
+                            : conv.unreadCount,
+                    }
                     : conv
-            ).sort((a, b) => 
+            ).sort((a, b) =>
                 new Date(b.lastMessageAt || 0).getTime() - new Date(a.lastMessageAt || 0).getTime()
+            ),
+        }));
+
+        if (fromSomeoneElse) get().fetchUnreadCount();
+    },
+
+    markOwnMessagesRead: (conversationId, readerId) => {
+        set((state) => ({
+            messages: state.messages.map((m) =>
+                m.conversation === conversationId && m.receiver?._id === readerId && !m.isRead
+                    ? { ...m, isRead: true }
+                    : m
             ),
         }));
     },

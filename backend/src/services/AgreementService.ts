@@ -217,7 +217,17 @@ class AgreementService {
      * Only allowed when booking.status === COMPLETED.
      * Prevents duplicate: one agreement per booking.
      */
-    async generateAgreement(bookingId: string, requesterId: string): Promise<IAgreementDocument> {
+    /**
+     * @param isAdmin the caller acts for the platform, not as a party to the
+     *   booking. Admin payment approval generates the agreement on the parties'
+     *   behalf, and the party check below would otherwise reject it — quietly,
+     *   since the caller only logs the failure.
+     */
+    async generateAgreement(
+        bookingId: string,
+        requesterId: string,
+        isAdmin = false
+    ): Promise<IAgreementDocument> {
         // Check for existing agreement first
         const existing = await Agreement.findOne({ booking: new mongoose.Types.ObjectId(bookingId) });
         if (existing) {
@@ -236,7 +246,7 @@ class AgreementService {
         // Authorization: only tenant or landlord of the booking
         const tenantId = booking.tenant._id.toString();
         const landlordId = booking.landlord._id.toString();
-        if (requesterId !== tenantId && requesterId !== landlordId) {
+        if (!isAdmin && requesterId !== tenantId && requesterId !== landlordId) {
             throw new Error('Unauthorized: You are not a party to this booking');
         }
 

@@ -252,8 +252,11 @@ class PaymentService {
             throw new Error('Payment not found');
         }
 
-        if (payment.status !== PaymentStatus.PENDING) {
-            throw new Error('Payment cannot be updated');
+        // A rejected payment is exactly the case where the tenant needs to send a
+        // corrected receipt, so it has to be resubmittable — allowing only
+        // PENDING made the "Resubmit Payment Proof" button fail every time.
+        if (payment.status !== PaymentStatus.PENDING && payment.status !== PaymentStatus.REJECTED) {
+            throw new Error(`A payment that is ${payment.status} cannot be updated`);
         }
 
         payment.transactionReference = transactionReference;
@@ -466,19 +469,29 @@ class PaymentService {
             throw new Error('Unauthorized: Not your booking');
         }
 
-        // Prevent duplicate submission
+        // Block a second submission of the SAME charge while one is still in
+        // flight. Including CONFIRMED here meant a paid deposit permanently
+        // blocked every later rent payment, so the booking could only ever
+        // receive one payment in its lifetime.
         const existingPayment = await Payment.findOne({
             booking: booking._id,
             tenant: new mongoose.Types.ObjectId(tenantId),
-            status: { $in: [PaymentStatus.PENDING, PaymentStatus.AWAITING_CONFIRMATION, PaymentStatus.CONFIRMED] },
+            paymentType,
+            status: { $in: [PaymentStatus.PENDING, PaymentStatus.AWAITING_CONFIRMATION] },
         });
 
         if (existingPayment) {
-            throw new Error('A payment has already been submitted for this booking');
+            throw new Error('A payment of this type is already awaiting review for this booking');
         }
 
+        // The amount has to follow the charge being paid — billing a security
+        // deposit at the monthly rent silently under- or over-charges it.
         const property = booking.property as { rent?: { amount: number } };
-        const amount = booking.rentDetails?.monthlyRent || property?.rent?.amount || 0;
+        const monthlyRent = booking.rentDetails?.monthlyRent || property?.rent?.amount || 0;
+        const amount =
+            paymentType === PaymentType.SECURITY_DEPOSIT
+                ? booking.rentDetails?.securityDeposit || monthlyRent
+                : monthlyRent;
 
         // Get landlord bank details if bank transfer
         let bankDetails;
@@ -580,7 +593,7 @@ class PaymentService {
 
         // Issue 2: Auto-generate agreement — silently skip if already exists
         try {
-            await AgreementService.generateAgreement(payment.booking.toString(), adminId);
+            await AgreementService.generateAgreement(payment.booking.toString(), adminId, true);
         } catch (err: unknown) {
             if (!(err instanceof Error) || !err.message.includes('already been generated')) {
                 logger.warn(`Auto-agreement generation failed for booking ${payment.booking}: ${err}`);

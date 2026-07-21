@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/auth.store';
 import { usePaymentStore, PaymentStatus, PaymentMethod, PaymentType } from '../store/payment.store';
+import { resolveAssetUrl } from '../services/api';
 import Button from '../components/atoms/Button';
 import { Badge } from '../components/atoms/Badge';
 import PaymentProgressTracker from '../components/molecules/PaymentProgressTracker';
@@ -301,7 +302,10 @@ const PaymentsPage: React.FC = () => {
                                     {/* Show proof of payment */}
                                     {payment.proofOfPayment && (
                                         <a 
-                                            href={payment.proofOfPayment}
+                                            // Stored as /uploads/... — without the
+                                            // API origin this hits the SPA and
+                                            // renders the app, not the receipt.
+                                            href={resolveAssetUrl(payment.proofOfPayment)}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-primary-600 hover:text-primary-700 text-sm"
@@ -528,10 +532,12 @@ const PaymentActionModal: React.FC<{
     });
     const [rejectReason, setRejectReason] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
+        setSubmitError(null);
         try {
             if (payment.action === 'proof') {
                 await onSubmitProof(proofData);
@@ -540,6 +546,10 @@ const PaymentActionModal: React.FC<{
             } else if (payment.action === 'reject') {
                 await onReject(rejectReason);
             }
+        } catch (err: any) {
+            // Without this the promise rejected into nothing: the spinner
+            // stopped, the modal stayed open, and the user was told nothing.
+            setSubmitError(err?.message ?? 'Something went wrong. Please try again.');
         } finally {
             setSubmitting(false);
         }
@@ -633,6 +643,12 @@ const PaymentActionModal: React.FC<{
                                 placeholder="Explain why you're rejecting this payment"
                             />
                         </div>
+                    )}
+
+                    {submitError && (
+                        <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-400">
+                            {submitError}
+                        </p>
                     )}
 
                     <div className="flex gap-3 pt-4">

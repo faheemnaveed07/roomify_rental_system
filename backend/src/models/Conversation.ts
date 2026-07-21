@@ -56,11 +56,15 @@ conversationSchema.index({ property: 1 });
 conversationSchema.index({ booking: 1 });
 conversationSchema.index({ lastMessageAt: -1 });
 
-// Ensure unique conversation between two users for a property
-conversationSchema.index(
-    { participants: 1, property: 1 },
-    { unique: true, sparse: true }
-);
+// Lookup index for getOrCreateConversation.
+//
+// This was `unique: true`, which is wrong on an array field: Mongo indexes one
+// key PER participant, so the first conversation about a property reserved
+// (landlordId, propertyId) and every later tenant asking about that same
+// listing collided with E11000. A landlord could hold exactly one conversation
+// per listing, ever. Uniqueness is handled in getOrCreateConversation, which
+// looks the pair up before creating.
+conversationSchema.index({ participants: 1, property: 1 });
 
 export const Conversation = mongoose.model<IConversationDocument>('Conversation', conversationSchema);
 export default Conversation;

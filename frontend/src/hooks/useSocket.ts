@@ -74,6 +74,13 @@ export const useSocket = (options: UseSocketOptions = {}) => {
             console.log('Socket disconnected');
         });
 
+        // Who was already online before we connected. Without this the roster
+        // only ever grew from live join events, so a peer who signed in first
+        // showed as Offline for the whole session.
+        socket.on('user:online-list', (data: { userIds: string[] }) => {
+            setOnlineUsers(prev => new Set([...prev, ...data.userIds]));
+        });
+
         socket.on('user:online', (data: UserOnlineData) => {
             setOnlineUsers(prev => {
                 const newSet = new Set(prev);
@@ -154,9 +161,19 @@ export const useSocket = (options: UseSocketOptions = {}) => {
         const { retries = 2, timeoutMs = 3000, retryDelayMs = 800 } = options;
         let lastError: Error | null = null;
 
+        // One id for all attempts at this message. A slow ack (rather than a
+        // lost send) used to store the message once per retry, so it appeared
+        // two or three times in both threads.
+        const payload = {
+            ...data,
+            clientMessageId:
+                globalThis.crypto?.randomUUID?.() ??
+                `${data.senderId}-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
+        };
+
         for (let attempt = 0; attempt <= retries; attempt += 1) {
             try {
-                return await emitWithAck('chat:send', data, timeoutMs);
+                return await emitWithAck('chat:send', payload, timeoutMs);
             } catch (error) {
                 lastError = error as Error;
                 if (attempt < retries) {

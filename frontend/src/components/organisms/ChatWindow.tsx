@@ -19,18 +19,21 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, onBack }) => {
         fetchMessages, 
         addMessage, 
         markAsRead,
+        markOwnMessagesRead,
         typingUsers,
         setTyping,
-        loading 
+        loading
     } = useChatStore();
-    
-    const { 
-        joinConversation, 
-        leaveConversation, 
+
+    const {
+        joinConversation,
+        leaveConversation,
         sendMessageWithRetry,
         sendTyping,
         onNewMessage,
         onTyping,
+        onReadReceipt,
+        markAsRead: emitRead,
         isUserOnline,
     } = useSocket({ userId: user?.id });
 
@@ -49,9 +52,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, onBack }) => {
             fetchMessages(conversationId);
             joinConversation(conversationId);
             
-            // Mark as read
+            // The REST call clears our own count; the socket emit is what tells
+            // the SENDER we read it. Only the store call was being made, so the
+            // other side's messages kept a single tick forever.
             if (user?.id) {
                 markAsRead(conversationId);
+                emitRead({ conversationId, userId: user.id });
             }
         }
 
@@ -70,6 +76,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, onBack }) => {
                 // Mark as read since we're viewing
                 if (user?.id && data.message.receiver?._id === user.id) {
                     markAsRead(conversationId);
+                    emitRead({ conversationId, userId: user.id });
                 }
             }
         });
@@ -80,9 +87,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversationId, onBack }) => {
             }
         });
 
+        const unsubRead = onReadReceipt((data) => {
+            if (data.conversationId === conversationId) {
+                markOwnMessagesRead(conversationId, data.userId);
+            }
+        });
+
         return () => {
             unsubMessage();
             unsubTyping();
+            unsubRead();
         };
     }, [conversationId, user?.id]);
 
