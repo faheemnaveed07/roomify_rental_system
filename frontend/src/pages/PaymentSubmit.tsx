@@ -83,7 +83,7 @@ const PaymentSubmitPage: React.FC = () => {
                 );
                 if (active) setExistingPayment(active);
             } catch (err: any) {
-                const backendMessage = err?.response?.data?.message;
+                const backendMessage = err?.message;
                 setLoadError(backendMessage || 'Failed to load booking details.');
                 toastError(backendMessage || 'Failed to load booking details.');
             } finally {
@@ -150,7 +150,7 @@ const PaymentSubmitPage: React.FC = () => {
             setSubmitted(true);
             success('Payment submitted! An admin will verify it shortly.');
         } catch (err: any) {
-            toastError(err?.response?.data?.message || 'Submission failed. Please try again.');
+            toastError(err?.message || 'Submission failed. Please try again.');
         }
     };
 

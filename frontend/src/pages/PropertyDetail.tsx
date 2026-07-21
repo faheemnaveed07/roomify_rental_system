@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { propertyService, bookingService, chatService, matchingService, resolveAssetUrl } from '../services/api';
 import { useAuthStore } from '../store/auth.store';
 import { IProperty } from '@shared/types';
@@ -106,9 +107,17 @@ const PropertyDetailPage: React.FC = () => {
                 bedNumber: property?.propertyType === 'shared_room' ? Number(selectedBedNumber) : undefined,
                 requestMessage
             });
-            alert('Booking request sent successfully!');
+            toast.success('Booking request sent. The landlord will be in touch.');
         } catch (err: any) {
-            alert(`Error: ${err.message}`);
+            // "Please complete verification…" as a bare alert leaves the tenant
+            // with nowhere to go; point them at the step that unblocks them.
+            if (err?.code === 'VERIFICATION_REQUIRED') {
+                toast.error('Verify your email and CNIC to request a booking.', {
+                    action: { label: 'Get verified', onClick: () => navigate('/verify') },
+                });
+            } else {
+                toast.error(err?.message ?? 'Could not send the booking request.');
+            }
         } finally {
             setBookingLoading(false);
         }

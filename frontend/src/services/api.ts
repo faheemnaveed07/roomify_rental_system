@@ -24,6 +24,29 @@ export const resolveAssetUrl = (image: string | { url?: string } | undefined): s
     return raw.startsWith('/uploads/') ? `${ASSETS_URL}${raw}` : raw;
 };
 
+/**
+ * A failed API call, with the server's own answer kept intact.
+ *
+ * The interceptor used to reject with a bare `new Error(message)`, which threw
+ * away the status and the `error.code` the API sends. Callers could then only
+ * show the raw sentence — nothing could react to WHY a call failed, so a
+ * landlord blocked for missing verification and one blocked for the wrong role
+ * were indistinguishable.
+ */
+export class ApiError extends Error {
+    readonly status: number;
+    readonly code?: string;
+    readonly details?: unknown;
+
+    constructor(message: string, status: number, code?: string, details?: unknown) {
+        super(message);
+        this.name = 'ApiError';
+        this.status = status;
+        this.code = code;
+        this.details = details;
+    }
+}
+
 const api = axios.create({
     baseURL: API_BASE_URL,
     headers: {
@@ -78,8 +101,19 @@ api.interceptors.response.use(
             window.location.replace('/auth');
         }
 
-        const message = error.response?.data?.message || 'Something went wrong';
-        return Promise.reject(new Error(message));
+        // A 403 on a role-gated route means the server disagrees with the role we
+        // cached at login — an admin changed it mid-session. Re-read the account
+        // so the UI stops claiming a role the server no longer grants.
+        if (error.response?.status === 403 && !config?.url?.includes('/auth/')) {
+            const { useAuthStore } = await import('../store/auth.store');
+            void useAuthStore.getState().validateSession();
+        }
+
+        const body = error.response?.data as (ApiResponse & { error?: { code?: string; details?: unknown } }) | undefined;
+        const message = body?.message || error.message || 'Something went wrong';
+        return Promise.reject(
+            new ApiError(message, error.response?.status ?? 0, body?.error?.code, body?.error?.details)
+        );
     }
 );
 

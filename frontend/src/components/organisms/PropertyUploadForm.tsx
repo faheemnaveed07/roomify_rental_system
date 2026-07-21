@@ -72,6 +72,7 @@ const PropertyUploadForm: React.FC<PropertyUploadFormProps> = ({ onSuccess }) =>
     const [images, setImages] = useState<IPropertyImage[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [needsVerification, setNeedsVerification] = useState(false);
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
@@ -178,7 +179,19 @@ const PropertyUploadForm: React.FC<PropertyUploadFormProps> = ({ onSuccess }) =>
             });
             onSuccess();
         } catch (err: any) {
-            setError(err.message || 'Failed to create property');
+            // A bare 403 reads as "you are not allowed here", which is wrong and
+            // unhelpful when the real cause is an incomplete profile or a role the
+            // server changed under a still-open session.
+            if (err?.code === 'VERIFICATION_REQUIRED') {
+                setError('Your email and CNIC must be verified before you can publish a listing.');
+                setNeedsVerification(true);
+            } else if (err?.status === 403) {
+                setError(
+                    'Your account no longer has landlord access on the server. Sign out and back in, or ask an admin to restore the role.'
+                );
+            } else {
+                setError(err?.message || 'Failed to create property');
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -481,8 +494,16 @@ const PropertyUploadForm: React.FC<PropertyUploadFormProps> = ({ onSuccess }) =>
                         </p>
 
                         {error && (
-                            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-medium">
-                                {error}
+                            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs font-medium space-y-2">
+                                <p>{error}</p>
+                                {needsVerification && (
+                                    <a
+                                        href="/verify"
+                                        className="inline-block rounded-lg bg-red-500/20 px-3 py-1.5 font-bold text-red-200 hover:bg-red-500/30"
+                                    >
+                                        Get verified
+                                    </a>
+                                )}
                             </div>
                         )}
 

@@ -6,9 +6,15 @@
  * reset survive with no listings attached. This script clears those out so the
  * database contains only seeded demo accounts plus one known admin.
  *
+ * SCOPE WARNING: with no --email, this deletes EVERY account that is not
+ * @demo.com — including hand-made test accounts you still care about. Pass
+ * --email to target one account instead of the whole non-seed population.
+ *
  * Usage:
- *   npm run users:cleanup              # DRY RUN — shows what would be deleted
- *   npm run users:cleanup -- --confirm # actually delete
+ *   npm run users:cleanup                                   # DRY RUN — all non-seed accounts
+ *   npm run users:cleanup -- --email probe@example.com      # DRY RUN — just that one
+ *   npm run users:cleanup -- --email probe@example.com --confirm
+ *   npm run users:cleanup -- --confirm                      # delete ALL non-seed accounts
  *
  * Admin credentials can be overridden:
  *   ADMIN_EMAIL=you@domavi.pk ADMIN_PASSWORD='Str0ngPass!' npm run users:cleanup -- --confirm
@@ -31,17 +37,27 @@ const KEEP_EMAIL_PATTERN = /@demo\.com$/i;
 
 async function main(): Promise<void> {
     const confirm = process.argv.includes('--confirm');
+    const emailFlag = process.argv.indexOf('--email');
+    const targetEmail = emailFlag !== -1 ? process.argv[emailFlag + 1] : null;
     const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/roomify';
 
     await mongoose.connect(mongoUri.replace(/\blocalhost\b/, '127.0.0.1'));
     console.log('✅ Connected to MongoDB\n');
 
-    // ── 1. Find legacy (non-seed) accounts ──────────────────────────────────
-    const legacy = await User.find({
-        email: { $not: KEEP_EMAIL_PATTERN },
-    }).select('email role createdAt');
+    // ── 1. Find the accounts in scope ───────────────────────────────────────
+    // Without --email this is EVERY non-seed account, which is a big hammer —
+    // say so out loud rather than letting it look like a targeted delete.
+    const legacy = targetEmail
+        ? await User.find({ email: targetEmail }).select('email role createdAt')
+        : await User.find({ email: { $not: KEEP_EMAIL_PATTERN } }).select('email role createdAt');
 
-    console.log(`Found ${legacy.length} legacy account(s) (not @demo.com):`);
+    if (targetEmail) {
+        console.log(`Targeting a single account: ${targetEmail}`);
+    } else {
+        console.log('⚠️  No --email given: scope is EVERY account that is not @demo.com.');
+    }
+
+    console.log(`Found ${legacy.length} account(s) in scope:`);
     for (const u of legacy) {
         const owned = await Property.countDocuments({ owner: u._id });
         console.log(`   • ${u.email.padEnd(34)} role=${String(u.role).padEnd(9)} listings=${owned}`);
@@ -53,7 +69,11 @@ async function main(): Promise<void> {
 
     if (!confirm) {
         console.log('\n🔎 DRY RUN — nothing was deleted.');
-        console.log('   Re-run with:  npm run users:cleanup -- --confirm\n');
+        console.log(
+            targetEmail
+                ? `   Re-run with:  npm run users:cleanup -- --email ${targetEmail} --confirm\n`
+                : '   Re-run with:  npm run users:cleanup -- --confirm\n'
+        );
         await mongoose.disconnect();
         return;
     }

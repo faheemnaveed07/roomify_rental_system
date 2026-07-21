@@ -243,7 +243,7 @@ const AdminDashboardPage: React.FC = () => {
     const [dialog, setDialog] = useState<DialogState>(null);
 
     // Query
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, error, refetch } = useQuery({
         queryKey: ['admin-properties', { status, city, search, page }],
         queryFn: () =>
             adminPropertyService.getAll({
@@ -393,8 +393,17 @@ const AdminDashboardPage: React.FC = () => {
             {/* Table */}
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 {isError ? (
-                    <div className="py-16 text-center text-red-500 text-sm">
-                        Failed to load properties. Please try again.
+                    // The backend sleeps on its free tier, so a cold start reads as
+                    // a hard failure. Say what actually went wrong and offer a retry
+                    // instead of a dead end.
+                    <div className="py-16 text-center space-y-3">
+                        <AlertTriangle className="mx-auto h-8 w-8 text-amber-500" />
+                        <p className="text-sm font-medium text-slate-500">
+                            {(error as Error)?.message ?? 'Could not reach the server.'}
+                        </p>
+                        <Button variant="outline" size="sm" onClick={() => refetch()}>
+                            Try again
+                        </Button>
                     </div>
                 ) : (
                     <Table>

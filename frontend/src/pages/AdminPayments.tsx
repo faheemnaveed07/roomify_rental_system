@@ -148,7 +148,7 @@ const AdminPaymentsPage: React.FC = () => {
             setAdminNotes('');
             await Promise.all([fetchPayments(activeTab, page), fetchStats()]);
         } catch (err: any) {
-            toastError(err?.response?.data?.message || 'Failed to approve payment.');
+            toastError(err?.message || 'Failed to approve payment.');
         } finally {
             setActionLoading(false);
         }
@@ -169,7 +169,7 @@ const AdminPaymentsPage: React.FC = () => {
             setRejectReasonError('');
             await Promise.all([fetchPayments(activeTab, page), fetchStats()]);
         } catch (err: any) {
-            toastError(err?.response?.data?.message || 'Failed to reject payment.');
+            toastError(err?.message || 'Failed to reject payment.');
         } finally {
             setActionLoading(false);
         }
