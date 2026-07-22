@@ -268,7 +268,7 @@ const Header: React.FC = () => {
                     >
                         R
                     </motion.span>
-                    <span className="text-base tracking-tight">Domavi</span>
+                    <span className="text-base tracking-tight">Property Rental System</span>
                 </Link>
 
                 {/* Role-based nav links */}

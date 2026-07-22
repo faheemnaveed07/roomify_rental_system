@@ -45,7 +45,7 @@ const PublicLayout: React.FC = () => (
                             <span className="text-black font-display text-lg leading-none">D</span>
                         </span>
                         <span>
-                            <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">DOMAVI</span>
+                            <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">PROPERTY RENTAL SYSTEM</span>
                             <span className="block font-mono text-[9px] text-[var(--muted)] tracking-[0.3em] mt-0.5">TRUST · HOME · <span className="font-urdu">گھر</span></span>
                         </span>
                     </div>
