@@ -6,6 +6,7 @@ dotenv.config();
 import { connectDatabase } from '../src/config/database';
 import { User } from '../src/models/User';
 import { logger } from '../src/utils/logger';
+import { UserRole, UserStatus } from '@shared/types/user.types';
 
 const email = process.argv[2] || process.env.PROMOTE_EMAIL;
 
@@ -23,8 +24,8 @@ const promote = async () => {
       process.exit(1);
     }
 
-    user.role = 'admin';
-    user.status = 'active';
+    user.role = UserRole.ADMIN;
+    user.status = UserStatus.ACTIVE;
     user.emailVerified = true;
     await user.save();
 
