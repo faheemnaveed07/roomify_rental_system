@@ -42,7 +42,7 @@ const PublicLayout: React.FC = () => (
                 <div>
                     <div className="flex items-center gap-3 mb-4">
                         <span className="w-8 h-8 bg-[var(--accent)] flex items-center justify-center shrink-0">
-                            <span className="text-black font-display text-lg leading-none">D</span>
+                            <span className="text-black font-display text-lg leading-none">R</span>
                         </span>
                         <span>
                             <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">PROPERTY RENTAL SYSTEM</span>
@@ -66,7 +66,7 @@ const PublicLayout: React.FC = () => (
                 </div>
             </div>
             <div className="container border-t border-[var(--border)] mt-12 pt-8 text-center font-mono text-xs tracking-[0.15em] text-[var(--muted)]">
-                © 2026 DOMAVI RENTAL SYSTEM · BUILT FOR MULTAN
+                © 2026 PROPERTY RENTAL SYSTEM · BUILT FOR MULTAN
             </div>
         </footer>
     </div>

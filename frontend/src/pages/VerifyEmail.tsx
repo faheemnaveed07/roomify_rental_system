@@ -61,7 +61,7 @@ const VerifyEmailPage: React.FC = () => {
                     to="/auth"
                     className="inline-flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-bright)] text-black font-heading text-xs tracking-[0.2em] uppercase py-3 px-6 transition-colors"
                 >
-                    Sign In to Domavi
+                    Sign In to Property Rental System
                 </Link>
             </motion.div>
         ),
@@ -108,7 +108,7 @@ const VerifyEmailPage: React.FC = () => {
                 className="relative z-10 w-full max-w-md"
             >
                 <div className="bg-[var(--bg-card)] border border-[var(--border-light)] notch-corner p-10 text-center">
-                    <p className="font-mono text-[11px] tracking-[0.3em] uppercase text-[var(--accent)] mb-8">DOMAVI</p>
+                    <p className="font-mono text-[11px] tracking-[0.3em] uppercase text-[var(--accent)] mb-8">PROPERTY RENTAL SYSTEM</p>
                     <AnimatePresence mode="wait">{content[state]}</AnimatePresence>
                 </div>
             </motion.div>

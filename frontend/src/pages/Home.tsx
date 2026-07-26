@@ -105,10 +105,10 @@ const LISTINGS = [
 ];
 
 const STORIES = [
-    { seed: 'photo-1494790108377-be9c29b29330', name: 'AYESHA K.', meta: 'Tenant · Gulgasht', quote: 'Domavi helped me lock in a CNIC-verified home within 24 hours. No agent, no scam, no stress.' },
-    { seed: 'photo-1507003211169-0a1dd7228f2d', name: 'USMAN T.', meta: 'Landlord · 3 properties', quote: 'I filled all three of my properties through Domavi. Tenants arrive already verified — that changes everything.' },
+    { seed: 'photo-1494790108377-be9c29b29330', name: 'AYESHA K.', meta: 'Tenant · Gulgasht', quote: 'Property Rental System helped me lock in a CNIC-verified home within 24 hours. No agent, no scam, no stress.' },
+    { seed: 'photo-1507003211169-0a1dd7228f2d', name: 'USMAN T.', meta: 'Landlord · 3 properties', quote: 'I filled all three of my properties through Property Rental System. Tenants arrive already verified — that changes everything.' },
     { seed: 'photo-1438761681033-6461ffad8d80', name: 'SARA M.', meta: 'Tenant · DHA Multan', quote: 'The roommate matching is unreal. Found someone with my exact schedule and budget in under a week.' },
-    { seed: 'photo-1633332755192-727a05c4013d', name: 'HAMZA R.', meta: 'Student · BZU', quote: 'Coming from another city, I had no contacts. Domavi made finding a safe room near campus actually easy.' },
+    { seed: 'photo-1633332755192-727a05c4013d', name: 'HAMZA R.', meta: 'Student · BZU', quote: 'Coming from another city, I had no contacts. Property Rental System made finding a safe room near campus actually easy.' },
 ];
 
 const MATCH_ROWS = [
@@ -401,8 +401,8 @@ const HomePage: React.FC = () => {
                         </div>
                         <div className="lg:col-span-5 lg:col-start-8 flex flex-col justify-end">
                             <p className="text-[var(--fg-dim)] text-lg leading-relaxed">
-                                Every Domavi member goes through a 3-step CNIC verification process. Here's exactly what happens — no
-                                ambiguity, no shortcuts. This is what makes Domavi different from every other rental platform in Pakistan.
+                                Every Property Rental System member goes through a 3-step CNIC verification process. Here's exactly what happens — no
+                                ambiguity, no shortcuts. This is what makes Property Rental System different from every other rental platform in Pakistan.
                             </p>
                         </div>
                     </div>
@@ -673,7 +673,7 @@ const HomePage: React.FC = () => {
                     <div className="reveal-stagger grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
                             { Icon: ShieldCheck, title: 'CNIC VERIFIED', body: 'Both tenants and landlords verify identity before they can list or message.' },
-                            { Icon: CreditCard, title: 'SECURE AGREEMENTS', body: 'Digital rental agreements signed and counter-signed inside Domavi.' },
+                            { Icon: CreditCard, title: 'SECURE AGREEMENTS', body: 'Digital rental agreements signed and counter-signed inside Property Rental System.' },
                             { Icon: Quote, title: 'IN-APP CHAT', body: 'Talk safely without sharing your number until you choose to.' },
                             { Icon: Star, title: 'DEPOSIT PROTECTION', body: 'Your deposit is tracked and protected until you are settled in.' },
                         ].map((f) => (
@@ -755,7 +755,7 @@ const HomePage: React.FC = () => {
                             <span className="text-[var(--accent)]">you can trust?</span>
                         </h2>
                         <p className="text-[var(--fg-dim)] text-lg max-w-xl mx-auto mb-10">
-                            Get CNIC-verified in 2 minutes and join 2,340+ members who found their place — and their people — on Domavi.
+                            Get CNIC-verified in 2 minutes and join 2,340+ members who found their place — and their people — on Property Rental System.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link

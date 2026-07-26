@@ -85,7 +85,7 @@ const OrbitChip: React.FC<{
 
 export const HeroOrbit: React.FC<HeroOrbitProps> = ({
     src = '/hero-home.webp',
-    alt = 'A verified home on Domavi',
+    alt = 'A verified home on Property Rental System',
     className,
 }) => {
     return (

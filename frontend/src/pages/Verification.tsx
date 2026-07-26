@@ -228,7 +228,7 @@ const VerificationPage: React.FC = () => {
                     <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#d4845a]">Verification</p>
                     <h1 className="mt-2 text-4xl font-bold text-[#f5f5f5]">Get verified</h1>
                     <p className="mt-2 max-w-xl text-[#c0c0c0]">
-                        Domavi is built on trust. Verify your email and CNIC to list a property or send a booking
+                        Property Rental System is built on trust. Verify your email and CNIC to list a property or send a booking
                         request.
                     </p>
                 </div>

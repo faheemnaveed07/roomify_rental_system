@@ -36,7 +36,7 @@ const AddProperty: React.FC = () => {
                 <div>
                     <h1 className="text-3xl font-black text-[#1E293B]">Verification required</h1>
                     <p className="mt-2 font-medium text-neutral-500">
-                        To keep Domavi trustworthy, you need a verified email and CNIC before you can list a
+                        To keep Property Rental System trustworthy, you need a verified email and CNIC before you can list a
                         property.
                     </p>
                 </div>

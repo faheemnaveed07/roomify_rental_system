@@ -65,7 +65,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
                     <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-600 text-white text-sm font-black shadow-md shadow-primary-200">
                         R
                     </span>
-                    <span className="text-base tracking-tight">Domavi</span>
+                    <span className="text-base tracking-tight">Property Rental System</span>
                 </Link>
                 <button
                     type="button"

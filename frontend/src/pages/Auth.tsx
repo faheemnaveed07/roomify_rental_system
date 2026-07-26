@@ -137,7 +137,7 @@ const AuthPage: React.FC = () => {
                     <div className="hidden lg:flex flex-col space-y-8">
                         <div>
                             <div className="section-marker mb-5">
-                                <span>DOMAVI ACCESS</span>
+                                <span>PROPERTY RENTAL SYSTEM ACCESS</span>
                             </div>
                             <h1 className="font-display text-7xl leading-[0.9] text-[var(--fg)]">
                                 A home you can <span className="text-[var(--accent)]">trust</span>
