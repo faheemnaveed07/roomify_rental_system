@@ -188,7 +188,20 @@ const HomePage: React.FC = () => {
     }, []);
 
     const handleSearch = () => {
-        navigate('/browse', { state: { query: location, filters: { city: location, budget, type: ptype } } });
+        // "Roommate" is the matching flow, not a property type.
+        if (ptype === 'roommate') {
+            navigate('/roommate-matches');
+            return;
+        }
+        // Keys must match what /browse seeds from router state:
+        // query → q (broad text search), maxPrice → maxRent, propertyType as-is.
+        // Sending `city` alongside q over-restricts area searches like "Gulberg".
+        const filters: Record<string, unknown> = {};
+        const maxRent = parseInt(budget.replace(/[^0-9]/g, ''), 10);
+        if (!Number.isNaN(maxRent) && maxRent > 0) filters.maxPrice = maxRent;
+        if (ptype === 'room') filters.propertyType = 'shared_room';
+        else if (ptype === 'place') filters.propertyType = 'full_house';
+        navigate('/browse', { state: { query: location.trim(), filters } });
     };
 
     const filteredListings = goal === 'all' ? LISTINGS : LISTINGS.filter((l) => l.type === goal);
@@ -299,8 +312,9 @@ const HomePage: React.FC = () => {
                                 <input
                                     value={location}
                                     onChange={(e) => setLocation(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                     type="text"
-                                    placeholder="Area, city, university..."
+                                    placeholder="City or area"
                                     className="form-input !border-0 !p-0 !text-sm"
                                     aria-label="Location"
                                 />
@@ -309,11 +323,13 @@ const HomePage: React.FC = () => {
                                 <span className="text-[var(--accent)] text-xs font-mono shrink-0">₨</span>
                                 <input
                                     value={budget}
-                                    onChange={(e) => setBudget(e.target.value)}
+                                    onChange={(e) => setBudget(e.target.value.replace(/[^0-9]/g, ''))}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                     type="text"
+                                    inputMode="numeric"
                                     placeholder="Budget"
                                     className="form-input !border-0 !p-0 !text-sm"
-                                    aria-label="Budget"
+                                    aria-label="Maximum monthly budget"
                                 />
                             </div>
                             <div className="flex items-center gap-3 px-4 py-2.5 w-full sm:w-44">
