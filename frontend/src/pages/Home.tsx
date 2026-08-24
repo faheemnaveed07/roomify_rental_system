@@ -350,14 +350,25 @@ const HomePage: React.FC = () => {
                 </div>
 
                 {/* Marquee */}
-                <div className="absolute bottom-0 left-0 right-0 border-t border-white/5 bg-black/60 backdrop-blur-sm py-3 overflow-hidden z-10">
-                    <div className="marquee-track font-display text-sm tracking-[0.25em] text-[var(--silver-dim)]">
+                <div className="absolute bottom-0 left-0 right-0 border-t border-white/5 bg-black/60 backdrop-blur-sm py-4 overflow-hidden z-10">
+                    <div className="marquee-track font-display text-lg lg:text-xl tracking-[0.22em] text-[var(--fg-dim)]">
                         {Array.from({ length: 2 }).map((_, dup) => (
                             <React.Fragment key={dup}>
-                                {['CNIC VERIFIED', 'NO MORE SCAMS', 'TRUST FIRST', 'ROOMMATE MATCHING', 'SECURE AGREEMENTS', 'DEPOSIT PROTECTION'].map((t) => (
-                                    <span key={t + dup} className="px-8">{t}</span>
+                                {[
+                                    ['🪪', 'CNIC VERIFIED'],
+                                    ['🛡️', 'NO MORE SCAMS'],
+                                    ['🤝', 'TRUST FIRST'],
+                                    ['👥', 'ROOMMATE MATCHING'],
+                                    ['📝', 'SECURE AGREEMENTS'],
+                                    ['💰', 'DEPOSIT PROTECTION'],
+                                    ['🏠', 'VERIFIED HOMES'],
+                                ].map(([emoji, t]) => (
+                                    <span key={t + dup} className="px-10 inline-flex items-center gap-3">
+                                        <span className="text-base lg:text-lg" aria-hidden>{emoji}</span>
+                                        {t}
+                                        <span className="text-[var(--accent)] pl-10" aria-hidden>·</span>
+                                    </span>
                                 ))}
-                                <span className="px-8 font-urdu">گھر dil se</span>
                             </React.Fragment>
                         ))}
                     </div>

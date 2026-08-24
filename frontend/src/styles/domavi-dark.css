@@ -57,27 +57,27 @@
    as one flat slab. These bands give each section its own tonal identity:
    warm raised panels, a deep "vault" tone for safety, and low-opacity accent
    washes for the stats strip and final CTA. */
-.domavi-dark .sec-raised { background-color: #100e0c; }
-.domavi-dark .sec-deep { background-color: #070605; }
+.domavi-dark .sec-raised { background-color: #17120d; }
+.domavi-dark .sec-deep { background-color: #040404; }
 .domavi-dark .sec-stats {
     background:
-        linear-gradient(180deg, rgba(212, 132, 90, 0.09), rgba(212, 132, 90, 0.02)),
-        #0b0908;
+        linear-gradient(180deg, rgba(212, 132, 90, 0.18), rgba(212, 132, 90, 0.06)),
+        #0e0a07;
 }
 .domavi-dark .sec-glow-verify {
     background:
-        radial-gradient(60% 55% at 85% 0%, rgba(45, 143, 94, 0.08), transparent 62%),
-        var(--bg);
+        radial-gradient(65% 60% at 85% 0%, rgba(45, 143, 94, 0.16), transparent 62%),
+        #0a0f0b;
 }
 .domavi-dark .sec-glow-accent {
     background:
-        radial-gradient(55% 50% at 10% 6%, rgba(212, 132, 90, 0.09), transparent 60%),
-        var(--bg);
+        radial-gradient(60% 55% at 10% 6%, rgba(212, 132, 90, 0.17), transparent 62%),
+        #110c08;
 }
 .domavi-dark .sec-cta {
     background:
-        linear-gradient(180deg, rgba(212, 132, 90, 0.14), rgba(212, 132, 90, 0.04) 55%, rgba(212, 132, 90, 0) 100%),
-        #0b0908;
+        linear-gradient(180deg, rgba(212, 132, 90, 0.24), rgba(212, 132, 90, 0.07) 60%, rgba(212, 132, 90, 0.02) 100%),
+        #0e0a07;
 }
 
 /* Anchors: globals.css paints every unclassed <a> in the light theme's blue,
