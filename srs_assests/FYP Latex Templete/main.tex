@@ -26,6 +26,48 @@
 \usepackage{titlesec}
 \usepackage{amsmath}
 \usepackage{helvet} % Arial-like sans-serif for title/approval headings (\sffamily)
+\usepackage{array}
+\usepackage{etoolbox}
+\usepackage{microtype} % better inter-word spacing / no stretched lines
+
+% ==========================================================
+% TYPOGRAPHY FIX
+% Prevents over-stretched justified lines and gives every
+% paragraph a consistent, clearly visible starting point.
+% ==========================================================
+
+% 1) Allow LaTeX more freedom so it never has to stretch word gaps
+\tolerance=1200
+\emergencystretch=3em
+\hyphenpenalty=50
+\hbadness=10000   % silence cosmetic underfull warnings
+
+% 2) Uniform paragraph style: no indent, clear vertical gap
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{7pt plus 2pt minus 1pt}
+
+% 2b) GLOBAL LINE SPACING = 1.5
+\onehalfspacing
+
+% 3) Tables: never justify (stops "O L X  /  General" style gaps)
+%    and keep them single-spaced so cells stay compact
+\renewcommand{\arraystretch}{1.25}
+\AtBeginEnvironment{tabularx}{\raggedright\singlespacing\setlength{\parskip}{0pt}}
+\AtBeginEnvironment{tabular}{\raggedright\singlespacing\setlength{\parskip}{0pt}}
+
+% 4) Lists: keep them tight now that \parskip is non-zero
+\setlist{topsep=4pt, itemsep=2pt, parsep=0pt}
+
+% 5) Clickable, sensibly coloured links (incl. bibliography URLs)
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=blue,
+  urlcolor=blue,
+  filecolor=blue,
+  breaklinks=true
+}
+\urlstyle{same}
 
 
 % Chapter Formatting
@@ -62,6 +104,11 @@
 \renewcommand{\footrulewidth}{0pt}
 \begin{document}
 % ---------- Front pages (template style, unnumbered) ----------
+% Front pages are hand-spaced: disable the global \parskip inside this group
+% so they keep their original one-page-each layout.
+\begingroup
+\setlength{\parskip}{0pt}
+\singlespacing
 \thispagestyle{empty}
 \input{title.tex}        % Page 1 - Title Page
 \newpage
@@ -71,6 +118,7 @@
 \thispagestyle{empty}
 \input{certificate}      % Page 3 - Final Approval
 \newpage
+\endgroup
 % ---------- Roman numbering ----------
 \pagenumbering{roman}
 \setcounter{page}{1}
@@ -81,6 +129,10 @@
 \input{abbreviations}
 \newpage
 
+% TOC / lists stay single-spaced (1.5 makes them unreadably sparse)
+\begingroup
+\singlespacing
+\setlength{\parskip}{0pt}
 \renewcommand*\contentsname{Table of Contents}
 \tableofcontents
 \newpage
@@ -90,6 +142,7 @@
 \newpage
 \addcontentsline{toc}{section}{List of Figures}
 \listoffigures
+\endgroup
 
 \clearpage
 % ---------- Arabic numbering ----------
@@ -102,9 +155,7 @@
 \input{ch_5_implementation}
 \input{ch_6_testing}
 \input{ch_7_conclusion}
-\nocite{*}
-\bibliographystyle{IEEEtran}
-\bibliography{ref}
+\input{references}
 
 \end{document}
 

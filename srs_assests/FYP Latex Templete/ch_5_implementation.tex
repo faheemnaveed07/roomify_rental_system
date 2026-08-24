@@ -16,14 +16,17 @@ The platform was developed using a modern JavaScript and TypeScript toolchain. T
 
 \begin{itemize}
     \item \textbf{IDE / Editor:} Visual Studio Code with ESLint and Prettier for linting and formatting.
-    \item \textbf{Languages:} TypeScript across both the frontend and backend, with HTML and CSS in the presentation layer.
-    \item \textbf{Frontend Framework:} React with the Vite build tool, Tailwind CSS for styling, and Zustand for state management.
-    \item \textbf{Backend Framework:} Node.js with Express.js, organised into routes, controllers, services, and middleware.
-    \item \textbf{Database:} MongoDB with the Mongoose object data modelling library.
+    \item \textbf{Languages:} TypeScript \cite{typescript} across both the frontend and backend, with HTML and CSS \cite{mdn} in the presentation layer.
+    \item \textbf{Frontend Framework:} React \cite{react} with the Vite \cite{vite} build tool, Tailwind CSS \cite{tailwind} with the shadcn/ui \cite{shadcn} and Radix UI \cite{radix} component primitives for styling, React Router \cite{reactrouter} for navigation, TanStack Query \cite{tanstack} for server state, Zustand \cite{zustand} for client state, React Hook Form \cite{reacthookform} with Zod \cite{zod} for form validation, Framer Motion \cite{framermotion} for animation, and Leaflet \cite{leaflet} with OpenStreetMap \cite{osm} tiles for maps.
+    \item \textbf{Backend Framework:} Node.js \cite{nodejs} with Express.js \cite{express}, organised into routes, controllers, services, and middleware, secured with Helmet \cite{helmet}, authenticated with JSON Web Tokens \cite{jwt} and bcrypt \cite{bcrypt} password hashing, using Socket.IO \cite{socketio} for real-time messaging, Multer \cite{multer} with Cloudinary \cite{cloudinary} and Amazon S3 \cite{awss3} for media storage, Nodemailer \cite{nodemailer} for e-mail, PDFKit \cite{pdfkit} for agreement generation, and Winston \cite{winston} for logging.
+    \item \textbf{Database:} MongoDB \cite{mongodb} with the Mongoose \cite{mongoose} object data modelling library, using geospatial queries \cite{geospatial} for commute-based search.
     \item \textbf{Version Control:} Git with a GitHub repository for collaboration between the two team members.
     \item \textbf{Operating System:} Cross-platform development on Windows and macOS.
     \item \textbf{Hardware:} Standard development laptops with 8--16 GB RAM; no specialised GPU is required.
+    \item \textbf{Deployment:} The frontend is deployed on Vercel \cite{vercel} and the backend API on Render \cite{render}.
 \end{itemize}
+
+The engineering process followed established software engineering practice \cite{sommerville, pressman}, with the database designed according to standard relational and document modelling principles \cite{elmasri}, and security controls aligned with the OWASP Top 10 \cite{owasp}.
 
 % -------------------------------------------------
 % 5.2 Core Module Implementation
@@ -117,7 +120,7 @@ Property Rental System integrates several third-party services to deliver its fe
 \begin{table}[h]
 \centering
 \caption{External APIs and Services Used}
-\begin{tabularx}{\textwidth}{|p{3.2cm}|X|p{3.5cm}|}
+\begin{tabularx}{\textwidth}{|>{\raggedright\arraybackslash}p{3.2cm}|X|>{\raggedright\arraybackslash}p{3.5cm}|}
 \hline
 \textbf{API / Service} & \textbf{Purpose} & \textbf{Used In Module} \\
 \hline
