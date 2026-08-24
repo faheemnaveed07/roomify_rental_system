@@ -328,7 +328,7 @@ const AdminPaymentsPage: React.FC = () => {
                                             {/* Property */}
                                             <td className="px-5 py-4">
                                                 <p style={{ fontSize: 13, fontWeight: 600, color: '#f5f5f5', maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                    {property?.title ?? '—'}
+                                                    {property?.title ?? 'N/A'}
                                                 </p>
                                             </td>
 
@@ -349,7 +349,7 @@ const AdminPaymentsPage: React.FC = () => {
                                             {/* Transaction ID */}
                                             <td className="px-5 py-4">
                                                 <span style={{ fontSize: 12, color: '#c0c0c0', fontFamily: 'monospace', background: '#1f1f1f', padding: '3px 8px', borderRadius: 6 }}>
-                                                    {payment.transactionReference ?? '—'}
+                                                    {payment.transactionReference ?? 'N/A'}
                                                 </span>
                                             </td>
 
@@ -366,7 +366,7 @@ const AdminPaymentsPage: React.FC = () => {
                                                         View
                                                     </a>
                                                 ) : (
-                                                    <span style={{ color: '#6a6a6a', fontSize: 12 }}>—</span>
+                                                    <span style={{ color: '#6a6a6a', fontSize: 12 }}>N/A</span>
                                                 )}
                                             </td>
 
@@ -398,7 +398,7 @@ const AdminPaymentsPage: React.FC = () => {
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <span style={{ fontSize: 12, color: '#6a6a6a' }}>—</span>
+                                                    <span style={{ fontSize: 12, color: '#6a6a6a' }}>N/A</span>
                                                 )}
                                             </td>
                                         </tr>

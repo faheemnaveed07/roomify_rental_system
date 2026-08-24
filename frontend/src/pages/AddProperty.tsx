@@ -44,7 +44,7 @@ const AddProperty: React.FC = () => {
                     onClick={() => navigate('/verify')}
                     className="rounded-2xl bg-[#2563EB] px-8 py-3 font-bold text-white transition-all hover:opacity-90"
                 >
-                    Get verified
+                    Get Verified
                 </button>
             </div>
         );
@@ -57,7 +57,7 @@ const AddProperty: React.FC = () => {
                     <CheckCircle size={48} />
                 </div>
                 <div>
-                    <h1 className="text-3xl font-black text-[#1E293B]">Listing Submitted!</h1>
+                    <h1 className="text-3xl font-black text-[#1E293B]">Listing Submitted</h1>
                     <p className="text-neutral-500 mt-2 font-medium">
                         Your property is being verified by our team. You can track its status in the dashboard.
                     </p>

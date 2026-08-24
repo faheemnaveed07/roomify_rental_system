@@ -106,7 +106,7 @@ const LISTINGS = [
 
 const STORIES = [
     { seed: 'photo-1494790108377-be9c29b29330', name: 'AYESHA K.', meta: 'Tenant · Gulgasht', quote: 'Property Rental System helped me lock in a CNIC-verified home within 24 hours. No agent, no scam, no stress.' },
-    { seed: 'photo-1507003211169-0a1dd7228f2d', name: 'USMAN T.', meta: 'Landlord · 3 properties', quote: 'I filled all three of my properties through Property Rental System. Tenants arrive already verified — that changes everything.' },
+    { seed: 'photo-1507003211169-0a1dd7228f2d', name: 'USMAN T.', meta: 'Landlord · 3 properties', quote: 'I filled all three of my properties through Property Rental System. Tenants arrive already verified. That changes everything.' },
     { seed: 'photo-1438761681033-6461ffad8d80', name: 'SARA M.', meta: 'Tenant · DHA Multan', quote: 'The roommate matching is unreal. Found someone with my exact schedule and budget in under a week.' },
     { seed: 'photo-1633332755192-727a05c4013d', name: 'HAMZA R.', meta: 'Student · BZU', quote: 'Coming from another city, I had no contacts. Property Rental System made finding a safe room near campus actually easy.' },
 ];
@@ -177,7 +177,11 @@ const HomePage: React.FC = () => {
 
     // ── Sticky CTA visibility ───────────────────────────────────────────────
     useEffect(() => {
-        const onScroll = () => setShowSticky(window.scrollY > window.innerHeight * 0.85);
+        const onScroll = () => {
+            const doc = document.documentElement;
+            const nearFooter = window.innerHeight + window.scrollY >= doc.scrollHeight - 480;
+            setShowSticky(window.scrollY > window.innerHeight * 0.85 && !nearFooter);
+        };
         onScroll();
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
@@ -283,7 +287,7 @@ const HomePage: React.FC = () => {
                             </span>
                         </h1>
                         <p className="max-w-lg text-[var(--fg-dim)] text-base md:text-lg leading-relaxed font-body">
-                            Every member verified by CNIC — find a real room, a real place, or real people.
+                            Every member is verified by CNIC. Find a real room, a real place, or real people.
                         </p>
                     </div>
 
@@ -401,7 +405,7 @@ const HomePage: React.FC = () => {
                         </div>
                         <div className="lg:col-span-5 lg:col-start-8 flex flex-col justify-end">
                             <p className="text-[var(--fg-dim)] text-lg leading-relaxed">
-                                Every Property Rental System member goes through a 3-step CNIC verification process. Here's exactly what happens — no
+                                Every Property Rental System member goes through a 3-step CNIC verification process. Here's exactly what happens. No
                                 ambiguity, no shortcuts. This is what makes Property Rental System different from every other rental platform in Pakistan.
                             </p>
                         </div>
@@ -410,8 +414,8 @@ const HomePage: React.FC = () => {
                     <div className="reveal-stagger grid md:grid-cols-3 gap-6 lg:gap-8">
                         {[
                             { n: '01', Icon: CreditCard, title: 'UPLOAD CNIC', body: 'Snap a clear photo of your CNIC front and back. Our system reads and validates the number in real time.', a: 'Time', av: '30 SEC', b: 'Format', bv: 'PHOTO', accent: false },
-                            { n: '02', Icon: Camera, title: 'LIVE SELFIE', body: 'Take a live photo — we match it against your CNIC photo. No stored selfies, just a real-time match result.', a: 'Time', av: '15 SEC', b: 'Method', bv: 'FACE AI', accent: false },
-                            { n: '03', Icon: null, title: 'VERIFIED LIVE', body: 'Your green "CNIC Verified" badge appears on your profile and listings. Landlords see it instantly — earned, not claimed.', a: 'Result', av: 'BADGE LIVE', b: 'Trust', bv: 'MAXIMUM', accent: true },
+                            { n: '02', Icon: Camera, title: 'LIVE SELFIE', body: 'Take a live photo and we match it against your CNIC photo. No stored selfies, just a real-time match result.', a: 'Time', av: '15 SEC', b: 'Method', bv: 'FACE AI', accent: false },
+                            { n: '03', Icon: null, title: 'VERIFIED LIVE', body: 'Your green "CNIC Verified" badge appears on your profile and listings. Landlords see it instantly. Earned, not claimed.', a: 'Result', av: 'BADGE LIVE', b: 'Trust', bv: 'MAXIMUM', accent: true },
                         ].map((step) => (
                             <div key={step.n} className="info-card notch-corner p-7 group">
                                 <div className="flex items-center justify-between mb-8">
@@ -462,7 +466,7 @@ const HomePage: React.FC = () => {
                         </div>
                         <div className="lg:col-span-6 lg:col-start-7 flex flex-col justify-end">
                             <p className="text-[var(--fg-dim)] text-lg leading-relaxed mb-6">
-                                Whether it's a single room, a full apartment, or your future best friend — start here. Every listing is CNIC-verified.
+                                Whether it's a single room, a full apartment, or your future best friend, it starts here. Every listing is CNIC-verified.
                             </p>
                             <div className="flex flex-wrap gap-3">
                                 {GOALS.map((g) => (
@@ -477,9 +481,9 @@ const HomePage: React.FC = () => {
                     {/* Goal program cards */}
                     <div className="reveal-stagger grid md:grid-cols-3 gap-6 lg:gap-8 mb-12">
                         {[
-                            { tag: '01 ROOM', Icon: HomeIcon, title: 'FIND A ROOM', body: 'Affordable rooms in verified homes near your campus or workplace. Private or shared options.', a: 'Price Range', av: '₨5K–20K', b: 'Availability', bv: '312 ROOMS', cta: 'Explore Rooms', badge: 'VERIFIED', badgeAccent: false, seed: 'photo-1505691938895-1758d7feb511', to: '/browse' },
-                            { tag: '02 PLACE', Icon: Building2, title: 'RENT A PLACE', body: 'Apartments and houses with CNIC-verified landlords and digital rental agreements.', a: 'Price Range', av: '₨15K–60K', b: 'Availability', bv: '185 PLACES', cta: 'View Places', badge: 'VERIFIED', badgeAccent: false, seed: 'photo-1600596542815-ffad4c1539a9', to: '/browse' },
-                            { tag: '03 ROOMMATE', Icon: UsersRound, title: 'FIND A ROOMMATE', body: 'Matched by lifestyle compatibility — sleep, study, cleanliness, social energy. Not just who is available.', a: 'Matching', av: 'AI-POWERED', b: 'Matched', bv: '612 PAIRS', cta: 'Try Matching', badge: 'MATCHING', badgeAccent: true, seed: 'photo-1522708323590-d24dbb6b0267', to: '#matching' },
+                            { tag: '01 ROOM', Icon: HomeIcon, title: 'FIND A ROOM', body: 'Affordable rooms in verified homes near your campus or workplace. Private or shared options.', a: 'Price Range', av: '₨5K TO 20K', b: 'Availability', bv: '312 ROOMS', cta: 'Explore Rooms', badge: 'VERIFIED', badgeAccent: false, seed: 'photo-1505691938895-1758d7feb511', to: '/browse' },
+                            { tag: '02 PLACE', Icon: Building2, title: 'RENT A PLACE', body: 'Apartments and houses with CNIC-verified landlords and digital rental agreements.', a: 'Price Range', av: '₨15K TO 60K', b: 'Availability', bv: '185 PLACES', cta: 'View Places', badge: 'VERIFIED', badgeAccent: false, seed: 'photo-1600596542815-ffad4c1539a9', to: '/browse' },
+                            { tag: '03 ROOMMATE', Icon: UsersRound, title: 'FIND A ROOMMATE', body: 'Matched by lifestyle compatibility: sleep, study, cleanliness, social energy. Not just who is available.', a: 'Matching', av: 'AI-POWERED', b: 'Matched', bv: '612 PAIRS', cta: 'Try Matching', badge: 'MATCHING', badgeAccent: true, seed: 'photo-1522708323590-d24dbb6b0267', to: '#matching' },
                         ].map((c) => (
                             <article key={c.tag} className="program-card info-card notch-corner group">
                                 <div className="relative h-72 overflow-hidden">
@@ -755,7 +759,7 @@ const HomePage: React.FC = () => {
                             <span className="text-[var(--accent)]">you can trust?</span>
                         </h2>
                         <p className="text-[var(--fg-dim)] text-lg max-w-xl mx-auto mb-10">
-                            Get CNIC-verified in 2 minutes and join 2,340+ members who found their place — and their people — on Property Rental System.
+                            Get CNIC-verified in 2 minutes and join 2,340+ members who found their place and their people on Property Rental System.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link

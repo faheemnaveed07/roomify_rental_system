@@ -167,7 +167,7 @@ const MyBookingsPage: React.FC = () => {
                                 {booking.status === 'completed' && (
                                     <div className="mt-4 pt-4 border-t border-neutral-100">
                                         <p className="text-sm font-semibold text-green-700 mb-3">
-                                            ✓ Booking completed — your lease agreement is ready.
+                                            ✓ Booking completed. Your lease agreement is ready.
                                         </p>
                                         <div className="flex flex-wrap gap-3">
                                             <Button

@@ -167,7 +167,7 @@ function RowActions({ property, onAction }: { property: any; onAction: (a: Dialo
     }
 
     // Rented listings are under an active tenancy — not the admin's to move.
-    return <span className="text-xs text-slate-400 italic">—</span>;
+    return <span className="text-xs text-slate-400 italic">N/A</span>;
 }
 
 // ── Main page ───────────────────────────────────────────────────────

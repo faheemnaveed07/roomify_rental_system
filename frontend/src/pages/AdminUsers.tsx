@@ -46,7 +46,7 @@ function roleVariant(role: string): 'default' | 'secondary' | 'outline' {
 }
 
 function formatDate(date?: string | Date): string {
-    if (!date) return '—';
+    if (!date) return 'N/A';
     return new Date(date).toLocaleDateString('en-GB', {
         day: '2-digit', month: 'short', year: 'numeric',
     });

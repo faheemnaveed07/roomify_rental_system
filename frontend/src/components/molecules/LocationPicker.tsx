@@ -117,7 +117,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             const json = (await res.json()) as Array<{ lat: string; lon: string }>;
             if (json?.length) {
                 pick([parseFloat(json[0].lon), parseFloat(json[0].lat)], true, 16);
-                setMsg('Found it — drag the pin to fine-tune the exact spot.');
+                setMsg('Found it. Drag the pin to fine-tune the exact spot.');
             } else {
                 setMsg('Address not found. Please place the pin manually on the map.');
             }

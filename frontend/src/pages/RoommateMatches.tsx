@@ -199,7 +199,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ pending, onChange, onApply, loadi
                                         className="w-full text-sm outline-none text-slate-700 bg-transparent"
                                     />
                                 </div>
-                                <span className="text-slate-300 text-sm">–</span>
+                                <span className="text-slate-300 text-sm">N/A</span>
                                 <div className="flex items-center gap-1.5 rounded-xl border border-input px-3 py-2 flex-1 focus-within:ring-2 focus-within:ring-ring transition">
                                     <input
                                         type="number"
@@ -256,7 +256,7 @@ const FilterBar: React.FC<FilterBarProps> = ({ pending, onChange, onApply, loadi
                             className="w-16 text-sm outline-none text-slate-700 bg-transparent"
                         />
                     </div>
-                    <span className="text-slate-300 text-sm font-light">–</span>
+                    <span className="text-slate-300 text-sm font-light">N/A</span>
                     <div className="flex items-center gap-1.5 rounded-xl border border-input px-3 py-2 focus-within:ring-2 focus-within:ring-ring transition">
                         <input
                             type="number"

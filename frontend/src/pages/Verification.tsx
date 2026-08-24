@@ -197,7 +197,7 @@ const VerificationPage: React.FC = () => {
         setSubmitting(true);
         try {
             await verificationService.uploadCnic(front, back, cnicNumber.trim() || undefined);
-            toast.success('CNIC submitted — identity verified');
+            toast.success('CNIC submitted. Identity verified.');
             setFront(null);
             setBack(null);
             await load();
@@ -226,7 +226,7 @@ const VerificationPage: React.FC = () => {
                 {/* Header */}
                 <div className="mb-10">
                     <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#d4845a]">Verification</p>
-                    <h1 className="mt-2 text-4xl font-bold text-[#f5f5f5]">Get verified</h1>
+                    <h1 className="mt-2 text-4xl font-bold text-[#f5f5f5]">Get Verified</h1>
                     <p className="mt-2 max-w-xl text-[#c0c0c0]">
                         Property Rental System is built on trust. Verify your email and CNIC to list a property or send a booking
                         request.

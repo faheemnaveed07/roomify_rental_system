@@ -68,9 +68,11 @@ const buildPriceIcon = (
     const stateClass = state === 'default' ? '' : ` ${state}`;
     return L.divIcon({
         className: 'price-marker-wrapper',
-        html: `<div class="price-marker${stateClass}">${label}</div>`,
-        iconSize: [60, 26],
-        iconAnchor: [30, 26],
+        // A house emoji on the pin so tenants instantly read "there is a house
+        // here", not just a floating price.
+        html: `<div class="price-marker${stateClass}"><span style="margin-right:4px">🏠</span>${label}</div>`,
+        iconSize: [74, 26],
+        iconAnchor: [37, 26],
     });
 };
 
@@ -87,7 +89,7 @@ const buildClusterIcon = (count: number): L.DivIcon => {
             font-family:Archivo,system-ui,sans-serif;
             border:3px solid #ffffff;
             box-shadow:0 2px 10px rgba(0,0,0,.35);
-        ">${count}</div>`,
+        "><span style="margin-right:3px;font-size:${count >= 100 ? 11 : 13}px">🏠</span>${count}</div>`,
         iconSize: [size, size],
         iconAnchor: [size / 2, size / 2],
     });

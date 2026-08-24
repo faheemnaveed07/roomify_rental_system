@@ -113,7 +113,7 @@ const PropertyDetailPage: React.FC = () => {
             // with nowhere to go; point them at the step that unblocks them.
             if (err?.code === 'VERIFICATION_REQUIRED') {
                 toast.error('Verify your email and CNIC to request a booking.', {
-                    action: { label: 'Get verified', onClick: () => navigate('/verify') },
+                    action: { label: 'Get Verified', onClick: () => navigate('/verify') },
                 });
             } else {
                 toast.error(err?.message ?? 'Could not send the booking request.');

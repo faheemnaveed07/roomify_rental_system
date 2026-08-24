@@ -26,7 +26,7 @@ const DashboardLayout: React.FC = () => {
         return onAgreementNotification((event, data) => {
             if (event === 'agreement:awaiting-signature') {
                 toast.info(
-                    `${data?.tenantName ?? 'A tenant'} signed the lease for ${data?.propertyTitle ?? 'a property'} — review & sign.`
+                    `${data?.tenantName ?? 'A tenant'} signed the lease for ${data?.propertyTitle ?? 'a property'}. Review and sign it.`
                 );
             } else {
                 toast.success(`Lease for ${data?.propertyTitle ?? 'your property'} is now fully signed.`);

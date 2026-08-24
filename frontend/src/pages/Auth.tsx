@@ -145,7 +145,7 @@ const AuthPage: React.FC = () => {
                                 <span className="text-stroke">People you'll click with</span>
                             </h1>
                             <p className="mt-5 text-lg text-[var(--fg-dim)] max-w-md leading-relaxed">
-                                Every member CNIC-verified. Real listings, secure agreements, and roommate matching — built for Multan.
+                                Every member CNIC-verified. Real listings, secure agreements, and roommate matching, built for Multan.
                             </p>
                         </div>
 

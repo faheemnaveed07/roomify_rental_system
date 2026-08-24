@@ -95,7 +95,7 @@ const PaymentProgressTracker: React.FC<PaymentProgressTrackerProps> = ({
         <div className="bg-white rounded-2xl border border-neutral-100 p-5 mb-4">
             {isConfirmed && (
                 <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm font-semibold text-green-800">🎉 Payment Confirmed — Your booking is now active</p>
+                    <p className="text-sm font-semibold text-green-800">🎉 Payment Confirmed. Your booking is now active</p>
                 </div>
             )}
             <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 mb-4">

@@ -501,7 +501,7 @@ const PropertyUploadForm: React.FC<PropertyUploadFormProps> = ({ onSuccess }) =>
                                         href="/verify"
                                         className="inline-block rounded-lg bg-red-500/20 px-3 py-1.5 font-bold text-red-200 hover:bg-red-500/30"
                                     >
-                                        Get verified
+                                        Get Verified
                                     </a>
                                 )}
                             </div>

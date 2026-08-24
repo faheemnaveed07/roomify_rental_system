@@ -463,20 +463,20 @@ const PREF_OPTIONS = {
         { value: 'non_smoker', label: '🚭 Non-Smoker' },
         { value: 'outdoor_only', label: '🌿 Outdoor Only' },
         { value: 'smoker', label: '🚬 Smoker' },
-        { value: 'no_preference', label: '— Any' },
+        { value: 'no_preference', label: 'Any' },
     ],
     petPreference: [
         { value: 'no_pets', label: '🐾 No Pets' },
         { value: 'loves_pets', label: '💕 Loves Pets' },
         { value: 'has_pets', label: '🐕 Has Pets' },
-        { value: 'no_preference', label: '— Any' },
+        { value: 'no_preference', label: 'Any' },
     ],
     dietaryPreference: [
         { value: 'halal', label: '☪️ Halal' },
         { value: 'vegetarian', label: '🥦 Vegetarian' },
         { value: 'vegan', label: '🌱 Vegan' },
         { value: 'non_vegetarian', label: '🍗 Non-Veg' },
-        { value: 'no_preference', label: '— Any' },
+        { value: 'no_preference', label: 'Any' },
     ],
     genderPreference: [
         { value: 'male', label: '♂ Male only' },
@@ -667,7 +667,10 @@ const RoommateProfilePage: React.FC = () => {
         }
     });
 
-    const progressPct = ((step + 1) / STEPS.length) * 100;
+    // Progress = steps actually COMPLETED. The old (step + 1) formula filled the
+    // bar to 100% the moment step 4 opened, so the last milestone looked
+    // finished before the user had submitted anything.
+    const progressPct = (step / STEPS.length) * 100;
     const StepComponent = [Step1BasicInfo, Step2BudgetLocation, Step3Lifestyle, Step4Preferences][step];
 
     if (isLoadingProfile) {
@@ -816,6 +819,7 @@ const RoommateProfilePage: React.FC = () => {
 
                             {step < STEPS.length - 1 ? (
                                 <Button
+                                    key="wizard-next"
                                     type="button"
                                     onClick={handleNext}
                                     className="flex items-center gap-2"
@@ -824,8 +828,14 @@ const RoommateProfilePage: React.FC = () => {
                                     <ChevronRight size={16} />
                                 </Button>
                             ) : (
+                                // type="button" + a distinct key: the old markup let
+                                // React reuse the still-focused Next button as
+                                // type="submit", so the Enter that advanced step 3
+                                // could immediately submit step 4 by itself.
                                 <Button
-                                    type="submit"
+                                    key="wizard-submit"
+                                    type="button"
+                                    onClick={() => onSubmit()}
                                     disabled={isSubmitting}
                                     className="flex items-center gap-2"
                                 >

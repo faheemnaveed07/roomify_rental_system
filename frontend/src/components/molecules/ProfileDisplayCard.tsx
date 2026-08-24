@@ -46,7 +46,7 @@ function formatLabel(val: string): string {
 
 function formatBudget(min: number, max: number, currency: string): string {
     const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(0)}K` : String(n);
-    return `${currency} ${fmt(min)} – ${fmt(max)}/mo`;
+    return `${currency} ${fmt(min)} to ${fmt(max)}/mo`;
 }
 
 function getInitials(firstName?: string, lastName?: string, fallback = 'RP'): string {

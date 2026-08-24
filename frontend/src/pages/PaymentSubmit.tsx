@@ -250,7 +250,7 @@ const PaymentSubmitPage: React.FC = () => {
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span style={{ color: '#8f8f8f', fontSize: 13 }}>Transaction ID</span>
                                 <span style={{ fontWeight: 600, color: '#c0c0c0', fontSize: 13 }}>
-                                    {payment.transactionReference ?? '—'}
+                                    {payment.transactionReference ?? 'N/A'}
                                 </span>
                             </div>
                             {payment.status === 'rejected' && payment.rejectionReason && (
