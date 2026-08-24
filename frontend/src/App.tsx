@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Link, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link, Outlet, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { useAuthStore } from './store/auth.store';
 import AuthPage from './pages/Auth';
@@ -30,47 +30,85 @@ import PaymentSubmitPage from './pages/PaymentSubmit';
 import AgreementPage from './pages/Agreement';
 import VerificationPage from './pages/Verification';
 
-// ── Public layout: Header + main content + footer ──────────────────
-const PublicLayout: React.FC = () => (
-    <div className="dv-app min-h-screen bg-neutral-50 flex flex-col">
-        <Header />
-        <main className="flex-grow">
-            <Outlet />
-        </main>
-        <footer className="domavi-dark bg-[var(--bg-darker)] border-t border-[var(--border)] text-[var(--fg-dim)] py-16 mt-20">
-            <div className="container grid grid-cols-1 md:grid-cols-3 gap-12">
-                <div>
-                    <div className="flex items-center gap-3 mb-4">
-                        <span className="w-8 h-8 bg-[var(--accent)] flex items-center justify-center shrink-0">
-                            <span className="text-black font-display text-lg leading-none">R</span>
-                        </span>
-                        <span>
-                            <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">PROPERTY RENTAL SYSTEM</span>
-                            <span className="block font-mono text-[9px] text-[var(--muted)] tracking-[0.3em] mt-0.5">TRUST · HOME</span>
-                        </span>
-                    </div>
-                    <p className="max-w-xs text-sm leading-relaxed">A home you can trust. People you'll click with — CNIC-verified rentals &amp; roommate matching for Pakistan.</p>
+// ── Footers ─────────────────────────────────────────────────────────
+// The full marketing footer (brand pitch + quick links, including
+// "Sign In / Register") belongs on marketing surfaces. Inside the app it is
+// noise at best and wrong at worst — a logged-in tenant being offered
+// "Sign In / Register" under their own payments page.
+const FullFooter: React.FC = () => (
+    <footer className="domavi-dark bg-[var(--bg-darker)] border-t border-[var(--border)] text-[var(--fg-dim)] py-16 mt-20">
+        <div className="container grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div>
+                <div className="flex items-center gap-3 mb-4">
+                    <span className="w-8 h-8 bg-[var(--accent)] flex items-center justify-center shrink-0">
+                        <span className="text-black font-display text-lg leading-none">R</span>
+                    </span>
+                    <span>
+                        <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">PROPERTY RENTAL SYSTEM</span>
+                        <span className="block font-mono text-[9px] text-[var(--muted)] tracking-[0.3em] mt-0.5">TRUST · HOME</span>
+                    </span>
                 </div>
-                <div>
-                    <h4 className="font-heading text-sm tracking-[0.2em] uppercase text-[var(--fg)] mb-4">Quick Links</h4>
-                    <ul className="space-y-2.5 text-sm">
-                        <li><Link to="/browse" className="hover:text-[var(--accent)] transition-colors">Find Properties</Link></li>
-                        <li><Link to="/auth" className="hover:text-[var(--accent)] transition-colors">Sign In / Register</Link></li>
-                        <li><Link to="/roommate-matches" className="hover:text-[var(--accent)] transition-colors">Roommate Matching</Link></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 className="font-heading text-sm tracking-[0.2em] uppercase text-[var(--fg)] mb-4">Contact</h4>
-                    <p className="font-mono text-xs tracking-wide">support@propertyrentalsystem.pk</p>
-                    <p className="font-mono text-xs tracking-wide mt-1.5">PAKISTAN</p>
-                </div>
+                <p className="max-w-xs text-sm leading-relaxed">A home you can trust. People you'll click with — CNIC-verified rentals &amp; roommate matching for Pakistan.</p>
             </div>
-            <div className="container border-t border-[var(--border)] mt-12 pt-8 text-center font-mono text-xs tracking-[0.15em] text-[var(--muted)]">
-                © 2026 PROPERTY RENTAL SYSTEM · ALL RIGHTS RESERVED
+            <div>
+                <h4 className="font-heading text-sm tracking-[0.2em] uppercase text-[var(--fg)] mb-4">Quick Links</h4>
+                <ul className="space-y-2.5 text-sm">
+                    <li><Link to="/browse" className="hover:text-[var(--accent)] transition-colors">Find Properties</Link></li>
+                    <li><Link to="/auth" className="hover:text-[var(--accent)] transition-colors">Sign In / Register</Link></li>
+                    <li><Link to="/roommate-matches" className="hover:text-[var(--accent)] transition-colors">Roommate Matching</Link></li>
+                </ul>
             </div>
-        </footer>
-    </div>
+            <div>
+                <h4 className="font-heading text-sm tracking-[0.2em] uppercase text-[var(--fg)] mb-4">Contact</h4>
+                <p className="font-mono text-xs tracking-wide">support@propertyrentalsystem.pk</p>
+                <p className="font-mono text-xs tracking-wide mt-1.5">PAKISTAN</p>
+            </div>
+        </div>
+        <div className="container border-t border-[var(--border)] mt-12 pt-8 text-center font-mono text-xs tracking-[0.15em] text-[var(--muted)]">
+            © 2026 PROPERTY RENTAL SYSTEM · ALL RIGHTS RESERVED
+        </div>
+    </footer>
 );
+
+// One quiet line for content pages: keeps the page grounded without pitching
+// the product to someone who is already using it.
+const SlimFooter: React.FC = () => (
+    <footer className="domavi-dark bg-[var(--bg-darker)] border-t border-[var(--border)] py-6 mt-16">
+        <div className="container flex flex-col sm:flex-row items-center justify-between gap-2 font-mono text-[11px] tracking-[0.15em] text-[var(--muted)]">
+            <span>© 2026 PROPERTY RENTAL SYSTEM</span>
+            <span>support@propertyrentalsystem.pk</span>
+        </div>
+    </footer>
+);
+
+// ── Public layout: Header + main content + route-aware footer ──────
+// Three tiers, the way large rental platforms do it:
+//   full — marketing surfaces (the landing page)
+//   slim — content/discovery pages (browse, detail, matches, auth family, 404)
+//   none — focused task flows (chat, payments, bookings, wizard, verification),
+//          where a footer under the work area is checkout-pattern noise
+const NO_FOOTER_EXACT = ['/messages', '/my-bookings', '/payments', '/verify', '/roommate-profile'];
+const NO_FOOTER_PREFIX = ['/payment/submit', '/agreement/'];
+
+const PublicLayout: React.FC = () => {
+    const { pathname } = useLocation();
+
+    const footer =
+        pathname === '/' ? <FullFooter />
+        : NO_FOOTER_EXACT.includes(pathname) ||
+          NO_FOOTER_PREFIX.some((p) => pathname.startsWith(p)) ? null
+        : <SlimFooter />;
+
+    return (
+        <div className="dv-app min-h-screen bg-neutral-50 flex flex-col">
+            <Header />
+            <main className="flex-grow">
+                <Outlet />
+            </main>
+            {footer}
+        </div>
+    );
+};
 
 const App: React.FC = () => {
     const { isAuthenticated, validateSession } = useAuthStore();
