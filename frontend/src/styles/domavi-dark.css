@@ -612,6 +612,20 @@
 :where(.dv-app) h2,
 :where(.dv-app) h3 { font-family: 'Oswald', sans-serif; letter-spacing: 0.01em; }
 
+/* globals.css paints every bare heading with light-theme ink (#0F172A).
+ * Headings without an explicit text-* class (e.g. "Description"/"Location"
+ * on the property page) inherited it and vanished on the dark surfaces.
+ * Same trick as above: this file loads after globals, so an equal-specificity
+ * element rule wins here, while any text-* utility still wins over this. */
+:where(.dv-app) h1, :where(.dv-app) h2, :where(.dv-app) h3,
+:where(.dv-app) h4, :where(.dv-app) h5, :where(.dv-app) h6 {
+    color: var(--dv-fg);
+}
+:where(.domavi-dark) h1, :where(.domavi-dark) h2, :where(.domavi-dark) h3,
+:where(.domavi-dark) h4, :where(.domavi-dark) h5, :where(.domavi-dark) h6 {
+    color: var(--fg);
+}
+
 /* ---- Surface remaps (hardcoded light utilities → dark) ---- */
 .dv-app .bg-white { background-color: var(--dv-bg-card) !important; }
 .dv-app .bg-slate-50,
@@ -683,6 +697,8 @@
 /* Timestamp/tick row inside a sent chat bubble: primary-200 is a pale blue left
    over from the old palette, which sits on terracotta with almost no contrast. */
 .dv-app .text-primary-200 { color: rgba(26, 14, 7, 0.65) !important; }
+.dv-app .text-primary-400,
+.dv-app .text-primary-500,
 .dv-app .text-primary-600,
 .dv-app .text-primary-700,
 .dv-app .text-primary,
