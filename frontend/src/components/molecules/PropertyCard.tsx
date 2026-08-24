@@ -95,6 +95,10 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     onMouseLeave,
 }) => {
     const [favorite, setFavorite] = useState<boolean>(isFavorite);
+    // Uploaded files can vanish from the host's ephemeral disk while the DB
+    // still points at them; a broken-image icon looks like a bug, so fall
+    // back to the same clean placeholder used when no image was set.
+    const [imgFailed, setImgFailed] = useState(false);
 
     const handleFavoriteClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -130,16 +134,18 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         >
             {/* ------------- Image area ------------- */}
             <div className="relative w-full aspect-[3/2] bg-neutral-100 overflow-hidden">
-                {resolvedImage ? (
+                {resolvedImage && !imgFailed ? (
                     <img
                         src={resolvedImage}
                         alt={title}
                         loading="lazy"
+                        onError={() => setImgFailed(true)}
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
                     />
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-neutral-400 text-sm">
-                        No Image
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-neutral-400">
+                        <span className="text-3xl" aria-hidden>🏠</span>
+                        <span className="text-xs font-medium tracking-wide">Photo coming soon</span>
                     </div>
                 )}
 

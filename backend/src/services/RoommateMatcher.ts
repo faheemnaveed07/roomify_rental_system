@@ -36,21 +36,92 @@ interface MatchingWeights {
     budget: number;
     location: number;
     schedule: number;
+    interests: number;
 }
 
+// Interests/languages were collected by the profile wizard but never scored;
+// they now carry real weight so "what we have in common" shows up in the match.
 const DEFAULT_WEIGHTS: MatchingWeights = {
-    lifestyle: 0.25,
-    preferences: 0.25,
-    budget: 0.20,
-    location: 0.15,
-    schedule: 0.15,
+    lifestyle: 0.22,
+    preferences: 0.22,
+    budget: 0.18,
+    location: 0.13,
+    schedule: 0.13,
+    interests: 0.12,
 };
+
+/**
+ * A smoker and a strict non-smoker can still score ~75 on everything else,
+ * which reads as a good match while being unlivable in practice. Hard
+ * incompatibilities therefore cap the overall score instead of just lowering
+ * one category.
+ */
+const SMOKING_CLASH_CAP = 45;
+const GENDER_MISMATCH_PROPERTY_CAP = 25;
 
 export class RoommateMatcher {
     private weights: MatchingWeights;
 
     constructor(weights: Partial<MatchingWeights> = {}) {
         this.weights = { ...DEFAULT_WEIGHTS, ...weights };
+    }
+
+    /**
+     * The pure scoring core: computes the full breakdown for two loaded
+     * profiles, entirely in memory. Both public entry points funnel through
+     * here so a pair can never score differently depending on which API asked.
+     */
+    computeCompatibility(
+        profile1: IRoommateProfile,
+        profile2: IRoommateProfile
+    ): { overallScore: number; breakdown: CompatibilityBreakdown[] } {
+        const categories: [string, number, number][] = [
+            ['Lifestyle', this.calculateLifestyleScore(profile1, profile2), this.weights.lifestyle],
+            ['Preferences', this.calculatePreferencesScore(profile1, profile2), this.weights.preferences],
+            ['Budget', this.calculateBudgetScore(profile1, profile2), this.weights.budget],
+            ['Location', this.calculateLocationScore(profile1, profile2), this.weights.location],
+            ['Schedule', this.calculateScheduleScore(profile1, profile2), this.weights.schedule],
+            ['Interests', this.calculateInterestsScore(profile1, profile2), this.weights.interests],
+        ];
+
+        const breakdown: CompatibilityBreakdown[] = categories.map(([category, score, weight]) => ({
+            category,
+            score,
+            weight,
+            weightedScore: score * weight,
+        }));
+
+        let overallScore = Math.round(
+            breakdown.reduce((sum, item) => sum + item.weightedScore, 0)
+        );
+
+        // Deal-breaker: a smoker paired with a strict non-smoker cannot be a
+        // "good" match no matter how aligned everything else is.
+        const s1 = profile1.preferences.smokingPreference;
+        const s2 = profile2.preferences.smokingPreference;
+        const smokingClash =
+            (s1 === 'smoker' && s2 === 'non_smoker') ||
+            (s1 === 'non_smoker' && s2 === 'smoker');
+        if (smokingClash) overallScore = Math.min(overallScore, SMOKING_CLASH_CAP);
+
+        return { overallScore, breakdown };
+    }
+
+    /**
+     * Gender acceptance is a hard filter, not a score: someone who only wants
+     * a female roommate must never be shown male candidates at 75%.
+     */
+    private mutuallyGenderCompatible(
+        profile1: IRoommateProfile,
+        profile2: IRoommateProfile
+    ): boolean {
+        const p1Accepts =
+            profile1.preferences.genderPreference === 'any' ||
+            profile1.preferences.genderPreference === profile2.gender;
+        const p2Accepts =
+            profile2.preferences.genderPreference === 'any' ||
+            profile2.preferences.genderPreference === profile1.gender;
+        return p1Accepts && p2Accepts;
     }
 
     /**
@@ -69,70 +140,32 @@ export class RoommateMatcher {
             throw new Error('One or both profiles not found');
         }
 
-        const breakdown: CompatibilityBreakdown[] = [];
+        const { overallScore, breakdown } = this.computeCompatibility(profile1, profile2);
 
-        // Calculate individual category scores
-        const lifestyleScore = this.calculateLifestyleScore(profile1, profile2);
-        breakdown.push({
-            category: 'Lifestyle',
-            score: lifestyleScore,
-            weight: this.weights.lifestyle,
-            weightedScore: lifestyleScore * this.weights.lifestyle,
-        });
-
-        const preferencesScore = this.calculatePreferencesScore(profile1, profile2);
-        breakdown.push({
-            category: 'Preferences',
-            score: preferencesScore,
-            weight: this.weights.preferences,
-            weightedScore: preferencesScore * this.weights.preferences,
-        });
-
-        const budgetScore = this.calculateBudgetScore(profile1, profile2);
-        breakdown.push({
-            category: 'Budget',
-            score: budgetScore,
-            weight: this.weights.budget,
-            weightedScore: budgetScore * this.weights.budget,
-        });
-
-        const locationScore = this.calculateLocationScore(profile1, profile2);
-        breakdown.push({
-            category: 'Location',
-            score: locationScore,
-            weight: this.weights.location,
-            weightedScore: locationScore * this.weights.location,
-        });
-
-        const scheduleScore = this.calculateScheduleScore(profile1, profile2);
-        breakdown.push({
-            category: 'Schedule',
-            score: scheduleScore,
-            weight: this.weights.schedule,
-            weightedScore: scheduleScore * this.weights.schedule,
-        });
-
-        // Calculate overall weighted score
-        const overallScore = Math.round(
-            breakdown.reduce((sum, item) => sum + item.weightedScore, 0)
-        );
-
-        // Store compatibility score in both profiles
-        await this.storeCompatibilityScore(profile1, profile2._id.toString(), overallScore);
-        await this.storeCompatibilityScore(profile2, profile1._id.toString(), overallScore);
+        // Cache the score on both sides for display purposes.
+        await Promise.all([
+            this.storeCompatibilityScore(profile1._id.toString(), profile2._id.toString(), overallScore),
+            this.storeCompatibilityScore(profile2._id.toString(), profile1._id.toString(), overallScore),
+        ]);
 
         logger.info(`Compatibility calculated: ${profileId1} <-> ${profileId2}: ${overallScore}`);
 
         return {
-            userId: profile1.user.toString(),
-            matchedUserId: profile2.user.toString(),
+            userId: profile1.user._id ? profile1.user._id.toString() : profile1.user.toString(),
+            matchedUserId: profile2.user._id ? profile2.user._id.toString() : profile2.user.toString(),
             overallScore,
             breakdown,
         };
     }
 
     /**
-     * Find top matches for a given profile
+     * Find top matches for a given profile.
+     *
+     * Always computes fresh, in memory, from a single candidate query: the old
+     * version re-fetched both profiles and saved both documents per pair, and
+     * served cached numbers that (a) went stale the moment someone edited
+     * their profile and (b) came back with an empty breakdown, so match cards
+     * randomly lost their detail bars.
      */
     async findMatches(
         profileId: string,
@@ -144,42 +177,60 @@ export class RoommateMatcher {
             throw new Error('Profile not found');
         }
 
-        // Get all active profiles except the current one
         const candidates = await RoommateProfile.find({
             _id: { $ne: profileId },
             isActive: true,
         });
 
         const results: CompatibilityResult[] = [];
+        const cacheOps: { profileId: string; matchedId: string; score: number }[] = [];
 
         for (const candidate of candidates) {
             try {
-                // Check if we already have a cached score
-                const cachedScore = profile.compatibilityScore.get(candidate._id.toString());
+                // Hard filter first: mutually unacceptable genders never match.
+                if (!this.mutuallyGenderCompatible(profile, candidate)) continue;
 
-                if (cachedScore !== undefined && cachedScore >= minScore) {
+                const { overallScore, breakdown } = this.computeCompatibility(profile, candidate);
+
+                cacheOps.push({
+                    profileId: profile._id.toString(),
+                    matchedId: candidate._id.toString(),
+                    score: overallScore,
+                });
+                cacheOps.push({
+                    profileId: candidate._id.toString(),
+                    matchedId: profile._id.toString(),
+                    score: overallScore,
+                });
+
+                if (overallScore >= minScore) {
                     results.push({
                         userId: profile.user.toString(),
                         matchedUserId: candidate.user.toString(),
-                        overallScore: cachedScore,
-                        breakdown: [],
+                        overallScore,
+                        breakdown,
                     });
-                } else if (cachedScore === undefined) {
-                    // Calculate new score
-                    const result = await this.calculateCompatibility(
-                        profileId,
-                        candidate._id.toString()
-                    );
-                    if (result.overallScore >= minScore) {
-                        results.push(result);
-                    }
                 }
             } catch (error) {
                 logger.error(`Error calculating match for ${candidate._id}:`, error);
             }
         }
 
-        // Sort by score descending and limit
+        // Persist the display cache in one round trip instead of 2N saves.
+        if (cacheOps.length > 0) {
+            // Cast: mongoose's BulkWrite typings reject dynamic $set keys on a
+            // Map-typed path even though the operation itself is valid.
+            await RoommateProfile.bulkWrite(
+                cacheOps.map((op) => ({
+                    updateOne: {
+                        filter: { _id: op.profileId },
+                        update: { $set: { [`compatibilityScore.${op.matchedId}`]: op.score } },
+                    },
+                })) as Parameters<typeof RoommateProfile.bulkWrite>[0],
+                { ordered: false }
+            ).catch((err) => logger.warn(`Match cache write failed: ${err}`));
+        }
+
         return results
             .sort((a, b) => b.overallScore - a.overallScore)
             .slice(0, limit);
@@ -352,7 +403,9 @@ export class RoommateMatcher {
     }
 
     /**
-     * Calculate location preference compatibility
+     * Calculate location preference compatibility.
+     * Fuzzy: "gulberg" and "Gulberg Lahore" count as the same area — exact
+     * string equality made free-text locations almost never overlap.
      */
     private calculateLocationScore(
         profile1: IRoommateProfile,
@@ -365,15 +418,56 @@ export class RoommateMatcher {
             return 50; // Neutral if no location preference
         }
 
-        const locations1 = profile1.preferredLocations.map((l) => l.toLowerCase());
-        const locations2 = profile2.preferredLocations.map((l) => l.toLowerCase());
+        const norm = (l: string) => l.toLowerCase().trim();
+        const locations1 = profile1.preferredLocations.map(norm);
+        const locations2 = profile2.preferredLocations.map(norm);
 
-        const commonLocations = locations1.filter((l) => locations2.includes(l));
+        const overlaps = (a: string, b: string) =>
+            a === b || a.includes(b) || b.includes(a);
+
+        const matched1 = locations1.filter((l1) => locations2.some((l2) => overlaps(l1, l2)));
+        const matched2 = locations2.filter((l2) => locations1.some((l1) => overlaps(l1, l2)));
+        const common = Math.max(matched1.length, matched2.length);
         const totalUnique = new Set([...locations1, ...locations2]).size;
 
-        if (commonLocations.length === 0) return 0;
+        if (common === 0) return 0;
+        return Math.min(100, Math.round((common / Math.min(totalUnique, locations1.length + locations2.length - common)) * 100));
+    }
 
-        return Math.round((commonLocations.length / totalUnique) * 100);
+    /**
+     * Interests & languages overlap. The wizard collects both, so they should
+     * count: shared hobbies predict day-to-day harmony, and a shared language
+     * matters in a multilingual market. Jaccard overlap, blended 70/30, with a
+     * neutral 50 when either side gave us nothing to compare.
+     */
+    private calculateInterestsScore(
+        profile1: IRoommateProfile,
+        profile2: IRoommateProfile
+    ): number {
+        const norm = (s: string) => s.toLowerCase().trim();
+        const jaccard = (a: string[], b: string[]): number | null => {
+            const setA = new Set(a.map(norm).filter(Boolean));
+            const setB = new Set(b.map(norm).filter(Boolean));
+            if (setA.size === 0 || setB.size === 0) return null;
+            const shared = [...setA].filter((x) => setB.has(x)).length;
+            const union = new Set([...setA, ...setB]).size;
+            return shared / union;
+        };
+
+        const interestOverlap = jaccard(profile1.interests ?? [], profile2.interests ?? []);
+        const languageOverlap = jaccard(profile1.languages ?? [], profile2.languages ?? []);
+
+        if (interestOverlap === null && languageOverlap === null) return 50;
+
+        // Any shared language at all is what matters, not how many.
+        const languageScore =
+            languageOverlap === null ? 50 : languageOverlap > 0 ? 100 : 20;
+        const interestScore =
+            interestOverlap === null
+                ? 50
+                : Math.round(Math.min(1, interestOverlap * 2) * 100); // 50% overlap already = full marks
+
+        return Math.round(interestScore * 0.7 + languageScore * 0.3);
     }
 
     /**
@@ -449,15 +543,19 @@ export class RoommateMatcher {
     }
 
     /**
-     * Store compatibility score in profile
+     * Store compatibility score in profile.
+     * Atomic field update — a full document save() here raced with concurrent
+     * calculations and could silently overwrite unrelated profile changes.
      */
     private async storeCompatibilityScore(
-        profile: IRoommateProfile,
+        profileId: string,
         matchedProfileId: string,
         score: number
     ): Promise<void> {
-        profile.compatibilityScore.set(matchedProfileId, score);
-        await profile.save();
+        await RoommateProfile.updateOne(
+            { _id: profileId },
+            { $set: { [`compatibilityScore.${matchedProfileId}`]: score } }
+        );
     }
 
     /**
@@ -546,9 +644,19 @@ export class RoommateMatcher {
             weightedScore: scheduleScore * weights.schedule,
         });
 
-        const overallScore = Math.round(
+        let overallScore = Math.round(
             breakdown.reduce((sum, item) => sum + item.weightedScore, 0)
         );
+
+        // Deal-breaker: a girls-only shared room shown to a male tenant used to
+        // score up to ~90 because gender sat inside a 10% category. If the room's
+        // gender rule excludes this user, the match can never be good.
+        if (property.propertyType === 'shared_room') {
+            const propGenderPref = property.sharedRoomDetails?.genderPreference || 'any';
+            if (propGenderPref !== 'any' && propGenderPref !== profile.gender) {
+                overallScore = Math.min(overallScore, GENDER_MISMATCH_PROPERTY_CAP);
+            }
+        }
 
         return {
             propertyId: property._id.toString(),

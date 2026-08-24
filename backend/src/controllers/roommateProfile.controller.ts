@@ -103,6 +103,22 @@ export class RoommateProfileController {
                 return;
             }
 
+            // The person's answers just changed, so every cached score involving
+            // them is stale: clear this profile's own cache and remove its entry
+            // from everyone else's. (Nothing ever invalidated these before, so
+            // matches kept showing pre-edit numbers.)
+            const profileId = String(profile._id);
+            await Promise.all([
+                RoommateProfile.updateOne(
+                    { _id: profileId },
+                    { $set: { compatibilityScore: {} } }
+                ),
+                RoommateProfile.updateMany(
+                    { [`compatibilityScore.${profileId}`]: { $exists: true } },
+                    { $unset: { [`compatibilityScore.${profileId}`]: '' } }
+                ),
+            ]).catch(() => { /* cache hygiene only — never block the update */ });
+
             const response: ApiResponse = {
                 success: true,
                 message: 'Profile updated successfully',

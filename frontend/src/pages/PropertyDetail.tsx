@@ -27,6 +27,9 @@ const PropertyDetailPage: React.FC = () => {
     const [requestMessage, setRequestMessage] = useState('Hi, I am interested in this property.');
     const [moveInDate, setMoveInDate] = useState('');
     const [error, setError] = useState<string | null>(null);
+    // The DB can reference an upload the host has since dropped; swap a dead
+    // hero image for the placeholder instead of a broken-image icon.
+    const [heroImgFailed, setHeroImgFailed] = useState(false);
 
     // Matching
     const [matchScore, setMatchScore] = useState<number | null>(null);
@@ -135,14 +138,18 @@ const PropertyDetailPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-2">
                     <div className="rounded-3xl overflow-hidden bg-neutral-200 h-[500px] mb-8">
-                        {property.images?.[0]?.url ? (
+                        {property.images?.[0]?.url && !heroImgFailed ? (
                             <img
                                 src={resolveAssetUrl(property.images[0])}
                                 alt={property.title}
+                                onError={() => setHeroImgFailed(true)}
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div className="w-full h-full flex items-center justify-center text-neutral-400">No Image</div>
+                            <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-neutral-400">
+                                <span className="text-5xl" aria-hidden>🏠</span>
+                                <span className="text-sm font-medium">Photo coming soon</span>
+                            </div>
                         )}
                     </div>
 
