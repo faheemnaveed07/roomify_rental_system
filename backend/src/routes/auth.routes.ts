@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authController } from '../controllers/auth.controller';
 import { authenticate } from '../middleware/auth.middleware';
+import { avatarUpload } from '../middleware/upload.middleware';
 import {
     authLimiter,
     passwordLimiter,
@@ -32,5 +33,12 @@ router.post('/reset-password/:token', passwordLimiter, authController.resetPassw
 // ✅ Protected routes (no additional rate limiting needed)
 router.post('/logout', authenticate, authController.logout.bind(authController));
 router.get('/profile', authenticate, authController.getProfile.bind(authController));
+router.put(
+    '/profile/avatar',
+    authenticate,
+    avatarUpload.single('avatar'),
+    authController.updateAvatar.bind(authController)
+);
+router.delete('/profile/avatar', authenticate, authController.removeAvatar.bind(authController));
 
 export default router;

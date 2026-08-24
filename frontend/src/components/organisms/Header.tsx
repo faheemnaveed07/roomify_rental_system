@@ -23,8 +23,28 @@ import {
 import { useAuthStore } from '../../store/auth.store';
 import { useChatStore } from '../../store/chat.store';
 import { UserRole } from '@shared/types';
+import { resolveAssetUrl } from '../../services/api';
+import AvatarUpload from '../molecules/AvatarUpload';
 
 type NavItem = { label: string; path: string; icon: React.ElementType };
+
+/** Small display-only avatar for the menu trigger — falls back to the initial. */
+const MiniAvatar: React.FC = () => {
+    const { user } = useAuthStore();
+    const [failed, setFailed] = useState(false);
+    useEffect(() => setFailed(false), [user?.avatar]);
+    const url = user?.avatar ? resolveAssetUrl(user.avatar) : '';
+
+    return (
+        <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white text-xs font-bold">
+            {url && !failed ? (
+                <img src={url} alt="" className="h-full w-full object-cover" onError={() => setFailed(true)} />
+            ) : (
+                user?.firstName?.[0] || 'U'
+            )}
+        </span>
+    );
+};
 
 const Header: React.FC = () => {
     const { isAuthenticated, user, logout } = useAuthStore();
@@ -309,9 +329,7 @@ const Header: React.FC = () => {
                                 whileTap={{ scale: 0.97 }}
                                 className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
                             >
-                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-700 text-white text-xs font-bold">
-                                    {user?.firstName?.[0] || 'U'}
-                                </span>
+                                <MiniAvatar />
                                 <span className="hidden sm:block max-w-[130px] truncate">{displayName}</span>
                                 <ChevronDown
                                     size={14}
@@ -328,10 +346,13 @@ const Header: React.FC = () => {
                                         transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
                                         className="absolute right-0 mt-2.5 w-64 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60"
                                     >
-                                        {/* Identity header */}
-                                        <div className="px-4 py-3.5 border-b border-slate-100 bg-slate-50/60">
-                                            <p className="text-sm font-semibold text-slate-900 truncate">{displayName}</p>
-                                            <p className="text-xs text-slate-400 capitalize mt-0.5">{user?.role}</p>
+                                        {/* Identity header — click the avatar to change the photo */}
+                                        <div className="px-4 py-3.5 border-b border-slate-100 bg-slate-50/60 flex items-center gap-3">
+                                            <AvatarUpload size={44} showRemove />
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-semibold text-slate-900 truncate">{displayName}</p>
+                                                <p className="text-xs text-slate-400 capitalize mt-0.5">{user?.role}</p>
+                                            </div>
                                         </div>
 
                                         <div className="p-2 space-y-0.5">

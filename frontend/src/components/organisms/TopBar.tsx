@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth.store';
 import { Menu, Home } from 'lucide-react';
+import AvatarUpload from '../molecules/AvatarUpload';
 
 const TopBar: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
     const { user } = useAuthStore();
@@ -33,9 +34,8 @@ const TopBar: React.FC<{ onMenuClick: () => void }> = ({ onMenuClick }) => {
                     </p>
                     <p className="text-[11px] text-slate-400 capitalize">{user?.role}</p>
                 </div>
-                <div className="h-9 w-9 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center text-white text-sm font-bold shadow-sm shadow-primary-200">
-                    {user?.firstName?.[0]}{user?.lastName?.[0]}
-                </div>
+                {/* Click to upload / change the profile photo */}
+                <AvatarUpload size={36} rounded="rounded-xl" />
             </div>
         </header>
     );

@@ -9,6 +9,7 @@ interface AuthState {
     loading: boolean;
     error: string | null;
     setAuth: (response: AuthResponse) => void;
+    setAvatar: (avatar: string | null) => void;
     clearAuth: () => void;
     validateSession: () => Promise<void>;
     login: (credentials: { email: string; password: string }) => Promise<void>;
@@ -34,6 +35,8 @@ export const useAuthStore = create<AuthState>()(
                     error: null,
                 });
             },
+            setAvatar: (avatar) =>
+                set((state) => (state.user ? { user: { ...state.user, avatar } } : {})),
             clearAuth: () => {
                 // ✅ No localStorage — cookies cleared by server
                 set({

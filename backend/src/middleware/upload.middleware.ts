@@ -4,6 +4,7 @@ import fs from 'fs';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/jpg'];
+const AVATAR_MIME_TYPES = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
 const CHAT_MIME_TYPES = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
 const PAYMENT_PROOF_MIME_TYPES = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
 
@@ -45,6 +46,12 @@ const createFileFilter = (allowedMimeTypes: string[]) => {
 export const imageUpload = multer({
     storage: createStorage('images'),
     fileFilter: createFileFilter(IMAGE_MIME_TYPES),
+    limits: { fileSize: MAX_FILE_SIZE },
+});
+
+export const avatarUpload = multer({
+    storage: createStorage('avatars'),
+    fileFilter: createFileFilter(AVATAR_MIME_TYPES),
     limits: { fileSize: MAX_FILE_SIZE },
 });
 

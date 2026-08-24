@@ -157,6 +157,20 @@ export const authService = {
         const response = await api.get<ApiResponse<never>>(`/auth/verify-email/${token}`);
         return response.data.message;
     },
+    /** Upload a new profile photo; returns the stored avatar path. */
+    updateAvatar: async (file: File): Promise<string> => {
+        const formData = new FormData();
+        formData.append('avatar', file);
+        const response = await api.put<ApiResponse<{ avatar: string }>>(
+            '/auth/profile/avatar',
+            formData,
+            { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
+        return response.data.data!.avatar;
+    },
+    removeAvatar: async (): Promise<void> => {
+        await api.delete('/auth/profile/avatar');
+    },
 };
 
 export interface VerificationMilestone {

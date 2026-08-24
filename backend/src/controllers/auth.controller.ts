@@ -253,6 +253,73 @@ export class AuthController {
             next(error);
         }
     }
+
+    // ─── Profile avatar ──────────────────────────────────────────────
+    // PUT /auth/profile/avatar — multipart upload (field: "avatar").
+    // Any authenticated user (tenant, landlord, admin) can set their photo.
+    async updateAvatar(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.user?.userId;
+            const file = req.file;
+
+            if (!file) {
+                res.status(400).json({
+                    success: false,
+                    message: 'No image file received. Attach an image as the "avatar" field.',
+                });
+                return;
+            }
+
+            const avatarUrl = `/uploads/avatars/${file.filename}`;
+
+            const user = await User.findByIdAndUpdate(
+                userId,
+                { avatar: avatarUrl },
+                { new: true }
+            ).select('avatar');
+
+            if (!user) {
+                res.status(404).json({ success: false, message: 'User not found' });
+                return;
+            }
+
+            const response: ApiResponse = {
+                success: true,
+                message: 'Profile photo updated',
+                data: { avatar: avatarUrl },
+            };
+            res.json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    // DELETE /auth/profile/avatar — go back to initials.
+    async removeAvatar(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const userId = req.user?.userId;
+
+            const user = await User.findByIdAndUpdate(
+                userId,
+                { avatar: null },
+                { new: true }
+            ).select('avatar');
+
+            if (!user) {
+                res.status(404).json({ success: false, message: 'User not found' });
+                return;
+            }
+
+            const response: ApiResponse = {
+                success: true,
+                message: 'Profile photo removed',
+                data: { avatar: null },
+            };
+            res.json(response);
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
 export const authController = new AuthController();
