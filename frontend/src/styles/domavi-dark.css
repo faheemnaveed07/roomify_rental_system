@@ -676,6 +676,23 @@
 .dv-app .bg-\[\#1E293B\] { background-color: var(--dv-bg-elev) !important; }
 .dv-app .from-primary-500 { --tw-gradient-from: #d4845a var(--tw-gradient-from-position) !important; }
 .dv-app .to-primary-700 { --tw-gradient-to: #a06030 var(--tw-gradient-to-position) !important; }
+/* Light-theme gradient stops. These utilities set their own --tw-gradient-*
+   vars, so none of the bg-* remaps above touch them: the roommate wizard kept
+   a white card header (invisible near-white heading on it) and a pale page
+   backdrop. Repaint the stops dark instead. */
+.dv-app .from-slate-50 {
+    --tw-gradient-from: #101010 var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgb(16 16 16 / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.dv-app .via-blue-50\/30 {
+    --tw-gradient-to: rgb(16 16 16 / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), #151515 var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+}
+.dv-app .to-slate-100 { --tw-gradient-to: #181818 var(--tw-gradient-to-position) !important; }
+.dv-app .to-white { --tw-gradient-to: #141414 var(--tw-gradient-to-position) !important; }
+/* Off-palette blue stop on the matches hero tile — keep it in the brand */
+.dv-app .to-blue-400 { --tw-gradient-to: #e89a6c var(--tw-gradient-to-position) !important; }
 .dv-app .shadow-primary-200,
 .dv-app .shadow-primary-200\/60 { --tw-shadow-color: transparent !important; }
 

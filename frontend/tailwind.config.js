@@ -40,6 +40,13 @@ export default {
                 },
                 /* App brand colors */
                 primary: {
+                    // Without DEFAULT, Tailwind never generated bg-primary/80,
+                    // bg-primary/5, via-primary/80 etc. — the analytics revenue
+                    // bars carried a class that didn't exist and rendered
+                    // invisible. The token resolves per theme scope (.dv-app
+                    // overrides it to terracotta).
+                    DEFAULT: 'hsl(var(--primary))',
+                    foreground: 'hsl(var(--primary-foreground))',
                     50: '#EFF6FF',
                     100: '#DBEAFE',
                     200: '#BFDBFE',
