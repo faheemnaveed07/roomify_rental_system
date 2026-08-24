@@ -42,7 +42,7 @@ const OUTER_ITEMS = [
 ];
 
 const INNER_ITEMS = [
-    { Icon: MapPin, label: 'Multan' },
+    { Icon: MapPin, label: 'Pakistan' },
     { Icon: Sparkles, label: 'Furnished' },
     { Icon: ShieldCheck, label: 'Verified' },
 ];

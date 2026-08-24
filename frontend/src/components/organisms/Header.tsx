@@ -161,7 +161,7 @@ const Header: React.FC = () => {
                         <span>
                             <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">PROPERTY RENTAL SYSTEM</span>
                             <span className="block font-mono text-[10px] text-[var(--muted)] tracking-[0.3em] mt-0.5">
-                                TRUST · HOME · <span className="font-urdu">گھر</span>
+                                TRUST · HOME
                             </span>
                         </span>
                     </Link>
@@ -185,7 +185,7 @@ const Header: React.FC = () => {
                     <div className="flex items-center gap-5">
                         <div className="hidden md:flex items-center gap-2 font-mono text-[11px] text-[var(--muted)]">
                             <MapPin className="w-3 h-3 text-[var(--accent)]" />
-                            <span>MULTAN · BZU · PAKISTAN</span>
+                            <span>AVAILABLE ACROSS PAKISTAN</span>
                         </div>
                         <Link
                             to="/auth"
@@ -194,10 +194,10 @@ const Header: React.FC = () => {
                             Sign In
                         </Link>
                         <Link
-                            to="/auth"
+                            to="/auth?tab=register"
                             className="hidden sm:inline-block font-heading text-xs tracking-[0.2em] uppercase text-black bg-[var(--accent)] px-5 py-2.5 hover:bg-[var(--accent-bright)] transition-colors"
                         >
-                            Get Verified
+                            Sign Up
                         </Link>
                         <button
                             type="button"
@@ -244,11 +244,11 @@ const Header: React.FC = () => {
                     </nav>
                     <div className="mt-auto">
                         <Link
-                            to="/auth"
+                            to="/auth?tab=register"
                             onClick={closeMobile}
                             className="block text-center font-heading text-xs tracking-[0.2em] uppercase text-black bg-[var(--accent)] px-5 py-3 hover:bg-[var(--accent-bright)] transition-colors"
                         >
-                            Get Verified
+                            Sign Up
                         </Link>
                     </div>
                 </div>

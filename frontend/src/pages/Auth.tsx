@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -56,7 +56,11 @@ const passwordInputCls = 'dv-input !pr-10 text-sm';
 
 // ─── Main page ───────────────────────────────────────────────────────
 const AuthPage: React.FC = () => {
-    const [tab, setTab] = useState<'login' | 'register'>('login');
+    // The header's Sign Up button deep-links to the register tab.
+    const [searchParams] = useSearchParams();
+    const [tab, setTab] = useState<'login' | 'register'>(
+        searchParams.get('tab') === 'register' ? 'register' : 'login'
+    );
     const [showLoginPw, setShowLoginPw] = useState(false);
     const [showRegPw, setShowRegPw] = useState(false);
 
@@ -145,7 +149,7 @@ const AuthPage: React.FC = () => {
                                 <span className="text-stroke">People you'll click with</span>
                             </h1>
                             <p className="mt-5 text-lg text-[var(--fg-dim)] max-w-md leading-relaxed">
-                                Every member CNIC-verified. Real listings, secure agreements, and roommate matching, built for Multan.
+                                Every member CNIC-verified. Real listings, secure agreements, and roommate matching, built for Pakistan.
                             </p>
                         </div>
 

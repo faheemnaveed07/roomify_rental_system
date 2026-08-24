@@ -349,7 +349,7 @@ const Step2BudgetLocation: React.FC<StepProps> = ({ errors, watch, setValue }) =
                     Preferred Locations *
                 </label>
                 <p className="text-xs text-slate-400 mb-2">
-                    Add areas in Multan or other cities (e.g. Gulshan Iqbal, DHA Multan)
+                    Add the areas or cities you prefer (e.g. DHA Lahore, Gulshan-e-Iqbal Karachi)
                 </p>
                 <TagInput
                     tags={locations}

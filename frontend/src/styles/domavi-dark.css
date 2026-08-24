@@ -52,6 +52,14 @@
     background-blend-mode: normal, normal, overlay;
 }
 
+/* Anchors: globals.css paints every unclassed <a> in the light theme's blue,
+   which is not part of either dark palette (footer quick links, Terms/Privacy
+   turned blue). Inherit the surrounding text colour instead; :where() keeps
+   specificity at (0,0,1) so any text-* utility still wins, and this file loads
+   after globals.css so the tie resolves here. */
+:where(.domavi-dark) a,
+:where(.dv-app) a { color: inherit; }
+
 /* Font-family helpers (mirror Tailwind font-* but safe inside the scope) */
 .domavi-dark .font-display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.005em; }
 .domavi-dark .font-heading { font-family: 'Oswald', sans-serif; }

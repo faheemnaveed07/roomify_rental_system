@@ -96,19 +96,19 @@ const GOALS = [
 ];
 
 const LISTINGS = [
-    { seed: 'photo-1505691938895-1758d7feb511', title: 'PRIVATE ROOM · BZU', area: 'BOSAN ROAD, MULTAN', price: '₨12,000/mo', host: 'AHMED R.', hostSeed: 'photo-1633332755192-727a05c4013d', match: '92%', type: 'room' },
-    { seed: 'photo-1560448204-e02f11c3d0e2', title: '2-BED · GULGASHT', area: 'GULGASHT COLONY, MULTAN', price: '₨28,000/mo', host: 'HASSAN M.', hostSeed: 'photo-1507003211169-0a1dd7228f2d', match: 'WHOLE', type: 'place' },
-    { seed: 'photo-1502672260266-1c1ef2d93688', title: 'SHARED ROOM · GIRLS', area: 'SHAH RUKN-E-ALAM', price: '₨9,500/mo', host: 'FATIMA N.', hostSeed: 'photo-1494790108377-be9c29b29330', match: '87%', type: 'roommate' },
-    { seed: 'photo-1522708323590-d24dbb6b0267', title: 'STUDIO · CANTT', area: 'CANTT AREA, MULTAN', price: '₨22,000/mo', host: 'BILAL K.', hostSeed: 'photo-1568602471122-7832951cc4c5', match: 'WHOLE', type: 'place' },
-    { seed: 'photo-1598928506311-c55ded91a20c', title: 'PRIVATE ROOM · NFC', area: 'NEW MULTAN', price: '₨11,000/mo', host: 'ZAINAB A.', hostSeed: 'photo-1438761681033-6461ffad8d80', match: '90%', type: 'room' },
-    { seed: 'photo-1493809842364-78817add7ffb', title: 'ROOMMATE WANTED', area: 'MUMTAZABAD, MULTAN', price: '₨8,000/mo', host: 'OMAR S.', hostSeed: 'photo-1500648767791-00dcc994a43e', match: '84%', type: 'roommate' },
+    { seed: 'photo-1505691938895-1758d7feb511', title: 'PRIVATE ROOM', area: 'GULBERG, LAHORE', price: '₨12,000/mo', host: 'AHMED R.', hostSeed: 'photo-1633332755192-727a05c4013d', match: '92%', type: 'room' },
+    { seed: 'photo-1560448204-e02f11c3d0e2', title: '2-BED APARTMENT', area: 'GULSHAN-E-IQBAL, KARACHI', price: '₨28,000/mo', host: 'HASSAN M.', hostSeed: 'photo-1507003211169-0a1dd7228f2d', match: 'WHOLE', type: 'place' },
+    { seed: 'photo-1502672260266-1c1ef2d93688', title: 'SHARED ROOM · GIRLS', area: 'F-11, ISLAMABAD', price: '₨9,500/mo', host: 'FATIMA N.', hostSeed: 'photo-1494790108377-be9c29b29330', match: '87%', type: 'roommate' },
+    { seed: 'photo-1522708323590-d24dbb6b0267', title: 'STUDIO', area: 'CANTT, RAWALPINDI', price: '₨22,000/mo', host: 'BILAL K.', hostSeed: 'photo-1568602471122-7832951cc4c5', match: 'WHOLE', type: 'place' },
+    { seed: 'photo-1598928506311-c55ded91a20c', title: 'PRIVATE ROOM', area: 'GULGASHT, MULTAN', price: '₨11,000/mo', host: 'ZAINAB A.', hostSeed: 'photo-1438761681033-6461ffad8d80', match: '90%', type: 'room' },
+    { seed: 'photo-1493809842364-78817add7ffb', title: 'ROOMMATE WANTED', area: 'HAYATABAD, PESHAWAR', price: '₨8,000/mo', host: 'OMAR S.', hostSeed: 'photo-1500648767791-00dcc994a43e', match: '84%', type: 'roommate' },
 ];
 
 const STORIES = [
-    { seed: 'photo-1494790108377-be9c29b29330', name: 'AYESHA K.', meta: 'Tenant · Gulgasht', quote: 'Property Rental System helped me lock in a CNIC-verified home within 24 hours. No agent, no scam, no stress.' },
+    { seed: 'photo-1494790108377-be9c29b29330', name: 'AYESHA K.', meta: 'Tenant · Lahore', quote: 'Property Rental System helped me lock in a CNIC-verified home within 24 hours. No agent, no scam, no stress.' },
     { seed: 'photo-1507003211169-0a1dd7228f2d', name: 'USMAN T.', meta: 'Landlord · 3 properties', quote: 'I filled all three of my properties through Property Rental System. Tenants arrive already verified. That changes everything.' },
-    { seed: 'photo-1438761681033-6461ffad8d80', name: 'SARA M.', meta: 'Tenant · DHA Multan', quote: 'The roommate matching is unreal. Found someone with my exact schedule and budget in under a week.' },
-    { seed: 'photo-1633332755192-727a05c4013d', name: 'HAMZA R.', meta: 'Student · BZU', quote: 'Coming from another city, I had no contacts. Property Rental System made finding a safe room near campus actually easy.' },
+    { seed: 'photo-1438761681033-6461ffad8d80', name: 'SARA M.', meta: 'Tenant · Karachi', quote: 'The roommate matching is unreal. Found someone with my exact schedule and budget in under a week.' },
+    { seed: 'photo-1633332755192-727a05c4013d', name: 'HAMZA R.', meta: 'Student · Islamabad', quote: 'Coming from another city, I had no contacts. Property Rental System made finding a safe room near campus actually easy.' },
 ];
 
 const MATCH_ROWS = [

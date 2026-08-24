@@ -46,7 +46,7 @@ const PublicLayout: React.FC = () => (
                         </span>
                         <span>
                             <span className="block font-display text-2xl leading-none tracking-wider text-[var(--fg)]">PROPERTY RENTAL SYSTEM</span>
-                            <span className="block font-mono text-[9px] text-[var(--muted)] tracking-[0.3em] mt-0.5">TRUST · HOME · <span className="font-urdu">گھر</span></span>
+                            <span className="block font-mono text-[9px] text-[var(--muted)] tracking-[0.3em] mt-0.5">TRUST · HOME</span>
                         </span>
                     </div>
                     <p className="max-w-xs text-sm leading-relaxed">A home you can trust. People you'll click with — CNIC-verified rentals &amp; roommate matching for Pakistan.</p>
@@ -61,12 +61,12 @@ const PublicLayout: React.FC = () => (
                 </div>
                 <div>
                     <h4 className="font-heading text-sm tracking-[0.2em] uppercase text-[var(--fg)] mb-4">Contact</h4>
-                    <p className="font-mono text-xs tracking-wide">support@domavi.pk</p>
-                    <p className="font-mono text-xs tracking-wide mt-1.5">MULTAN · PAKISTAN</p>
+                    <p className="font-mono text-xs tracking-wide">support@propertyrentalsystem.pk</p>
+                    <p className="font-mono text-xs tracking-wide mt-1.5">PAKISTAN</p>
                 </div>
             </div>
             <div className="container border-t border-[var(--border)] mt-12 pt-8 text-center font-mono text-xs tracking-[0.15em] text-[var(--muted)]">
-                © 2026 PROPERTY RENTAL SYSTEM · BUILT FOR MULTAN
+                © 2026 PROPERTY RENTAL SYSTEM · ALL RIGHTS RESERVED
             </div>
         </footer>
     </div>
