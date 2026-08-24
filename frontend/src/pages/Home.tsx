@@ -366,7 +366,7 @@ const HomePage: React.FC = () => {
 
             {/* ===================== STATS (live from the API) ===================== */}
             {stats && (
-            <section className="border-y border-[var(--border)] bg-[var(--bg-darker)] relative overflow-hidden">
+            <section className="border-y border-[var(--border)] sec-stats relative overflow-hidden">
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10 py-16 lg:py-20">
                     <div className="reveal-stagger grid grid-cols-2 lg:grid-cols-4 gap-y-10 gap-x-6">
                         {[
@@ -388,7 +388,7 @@ const HomePage: React.FC = () => {
             )}
 
             {/* ===================== VERIFICATION ===================== */}
-            <section className="relative py-28 lg:py-36" id="verification">
+            <section className="relative py-28 lg:py-36 sec-glow-verify" id="verification">
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
                     <div className="reveal grid lg:grid-cols-12 gap-8 mb-20">
                         <div className="lg:col-span-6">
@@ -449,7 +449,7 @@ const HomePage: React.FC = () => {
             </section>
 
             {/* ===================== BROWSE BY GOAL ===================== */}
-            <section className="relative py-28 lg:py-36 border-t border-[var(--border)] bg-[var(--bg-darker)]" id="browse">
+            <section className="relative py-28 lg:py-36 border-t border-[var(--border)] sec-raised" id="browse">
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
                     <div className="reveal grid lg:grid-cols-12 gap-8 mb-16">
                         <div className="lg:col-span-5">
@@ -564,7 +564,7 @@ const HomePage: React.FC = () => {
             </section>
 
             {/* ===================== ROOMMATE MATCHING ===================== */}
-            <section className="relative py-28 lg:py-36" id="matching">
+            <section className="relative py-28 lg:py-36 sec-glow-accent" id="matching">
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
                     <div className="reveal grid lg:grid-cols-12 gap-8 mb-16">
                         <div className="lg:col-span-7">
@@ -664,7 +664,7 @@ const HomePage: React.FC = () => {
             </section>
 
             {/* ===================== TRUST & SAFETY ===================== */}
-            <section className="relative py-28 lg:py-36 border-t border-[var(--border)] bg-[var(--bg-darker)]" id="trust">
+            <section className="relative py-28 lg:py-36 border-t border-[var(--border)] sec-deep" id="trust">
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
                     <div className="reveal mb-16">
                         <div className="section-marker mb-6">
@@ -694,7 +694,7 @@ const HomePage: React.FC = () => {
             </section>
 
             {/* ===================== MEMBER STORIES ===================== */}
-            <section className="relative py-28 lg:py-36" id="stories">
+            <section className="relative py-28 lg:py-36 sec-raised border-t border-[var(--border)]" id="stories">
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10 mb-12">
                     <div className="reveal grid lg:grid-cols-12 gap-8 items-end">
                         <div className="lg:col-span-8">
@@ -748,7 +748,7 @@ const HomePage: React.FC = () => {
             </section>
 
             {/* ===================== BOOK / CTA ===================== */}
-            <section className="relative py-28 lg:py-36 border-t border-[var(--border)] bg-[var(--bg-darker)]" id="cta">
+            <section className="relative py-28 lg:py-36 border-t border-[var(--border)] sec-cta" id="cta">
                 <div className="max-w-[1600px] mx-auto px-6 lg:px-10">
                     <div className="reveal booking-frame p-10 lg:p-20 text-center">
                         <div className="section-marker justify-center mb-6 flex">

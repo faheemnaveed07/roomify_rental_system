@@ -52,6 +52,34 @@
     background-blend-mode: normal, normal, overlay;
 }
 
+/* ── Section rhythm ─────────────────────────────────────────────────
+   The landing page alternated #0a0a0a and #050505 — a 2% step the eye reads
+   as one flat slab. These bands give each section its own tonal identity:
+   warm raised panels, a deep "vault" tone for safety, and low-opacity accent
+   washes for the stats strip and final CTA. */
+.domavi-dark .sec-raised { background-color: #100e0c; }
+.domavi-dark .sec-deep { background-color: #070605; }
+.domavi-dark .sec-stats {
+    background:
+        linear-gradient(180deg, rgba(212, 132, 90, 0.09), rgba(212, 132, 90, 0.02)),
+        #0b0908;
+}
+.domavi-dark .sec-glow-verify {
+    background:
+        radial-gradient(60% 55% at 85% 0%, rgba(45, 143, 94, 0.08), transparent 62%),
+        var(--bg);
+}
+.domavi-dark .sec-glow-accent {
+    background:
+        radial-gradient(55% 50% at 10% 6%, rgba(212, 132, 90, 0.09), transparent 60%),
+        var(--bg);
+}
+.domavi-dark .sec-cta {
+    background:
+        linear-gradient(180deg, rgba(212, 132, 90, 0.14), rgba(212, 132, 90, 0.04) 55%, rgba(212, 132, 90, 0) 100%),
+        #0b0908;
+}
+
 /* Anchors: globals.css paints every unclassed <a> in the light theme's blue,
    which is not part of either dark palette (footer quick links, Terms/Privacy
    turned blue). Inherit the surrounding text colour instead; :where() keeps
